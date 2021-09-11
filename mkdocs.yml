@@ -1,0 +1,48 @@
+site_name: App Sizer
+site_description: "App Sizer is a tool designed to analyze the download size of Android applications"
+site_author: "Grab, Inc"
+site_url: "https://github.com/grab/AppSizer"
+remote_branch: gh-pages
+
+repo_name: "grab/AppSizer"
+repo_url: "https://github.com/grab/AppSizer"
+
+copyright: "Copyright 2024 Grabtaxi Holdings PTE LTE (GRAB)"
+
+theme:
+  name: "material"
+  palette:
+    primary: "cyan"
+  font:
+    text: "Roboto"
+    code: "Roboto Mono"
+  features:
+    - navigation.indexes
+
+nav:
+  - Home Page: index.md
+  - Configuration:
+      - Gradle Plugin: plugin.md
+      - Commandline Tool: cli.md
+      - Grafana & InfluxDb Docker: docker.md
+  - Reports: report.md
+  - Limitation: limitation.md
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.magiclink
+  - pymdownx.tabbed
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+
+# Customization
+extra_css:
+  - "css/site.css"

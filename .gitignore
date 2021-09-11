@@ -1,0 +1,16 @@
+*.iml
+.gradle/
+local.properties
+.idea/*
+!.idea/copyright
+sample/.idea/*
+.DS_Store
+/build/
+build/
+/captures
+
+
+# Windows thumbnail db
+# Idea non-crucial project fileS
+*.iws
+.java-version

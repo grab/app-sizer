@@ -1,0 +1,80 @@
+name: App Sizer CI
+
+on:
+    push:
+        branches: [ main, master ]
+    pull_request:
+    workflow_dispatch:
+        inputs:
+            release:
+                description: 'Trigger a release build'
+                required: false
+                default: ''
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
+env:
+    GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+    TERM: dumb
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install JDK 17
+              uses: actions/setup-java@v4
+              with:
+                  distribution: "zulu"
+                  java-version: "17"
+            - name: Build
+              run: ./gradlew assemble
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v3
+              with:
+                  name: build-artifacts
+                  path: |
+                      gradle-plugin/build/libs/*.jar
+                      clt/build/libs/*.jar
+                  retention-days: 7
+
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install JDK 17
+              uses: actions/setup-java@v4
+              with:
+                  distribution: "zulu"
+                  java-version: "17"
+            - name: Run tests
+              run: ./gradlew test
+
+    build-sample-app:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install JDK 17
+              uses: actions/setup-java@v4
+              with:
+                  distribution: "zulu"
+                  java-version: "17"
+            - name: Build sample app
+              run: |
+                  cd ./sample
+                  ./gradlew app:appSizeAnalysisProRelease --stacktrace -Dorg.gradle.debug=false --no-daemon
+
+    publish-artifact:
+        runs-on: ubuntu-latest
+        if: github.event.inputs.release == 'publish'
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install JDK 17
+              uses: actions/setup-java@v4
+              with:
+                  distribution: "zulu"
+                  java-version: "17"
+            - name: Publish to Artifactory
+              run: ./gradlew artifactoryPublish

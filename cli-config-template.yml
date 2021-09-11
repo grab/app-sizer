@@ -1,0 +1,36 @@
+project-input:
+  libraries-directory: "./path/to/libs/aars/jars/dir"
+  modules-directory: "./path/to/modules/aar/jars/dir"
+  modules-dir-is-project-root: true
+  r8-mapping-file: "./path/to/R8/mapping/file.txt"
+  owner-mapping-file: "./path/to/owner/mapping/file.yml"
+  version: "your/app/version"
+  large-file-threshold: 10
+  project-name: "your/project/name"
+apk-generation:
+  bundle-tool: "./path/to/bundle/tool.jar"
+  app-bundle-file: "./path/to/the/app/bundle.aab"
+  device-specs:
+    - "./path/to/device/spec-1.json"
+    - "./path/to/device/spec-n.json"
+  key-signing:
+    keystore-file: "./path/to/your/keystore/file.keystore"
+    keystore-pw: "keystore_password"
+    key-alias: "keystore_alias"
+    key-pw: "key_pw"
+report:
+  output-directory: "./path/to/output/report/dir"
+  custom-attributes:
+    your-custom-key: "your_custom_value"
+  influx-db-config:
+    db-name: "database name"
+    url: "db server url"
+    username: "db-username"
+    password: "db-password"
+    report-table-name: "app_size"
+    retention-policy:
+      name: "retention-policy-name"
+      duration: "value"
+      shard-duration: "value"
+      replication-factor: value
+      is-default: true/false
