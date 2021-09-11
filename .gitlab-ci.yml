@@ -1,0 +1,39 @@
+default:
+  image: gitlab.myteksi.net:4567/mobile/platform/mobile-tooling/base-android:34.0.0
+  tags:
+    - 2xlarge
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+stages:
+  - build
+  - test
+  - publish
+
+build:
+  stage: build
+  script:
+    - ./gradlew assemble
+  artifacts:
+    paths:
+      - gradle-plugin/build/libs/*.jar
+      - clt/build/libs/*.jar
+    expire_in: 1 week
+
+test:
+  stage: test
+  script:
+    - ./gradlew test
+
+build_sample_app:
+  stage: test
+  script:
+    - cd ./sample
+    - ./gradlew app:appSizeAnalysisProRelease --stacktrace -Dorg.gradle.debug=false --no-daemon
+
+publish_artifact:
+  stage: build
+  rules:
+    - if: $RELEASE == "publish"
+  script:
+    - ./gradlew artifactoryPublish

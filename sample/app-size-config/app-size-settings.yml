@@ -1,0 +1,37 @@
+project-input:
+  libraries-directory: "./build/gradle-cache/caches/modules-2/files-2.1"
+  modules-directory: "./"
+  project-root-dir: "./"
+  r8-mapping-file: "./app/build/outputs/mapping/proRelease/mapping.txt"
+  owner-mapping-file: "./module-owner.yml"
+  version: "1.0.1"
+  large-file-threshold: 10
+  project-name: "sample"
+apk-generation:
+  bundle-tool: "./binary/bundletool-all-1.15.4.jar"
+  app-bundle-file: "./app/build/outputs/bundle/proRelease/sample-bundle-file-pro-release.aab"
+  device-specs:
+    - "./app-size-config/device-1.json"
+    - "./app-size-config/device-2.json"
+  key-signing:
+    keystore-file: "./buildsystem/sample-release.keystore"
+    keystore-pw: "12345678"
+    key-alias: "key0"
+    key-pw: "12345678"
+report:
+  output-directory: "./build/app-sizer"
+  custom-attributes:
+    pipelineId: "100"
+  influx-db-config:
+    db-name: "sizer"
+    url: "http://localhost:8086"
+    username: "root"
+    password: "root"
+    report-table-name: "app_size"
+    retention-policy:
+      name: "app_sizer"
+      duration: "360d"
+      shard-duration: "0m"
+      replication-factor: 2
+      is-default: true
+

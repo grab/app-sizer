@@ -1,0 +1,590 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 3,
+  "iteration": 1718528153248,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "m2unCvxIk"
+      },
+      "description": "This graph illustrates the trend of app download sizes, grouped by their respective app versions. You have the option to apply a filter based on the Reference Device.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 6,
+            "gradientMode": "hue",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 2,
+            "pointSize": 9,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "Hover value",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "m2unCvxIk"
+          },
+          "hide": false,
+          "query": "SELECT \"size\" FROM \"app_size\" WHERE (\"type\" = 'apk_basic' and \"contributor\"= 'apk' and \"device_name\" =~ /^$reference_device$/ ) AND $timeFilter ",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "App Download Size for $tag_app_version",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "m2unCvxIk"
+          },
+          "hide": false,
+          "query": "SELECT \"size\" FROM \"app_size\" WHERE (\"type\" = 'apk_basic' and \"contributor\"= 'apk' and \"device_name\" =~ /^$reference_device$/ ) AND $timeFilter GROUP BY \"app_version\"",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "App Download Size Trending",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "m2unCvxIk"
+      },
+      "description": "A graph representation of the breakdown of the App Download Size by individual components. You have the option to filter by App Version, Reference Device",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "id": 2,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "percent",
+            "value"
+          ]
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "$tag_contributor",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "m2unCvxIk"
+          },
+          "query": "SELECT last(\"size\") FROM \"app_size\" WHERE (\"type\" = 'apk' AND \"app_version\" =~ /^$app_version$/ AND \"device_name\" =~ /^$reference_device$/ AND \"contributor\" != 'apk' AND $timeFilter )  GROUP BY \"contributor\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "App Download Size Breakdown by Components",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "m2unCvxIk"
+      },
+      "description": "A roster of teams, each accompanied by the corresponding size of their contribution to the total app download size. \nYou could filter by the App Version and the Reference Device",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 15,
+        "w": 12,
+        "x": 0,
+        "y": 17
+      },
+      "id": 4,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "percent",
+            "value"
+          ]
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "$tag_contributor",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "m2unCvxIk"
+          },
+          "query": "SELECT last(\"size\") FROM \"app_size\" WHERE (\"type\"='team' and \"app_version\" =~ /^$app_version$/ and \"device_name\" =~ /^$reference_device$/ AND $timeFilter )  GROUP BY \"contributor\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "App Download Size Breakdown by Teams",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "m2unCvxIk"
+      },
+      "description": "A list of module names associated with the selected 'Team Name' filter, accompanied by a graph illustrating the contribution of each module to the app download size.\nYou have the option to filter by App Version, Reference Device and Team Name",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 15,
+        "w": 12,
+        "x": 12,
+        "y": 17
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "percent",
+            "value"
+          ]
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "$tag_contributor",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "m2unCvxIk"
+          },
+          "query": "SELECT last(\"size\") FROM \"app_size\" WHERE (\"type\" = 'module' AND \"app_version\" =~ /^$app_version$/  and \"device_name\" =~ /^$reference_device$/ and \"owner\"  =~ /^$tf_name$/  ) GROUP BY \"contributor\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Team Codebase Breakdown (Select the team name to see the detail)",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "m2unCvxIk"
+      },
+      "description": "A compilation of libraries, each denoted with the size it contributes to the overall App Download Size. You have the option to filter by App Version and Reference Device.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 15,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
+      "id": 7,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "percent",
+            "value"
+          ]
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "$tag_contributor",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "m2unCvxIk"
+          },
+          "query": "SELECT last(\"size\") FROM \"app_size\" WHERE (\"type\" = 'library' AND \"app_version\" =~ /^$app_version$/ AND \"device_name\" =~ /^$reference_device$/ AND $timeFilter )  GROUP BY \"contributor\"\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "App Download Size Breakdown by Libraries",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "m2unCvxIk"
+      },
+      "description": "A list of files exceeding the size threshold as set in the app-sizer configuration. You can apply filters based on App Version and Reference Device.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "left",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "displayName": "${__field.labels}",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 47
+      },
+      "id": 8,
+      "options": {
+        "footer": {
+          "enablePagination": false,
+          "fields": [
+            "Size"
+          ],
+          "reducer": [
+            "sum"
+          ],
+          "show": true
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "9.0.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "m2unCvxIk"
+          },
+          "query": "SELECT last(\"size\") as Size , \"contributor\" as \"File Name\",  \"owner\" as Owner FROM \"app_size\" WHERE (\"type\" = 'large_file' AND \"app_version\" =~ /^$app_version$/ AND \"device_name\" =~ /^$reference_device$/ AND $timeFilter )  group by \"contributor\"\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "table"
+        }
+      ],
+      "title": "Large Files",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Size",
+                "Owner",
+                "File Name"
+              ]
+            }
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 36,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "1.0.2",
+          "value": "1.0.2"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "m2unCvxIk"
+        },
+        "definition": "select DISTINCT(\"app_version\") from (select * from \"app_size\") ",
+        "hide": 0,
+        "includeAll": false,
+        "label": "App Version",
+        "multi": false,
+        "name": "app_version",
+        "options": [],
+        "query": "select DISTINCT(\"app_version\") from (select * from \"app_size\") ",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "device-1",
+          "value": "device-1"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "m2unCvxIk"
+        },
+        "definition": "select DISTINCT(\"device_name\") from (select * from \"app_size\") ",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Reference Device",
+        "multi": false,
+        "name": "reference_device",
+        "options": [],
+        "query": "select DISTINCT(\"device_name\") from (select * from \"app_size\") ",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "Platform",
+          "value": "Platform"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "m2unCvxIk"
+        },
+        "definition": "select DISTINCT(\"owner\") from (select * from \"app_size\") where \"owner\" != 'NA'",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Team name",
+        "multi": false,
+        "name": "tf_name",
+        "options": [],
+        "query": "select DISTINCT(\"owner\") from (select * from \"app_size\") where \"owner\" != 'NA'",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "App Download Size Breakdown",
+  "uid": "FBZO0xxSk",
+  "version": 51,
+  "weekStart": ""
+}
