@@ -1,12 +1,15 @@
 package com.grab.bundle.apk
 
+import com.grab.bundle.ClassFileInfo
+import com.grab.bundle.RawFileInfo
+
 data class DexFileInfo(
     val name: String,
-    val size: Long,
-    val classes: Set<ClassFileInfo>
-)
+    val compressedSize: Long,
+    val classes: Set<ClassFileInfo>,
+    val others: Set<RawFileInfo> = emptySet(),
+    val size : Long,
+){
+    val classSize : Long by lazy { classes.sumOf { it.size } + others.sumOf { it.size }}
+}
 
-data class ClassFileInfo(
-    val name: String,
-    val size: Long
-)

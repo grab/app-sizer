@@ -1,33 +1,32 @@
 package com.grab.bundle
 
 enum class FileType {
-    RESOURCE, NATIVE_LIB, ASSET, OTHERS
+    RESOURCE, NATIVE_LIB, ASSET, DEX, JAR, OTHERS, CLASS
+}
+
+interface FileInfo {
+    val compressedSize: Long
+    val size : Long
 }
 
 data class RawFileInfo(
     val path: String,
-    val size: Long
-) {
+    override val compressedSize: Long,
+    override val size : Long
+) : FileInfo {
     val type: FileType
         get() = when {
-            path.startsWith("res") -> FileType.RESOURCE
+            path.startsWith("res/") -> FileType.RESOURCE
             path.endsWith(".so", true) -> FileType.NATIVE_LIB
-            path.startsWith("assets") -> FileType.ASSET
+            path.startsWith("assets/") -> FileType.ASSET
+            path.endsWith(".dex") -> FileType.DEX
+            path.endsWith(".jar") -> FileType.JAR
+            path.endsWith(".class") -> FileType.CLASS
             else -> FileType.OTHERS
         }
 
-    companion object {
-        fun toType(type: String): FileType {
-            return when (type) {
-                "res" -> FileType.RESOURCE
-                "lib" -> FileType.NATIVE_LIB
-                else -> FileType.ASSET
-            }
-        }
-    }
-
     override fun equals(other: Any?): Boolean {
-        if(other is RawFileInfo) return path == other.path
+        if (other is RawFileInfo) return path == other.path
         return super.equals(other)
     }
 

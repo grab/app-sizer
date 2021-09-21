@@ -2,7 +2,10 @@ package com.grab.bundle
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.*
-import com.grab.bundle.report.BuildReportData
+import com.grab.bundle.aar.AarFileParser
+import com.grab.bundle.apk.ApkFileParser
+import com.grab.bundle.apk.ProguardMappingParser
+import com.grab.bundle.jar.JarFileParser
 import com.grab.bundle.report.GroupByLibAnalyticReport
 import java.io.File
 
@@ -18,7 +21,7 @@ class BundleCommand : CliktCommand() {
         help = "Path to the input apks directory"
     ).convert { File(it) }.required()
 
-    private val aarDirs: File by option(
+    private val libDirs: File by option(
         "-a",
         "--aar-dir",
         help = "Path to the aar files"
@@ -30,6 +33,12 @@ class BundleCommand : CliktCommand() {
         help = "Path to the output excel file"
     ).convert { File(it) }.required()
 
+    private val mappingFile: File by option(
+        "-m",
+        "--mapping-file",
+        help = "Path to the R8 mapping file"
+    ).convert { File(it) }.required()
+
     private val reportOption by option()
         .switch(
             "--group-by-lib" to OPTION_GROUP_BY_LIB,
@@ -38,18 +47,17 @@ class BundleCommand : CliktCommand() {
         ).default(OPTION_GROUP_BY_LIB)
 
     override fun run() {
-        val fileQuery = ApkComponentFactory.provideFileQuery()
-        val apkFileParser = ApkComponentFactory.provideApkParser(fileQuery)
-        val aarFileParser = ApkComponentFactory.provideAarFileParser(fileQuery)
-        val analytics = ApkComponentFactory.provideAnalytics()
-        val apkComponentAnalytic =
-            ApkComponentFactory.provideApkComponentAnalytic(apkFileParser, aarFileParser, analytics)
-        val processedData = apkComponentAnalytic.process(apkDirs, aarDirs)
-        val buildReportData = BuildReportData(analytics)
-        val apkInfo = apkFileParser.parseApks(apkDirs)
+        val apkProfileComponent = DaggerApkProfileComponent.create()
+        val apkComponentAnalytic = apkProfileComponent.apkComponentAnalytic()
+        val proguardMap = ProguardMappingParser().parse(mappingFile)
+        val aarFilesInfo = apkProfileComponent.aarFileParser().parseAars(libDirs)
+        val jarFilesInfo = apkProfileComponent.jarFileParser().parseJars(libDirs)
+        val apkFilesInfo = apkProfileComponent.apkParser().parseApks(apkDirs, proguardMap)
+        val processedData = apkComponentAnalytic.process(apkFilesInfo, aarFilesInfo, jarFilesInfo)
+
         when (reportOption) {
-            OPTION_GROUP_BY_LIB -> GroupByLibAnalyticReport(buildReportData, output)
-                .report(apkInfo, processedData)
+            OPTION_GROUP_BY_LIB -> GroupByLibAnalyticReport(output)
+                .report(apkFilesInfo, processedData)
         }
     }
 }
