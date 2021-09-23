@@ -1,3 +1,3 @@
 
-rootProject.name = "bundle-profile"
+rootProject.name = "apk-contributor-analyzer"
 

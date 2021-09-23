@@ -15,19 +15,17 @@ repositories {
 }
 
 dependencies {
-//    implementation(files("libs/baksmali-2.5.2.jar"))
     implementation("org.smali:dexlib2:2.5.2")
     implementation("com.github.ajalt.clikt:clikt:3.2.0")
     implementation("com.android.tools.build:bundletool:1.8.0")
     implementation("com.android.tools:common:27.0.2")
 
-//    implementation("com.android.tools:common:1.8.0")
 
     implementation("com.google.guava:guava:30.1.1-jre")
     implementation("org.apache.poi:poi-ooxml:5.0.0")
     implementation("org.jxls:jxls-jexcel:1.0.6")
 
-    implementation ("com.google.dagger:dagger:2.38.1")
+    implementation("com.google.dagger:dagger:2.38.1")
     kapt("com.google.dagger:dagger-compiler:2.38.1")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.5.21")
