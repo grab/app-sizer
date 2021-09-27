@@ -18,4 +18,5 @@ data class ApkFileInfo(
                 assets.sumOf { it.downloadSize } +
                 dexes.sumOf { it.downloadSize } +
                 others.sumOf { it.downloadSize }
+
 }

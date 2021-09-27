@@ -3,11 +3,11 @@ package com.grab.tools.report
 import com.grab.tools.AnalyticsOption
 import com.grab.tools.di.AnalyticsOptionKey
 import com.grab.tools.di.NAMED_FEATURE_MAPPING_FILE
-import com.grab.tools.di.NAMED_LIB_DIRECTORY
 import com.grab.tools.di.NAMED_OUTPUT_FILE
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import dagger.multibindings.IntoSet
 import java.io.File
 import javax.inject.Named
 
@@ -16,7 +16,8 @@ object ReportModule {
 
     @Provides
     fun provideFeatureMapping(
-        @Named(NAMED_FEATURE_MAPPING_FILE) ymlFile: File?): FeatureMapping {
+        @Named(NAMED_FEATURE_MAPPING_FILE) ymlFile: File?
+    ): FeatureMapping {
         return if (ymlFile == null) DummyFeatureMapping()
         else DefaultFeatureMapping(ymlFile)
     }
@@ -38,8 +39,18 @@ object ReportModule {
     @AnalyticsOptionKey(AnalyticsOption.FEATURES_ANALYTICS)
     fun provideFeatureAnalyticReport(
         featureMapping: FeatureMapping,
-        @Named(NAMED_LIB_DIRECTORY) rootProject: File,
-    ): AnalyticReport = FeatureAnalyticReport(featureMapping, rootProject)
+        featureReportWriter: Set<@JvmSuppressWildcards FeatureReportWriter>
+    ): AnalyticReport = FeatureAnalyticReport(featureMapping, featureReportWriter)
+
+    @Provides
+    @IntoSet
+    fun provideExcelFeatureReportWriter(@Named(NAMED_OUTPUT_FILE) rootProject: File): FeatureReportWriter =
+        ExcelFeatureReportWriter(rootProject)
+
+    @Provides
+    @IntoSet
+    fun provideJsonFeatureReportWriter(@Named(NAMED_OUTPUT_FILE) rootProject: File): FeatureReportWriter =
+        JsonFeatureReportWriter(rootProject)
 
     @Provides
     @IntoMap

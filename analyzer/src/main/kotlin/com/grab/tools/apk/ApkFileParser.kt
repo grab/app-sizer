@@ -4,6 +4,7 @@ import com.android.tools.apk.analyzer.ApkSizeCalculator
 import com.grab.tools.utils.FileQuery
 import com.grab.tools.FileType
 import com.grab.tools.RawFileInfo
+import com.grab.tools.di.DaggerAnalyzerComponent
 import shadow.bundletool.com.android.tools.proguard.ProguardMap
 import java.io.File
 import java.nio.file.Path

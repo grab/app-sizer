@@ -4,17 +4,17 @@ import shadow.bundletool.com.android.SdkConstants
 import java.io.File
 import java.io.IOException
 
-interface AarFileProvider {
+interface AarFileQuery {
     fun provide(dir: File): Sequence<File>
 }
 
-class DefaultAarFileProvider(private val fileQuery: FileQuery = DefaultFileQuery()) : AarFileProvider {
+class DefaultAarFileQuery(private val fileQuery: FileQuery = DefaultFileQuery()) : AarFileQuery {
     override fun provide(dir: File): Sequence<File> = fileQuery.query(dir, SdkConstants.EXT_AAR)
 }
 
 internal const val DEFAULT_AAR_FOLDER = "/build/outputs/aar"
 
-class ModuleAarFileProvider(private val fileQuery: FileQuery = DefaultFileQuery()) : AarFileProvider {
+class ModuleAarFileQuery(private val fileQuery: FileQuery = DefaultFileQuery()) : AarFileQuery {
     override fun provide(dir: File): Sequence<File> {
         if (dir.isFile) throw IOException("${dir.path} is not a directory")
         return dir.queryModules()
@@ -25,7 +25,7 @@ class ModuleAarFileProvider(private val fileQuery: FileQuery = DefaultFileQuery(
 }
 
 fun main() {
-    val jarFileQuery = ModuleAarFileProvider()
+    val jarFileQuery = ModuleAarFileQuery()
     jarFileQuery.provide(File("/Users/van.minh/Projects/pax-android-v2")).toList()
         .forEach {
             println(it.path)

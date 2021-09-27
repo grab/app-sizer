@@ -15,11 +15,17 @@ class AnalyzerCommand : CliktCommand() {
         help = "Path to the input apks directory"
     ).convert { File(it) }.required()
 
-    private val inputDir: File by option(
-        "-i",
-        "--input-dir",
-        help = "Path to the directory contains all libs (aar & jar) files or the project root folder"
-    ).convert { File(it) }.required()
+    private val librariesDir: File? by option(
+        "-l",
+        "--lib-dir",
+        help = "Path to the directory contains all libs (aar & jar) files"
+    ).convert { File(it) }
+
+    private val projectDir: File? by option(
+        "-p",
+        "--project-dir",
+        help = "Path to the project's root folder"
+    ).convert { File(it) }
 
     private val outputFile: File by option(
         "-o",
@@ -45,18 +51,74 @@ class AnalyzerCommand : CliktCommand() {
             "--modules" to AnalyticsOption.MODULE_ANALYTICS,
             "--features" to AnalyticsOption.FEATURES_ANALYTICS,
             "--apk" to AnalyticsOption.APK_ANALYTICS,
+            "--general" to AnalyticsOption.GENERAL,
         ).default(AnalyticsOption.LIBRARIES_ANALYTICS)
 
     override fun run() {
         val component = DaggerAnalyzerComponent.factory()
-            .create(inputDir, outputFile, featureMappingFile, reportOption)
+            .create(
+                libsDir = librariesDir,
+                rootProjectDir = projectDir,
+                featureMappingFile = featureMappingFile,
+                output = outputFile,
+                analyticsOption = reportOption
+            )
         val apkComponentAnalytic = component.apkComponentAnalytic()
+        val analyticReportMap = component.analyticReportMap()
+        val jarFileQueryMap = component.jarFileQueryMap()
+        val aarFileQueryMap = component.aarFileQueryMap()
         val proguardMap = ProguardMappingParser().parse(mappingFile)
-        val aarFilesInfo = component.aarFileParser().parseAars(inputDir)
-        val jarFilesInfo = component.jarFileParser().parseJars(inputDir)
         val apkFilesInfo = component.apkParser().parseApks(apkDirs, proguardMap)
-        val processedData = apkComponentAnalytic.process(apkFilesInfo, aarFilesInfo, jarFilesInfo)
-        component.analyticReportMap()[reportOption]?.report(apkFilesInfo, processedData)
-    }
+        val libDir = librariesDir
+        val projectDir = projectDir
+        when {
+            // Todo move to a separate class
+            reportOption == AnalyticsOption.GENERAL && libDir != null && projectDir != null -> {
+                val libAarFileQuery = aarFileQueryMap[AnalyticsOption.LIBRARIES_ANALYTICS]!!
+                val libJarFileQuery = jarFileQueryMap[AnalyticsOption.LIBRARIES_ANALYTICS]!!
+                val libAarFilesInfo = component.aarFileParser().parseAars(libDir, libAarFileQuery)
+                val libJarFilesInfo = component.jarFileParser().parseJars(libDir, libJarFileQuery)
+                val libProcessedData = apkComponentAnalytic.process(apkFilesInfo, libAarFilesInfo, libJarFilesInfo)
+                val allLibContributor = libProcessedData.reduce { acc, contributor ->
+                    Contributor(
+                        path = "All-libraries/build/",
+                        assets = acc.assets + contributor.assets,
+                        resources = acc.resources + contributor.resources,
+                        nativeLibs = acc.nativeLibs + contributor.nativeLibs,
+                        classes = acc.classes + contributor.classes,
+                        others = acc.others + contributor.others
+                    )
+                }
 
+                val aarFileQuery = aarFileQueryMap[AnalyticsOption.FEATURES_ANALYTICS]!!
+                val jarFileQuery = jarFileQueryMap[AnalyticsOption.FEATURES_ANALYTICS]!!
+                val aarFilesInfo = component.aarFileParser().parseAars(projectDir, aarFileQuery)
+                val jarFilesInfo = component.jarFileParser().parseJars(projectDir, jarFileQuery)
+                val processedData =
+                    apkComponentAnalytic.process(apkFilesInfo, aarFilesInfo, jarFilesInfo) + allLibContributor
+                analyticReportMap[AnalyticsOption.FEATURES_ANALYTICS]?.report(apkFilesInfo, processedData)
+            }
+            reportOption == AnalyticsOption.LIBRARIES_ANALYTICS && libDir != null -> {
+                val aarFileQuery = aarFileQueryMap[AnalyticsOption.LIBRARIES_ANALYTICS]
+                val jarFileQuery = jarFileQueryMap[AnalyticsOption.LIBRARIES_ANALYTICS]
+                if (aarFileQuery != null && jarFileQuery != null) {
+                    val aarFilesInfo = component.aarFileParser().parseAars(libDir, aarFileQuery)
+                    val jarFilesInfo = component.jarFileParser().parseJars(libDir, jarFileQuery)
+                    val processedData = apkComponentAnalytic.process(apkFilesInfo, aarFilesInfo, jarFilesInfo)
+                    analyticReportMap[AnalyticsOption.LIBRARIES_ANALYTICS]?.report(apkFilesInfo, processedData)
+                }
+            }
+            reportOption == AnalyticsOption.FEATURES_ANALYTICS && projectDir != null -> {
+                val aarFileQuery = aarFileQueryMap[AnalyticsOption.FEATURES_ANALYTICS]
+                val jarFileQuery = jarFileQueryMap[AnalyticsOption.FEATURES_ANALYTICS]
+                if (aarFileQuery != null && jarFileQuery != null) {
+                    val aarFilesInfo = component.aarFileParser().parseAars(projectDir, aarFileQuery)
+                    val jarFilesInfo = component.jarFileParser().parseJars(projectDir, jarFileQuery)
+                    val processedData = apkComponentAnalytic.process(apkFilesInfo, aarFilesInfo, jarFilesInfo)
+                    analyticReportMap[AnalyticsOption.FEATURES_ANALYTICS]?.report(apkFilesInfo, processedData)
+                }
+            }
+        }
+    }
 }
+

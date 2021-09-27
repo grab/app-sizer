@@ -17,10 +17,10 @@ import com.grab.tools.jar.JarStreamParser
 import com.grab.tools.jar.JarStreamParserImpl
 import com.grab.tools.report.AnalyticReport
 import com.grab.tools.report.ReportModule
-import com.grab.tools.utils.AarFileProvider
+import com.grab.tools.utils.AarFileQuery
 import com.grab.tools.utils.FileProviderModule
 import com.grab.tools.utils.FileQuery
-import com.grab.tools.utils.JarFileProvider
+import com.grab.tools.utils.JarFileQuery
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
@@ -30,6 +30,7 @@ import javax.inject.Named
 import javax.inject.Scope
 
 const val NAMED_LIB_DIRECTORY = "lib"
+const val NAMED_ROOT_PROJECT = "root"
 const val NAMED_OUTPUT_FILE = "out"
 const val NAMED_FEATURE_MAPPING_FILE = "mapping_file"
 
@@ -52,13 +53,16 @@ interface AnalyzerComponent {
     fun aarFileParser(): AarFileParser
     fun jarFileParser(): JarFileParser
     fun analyticReportMap(): Map<AnalyticsOption, @JvmSuppressWildcards AnalyticReport>
+    fun jarFileQueryMap() : Map<AnalyticsOption, @JvmSuppressWildcards JarFileQuery>
+    fun aarFileQueryMap() : Map<AnalyticsOption, @JvmSuppressWildcards AarFileQuery>
 
     @Component.Factory
     interface Factory {
         fun create(
-            @BindsInstance @Named(NAMED_LIB_DIRECTORY) libsDir: File,
-            @BindsInstance @Named(NAMED_OUTPUT_FILE) output: File,
+            @BindsInstance @Named(NAMED_LIB_DIRECTORY) libsDir: File?,
+            @BindsInstance @Named(NAMED_ROOT_PROJECT) rootProjectDir: File?,
             @BindsInstance @Named(NAMED_FEATURE_MAPPING_FILE) featureMappingFile: File?,
+            @BindsInstance @Named(NAMED_OUTPUT_FILE) output: File,
             @BindsInstance analyticsOption: AnalyticsOption
         ): AnalyzerComponent
     }
@@ -90,15 +94,14 @@ object AnalyzerModule {
 
     @Provides
     @AppScope
-    fun provideJarFileParser(jarFileProvider: JarFileProvider): JarFileParser = JarFileParserImpl(jarFileProvider)
+    fun provideJarFileParser(): JarFileParser = JarFileParserImpl()
 
     @Provides
     @AppScope
     fun provideAarFileParser(
-        jarFileParser: JarStreamParser,
-        aarFileProvider: AarFileProvider
+        jarFileParser: JarStreamParser
     ): AarFileParser =
-        AarFileParserImpl(aarFileProvider, jarFileParser)
+        AarFileParserImpl(jarFileParser)
 
     @Provides
     @AppScope

@@ -5,7 +5,7 @@ import com.grab.tools.apk.ApkFileInfo
 import java.util.*
 
 
-class FeatureAnalyticReport(
+class GeneralAnalyticReport(
     private val featureMapping: FeatureMapping,
     private val featureReportWriters: Set<@JvmSuppressWildcards FeatureReportWriter>
 ) : AnalyticReport {
@@ -14,10 +14,12 @@ class FeatureAnalyticReport(
         val featureToContributorMap = featureMapping.featureToModuleMap.mapValues { entry ->
             entry.value.flatMap { module ->
                 if (moduleToContributorMap[module] == null) println("Can not find: $module")
-                moduleToContributorMap[module] ?: emptyList()
+                moduleToContributorMap.remove(module) ?: emptyList()
             }
         }
         val features = featureToContributorMap.map {
+            Feature(it.key, it.value)
+        } + moduleToContributorMap.map { // module with no feature
             Feature(it.key, it.value)
         }
 
@@ -33,7 +35,6 @@ class FeatureAnalyticReport(
         featureReportWriters.forEach {
             it.reportEachFeature(dexCompressedRatio, data)
         }
-        featureReportWriters.forEach { it.save() }
     }
 
     private fun dexDownloadRatio(apks: Set<ApkFileInfo>): Double {

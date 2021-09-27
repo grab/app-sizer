@@ -14,42 +14,42 @@ object FileProviderModule {
     @Provides
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.LIBRARIES_ANALYTICS)
-    fun provideDefaultAarFileProvider(fileQuery: FileQuery): AarFileProvider = DefaultAarFileProvider(fileQuery)
+    fun provideDefaultAarFileProvider(fileQuery: FileQuery): AarFileQuery = DefaultAarFileQuery(fileQuery)
 
     @Provides
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.MODULE_ANALYTICS)
-    fun provideModuleAnalyticAarFileProvider(fileQuery: FileQuery): AarFileProvider = ModuleAarFileProvider(fileQuery)
+    fun provideModuleAnalyticAarFileProvider(fileQuery: FileQuery): AarFileQuery = ModuleAarFileQuery(fileQuery)
 
     @Provides
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.FEATURES_ANALYTICS)
-    fun provideFeatureAnalyticAarFileProvider(fileQuery: FileQuery): AarFileProvider = ModuleAarFileProvider(fileQuery)
+    fun provideFeatureAnalyticAarFileProvider(fileQuery: FileQuery): AarFileQuery = ModuleAarFileQuery(fileQuery)
 
     @Provides
     fun provideAarFileProvider(
         analyticsOption: AnalyticsOption,
-        map: Map<AnalyticsOption, @JvmSuppressWildcards AarFileProvider>
-    ): AarFileProvider = map[analyticsOption]!!
+        map: Map<AnalyticsOption, @JvmSuppressWildcards AarFileQuery>
+    ): AarFileQuery = map[analyticsOption]!!
 
     @Provides
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.LIBRARIES_ANALYTICS)
-    fun provideDefaultJarFileProvider(fileQuery: FileQuery): JarFileProvider = DefaultJarFileProvider(fileQuery)
+    fun provideDefaultJarFileProvider(fileQuery: FileQuery): JarFileQuery = DefaultJarFileQuery(fileQuery)
 
     @Provides
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.MODULE_ANALYTICS)
-    fun provideModuleModuleJarFileProvider(fileQuery: FileQuery): JarFileProvider = ModuleJarFileProvider(fileQuery)
+    fun provideModuleModuleJarFileProvider(fileQuery: FileQuery): JarFileQuery = ModuleJarFileQuery(fileQuery)
 
     @Provides
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.FEATURES_ANALYTICS)
-    fun provideFeatureModuleJarFileProvider(fileQuery: FileQuery): JarFileProvider = ModuleJarFileProvider(fileQuery)
+    fun provideFeatureModuleJarFileProvider(fileQuery: FileQuery): JarFileQuery = ModuleJarFileQuery(fileQuery)
 
     @Provides
     fun provideJarFileProvider(
         analyticsOption: AnalyticsOption,
-        map: Map<AnalyticsOption, @JvmSuppressWildcards JarFileProvider>
-    ): JarFileProvider = map[analyticsOption]!!
+        map: Map<AnalyticsOption, @JvmSuppressWildcards JarFileQuery>
+    ): JarFileQuery = map[analyticsOption]!!
 }

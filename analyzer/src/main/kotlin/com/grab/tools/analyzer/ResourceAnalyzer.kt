@@ -8,14 +8,14 @@ import com.grab.tools.jar.JarFileInfo
 class ResourceAnalyzer : Analyzer {
     override fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): RawContributors {
         val apkResource = apks.flatMap { it.resources }
-        val aarsResMap = mutableMapOf<RawFileInfo, String>().apply {
+        val aarsToResMap = mutableMapOf<RawFileInfo, String>().apply {
             aars.forEach { aar ->
                 aar.resources.forEach { file -> put(file, aar.path) }
             }
         }
         return mutableMapOf<String, MutableSet<RawFileInfo>>().apply {
             apkResource.forEach { resource ->
-                val aarName = aarsResMap[resource]
+                val aarName = aarsToResMap[resource]
                 if (aarName != null) {
                     putIfAbsent(aarName, mutableSetOf())
                     get(aarName)?.add(resource)

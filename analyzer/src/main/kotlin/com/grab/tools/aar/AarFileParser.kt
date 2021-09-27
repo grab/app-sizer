@@ -3,19 +3,19 @@ package com.grab.tools.aar
 import com.grab.tools.FileType
 import com.grab.tools.RawFileInfo
 import com.grab.tools.apk.getPath
-import com.grab.tools.utils.AarFileProvider
 import com.grab.tools.jar.JarFileInfo
 import com.grab.tools.jar.JarStreamParser
+import com.grab.tools.utils.AarFileQuery
 import java.io.File
 import java.util.zip.ZipFile
 
 interface AarFileParser {
     fun parse(file: File): AarFileInfo
-    fun parseAars(dir: File): Set<AarFileInfo>
+    fun parseAars(dir: File, aarFileProvider: AarFileQuery): Set<AarFileInfo>
 }
 
 // http://tools.android.com/tech-docs/new-build-system/aar-format
-class AarFileParserImpl(private val aarFileProvider: AarFileProvider, private val jarParser: JarStreamParser) : AarFileParser {
+class AarFileParserImpl(private val jarParser: JarStreamParser) : AarFileParser {
 
     override fun parse(file: File): AarFileInfo {
         ZipFile(file).use { zipFile ->
@@ -59,7 +59,7 @@ class AarFileParserImpl(private val aarFileProvider: AarFileProvider, private va
         }
     }
 
-    override fun parseAars(dir: File): Set<AarFileInfo> {
+    override fun parseAars(dir: File, aarFileProvider: AarFileQuery): Set<AarFileInfo> {
         return aarFileProvider.provide(dir)
             .map { file -> parse(file) }
             .toSet()

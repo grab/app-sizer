@@ -1,20 +1,19 @@
 package com.grab.tools.jar
 
 import com.grab.tools.ClassFileInfo
-import com.grab.tools.utils.FileQuery
 import com.grab.tools.FileType
 import com.grab.tools.RawFileInfo
 import com.grab.tools.apk.getPath
-import com.grab.tools.utils.JarFileProvider
+import com.grab.tools.utils.JarFileQuery
 import java.io.File
 import java.util.zip.ZipFile
 
 interface JarFileParser {
     fun parse(file: File): JarFileInfo
-    fun parseJars(dir: File): Set<JarFileInfo>
+    fun parseJars(dir: File, jarFileQuery: JarFileQuery): Set<JarFileInfo>
 }
 
-class JarFileParserImpl(private val jarFileProvider: JarFileProvider) : JarFileParser {
+class JarFileParserImpl() : JarFileParser {
     override fun parse(file: File): JarFileInfo {
         ZipFile(file).use { zipFile ->
             val entries = zipFile.entries()
@@ -50,8 +49,8 @@ class JarFileParserImpl(private val jarFileProvider: JarFileProvider) : JarFileP
         }
     }
 
-    override fun parseJars(dir: File): Set<JarFileInfo> {
-        return jarFileProvider.provide(dir)
+    override fun parseJars(dir: File, jarFileQuery: JarFileQuery): Set<JarFileInfo> {
+        return jarFileQuery.query(dir)
             .map { file -> parse(file) }
             .toSet()
     }

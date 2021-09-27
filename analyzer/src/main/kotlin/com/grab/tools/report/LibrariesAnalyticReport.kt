@@ -142,11 +142,10 @@ class LibrariesAnalyticReport(
         })
         return data
     }
+}
 
-    private fun Long.reportSize(): String = when {
-        this < KILO_BYTE -> "$this bytes"
-        this < MEGA_BYTE -> "%.3f KB".format(this.toDouble() / KILO_BYTE)
-        else -> "%.3f MB".format(this.toDouble() / MEGA_BYTE)
-    }
-
+internal fun Long.reportSize(): String = when {
+    this < KILO_BYTE -> "$this bytes"
+    this < MEGA_BYTE -> "%.3f KB".format(this.toDouble() / KILO_BYTE)
+    else -> "%.3f MB".format(this.toDouble() / MEGA_BYTE)
 }
