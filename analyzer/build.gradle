@@ -5,6 +5,9 @@ plugins {
 group = "com.grab.tool"
 version = "1.0-SNAPSHOT"
 
+test {
+    useJUnitPlatform()
+}
 
 dependencies {
     implementation("org.smali:dexlib2:2.5.2")
@@ -13,6 +16,7 @@ dependencies {
     implementation("com.android.tools:common:27.0.2")
     implementation("org.yaml:snakeyaml:1.21")
 
+    implementation("net.sf.kxml:kxml2:2.3.0")
     implementation("com.google.guava:guava:30.1.1-jre")
     implementation("org.apache.poi:poi-ooxml:5.0.0")
     implementation("org.jxls:jxls-jexcel:1.0.6")

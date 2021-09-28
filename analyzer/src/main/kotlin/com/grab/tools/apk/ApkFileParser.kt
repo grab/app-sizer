@@ -1,16 +1,15 @@
 package com.grab.tools.apk
 
 import com.android.tools.apk.analyzer.ApkSizeCalculator
+import com.grab.tools.FileInfo
 import com.grab.tools.utils.FileQuery
 import com.grab.tools.FileType
 import com.grab.tools.RawFileInfo
-import com.grab.tools.di.DaggerAnalyzerComponent
 import shadow.bundletool.com.android.tools.proguard.ProguardMap
 import java.io.File
 import java.nio.file.Path
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-
 
 interface ApkFileParser {
     fun parse(file: File, proguardMap: ProguardMap?): ApkFileInfo
@@ -21,6 +20,7 @@ class ApkFileParserImpl(
     private val fileQuery: FileQuery,
     private val dexFileParser: DexFileParser,
     private val apkSizeCalculator: ApkSizeCalculator,
+    private val manifestFileParser: ManifestFileParser
 ) : ApkFileParser {
     override fun parse(file: File, proguardMap: ProguardMap?): ApkFileInfo {
         val apkSizeInfo = apkSizeCalculator.parseSize(file.toPath())
@@ -33,7 +33,7 @@ class ApkFileParserImpl(
             val resources = mutableSetOf<RawFileInfo>()
             val assets = mutableSetOf<RawFileInfo>()
             val nativeLibs = mutableSetOf<RawFileInfo>()
-            val others = mutableSetOf<RawFileInfo>()
+            val others = mutableSetOf<FileInfo>()
             val dexes = mutableSetOf<DexFileInfo>()
 
             while (entries.hasMoreElements()) {
@@ -41,6 +41,7 @@ class ApkFileParserImpl(
                 val path = entry.getPath()
                 val downloadSize = apkSizeInfo.downloadFileSizeMap[path] ?: 0
                 val rawSize = apkSizeInfo.rawFileSizeMap[path] ?: 0
+
 
                 val fileInfo = RawFileInfo(
                     path = path,
@@ -54,6 +55,7 @@ class ApkFileParserImpl(
                     FileType.ASSET -> assets.add(fileInfo)
                     FileType.NATIVE_LIB -> nativeLibs.add(fileInfo)
                     FileType.DEX -> dexes.add(dexFileParser.parse(entry, zipFile.getInputStream(entry), apkSizeInfo, proguardMap))
+                    FileType.MANIFEST -> others.add(manifestFileParser.parse(zipFile.getInputStream(entry), fileInfo))
                     else -> others.add(fileInfo)
                 }
             }
