@@ -43,6 +43,16 @@ object ReportModule {
     ): AnalyticReport = FeatureAnalyticReport(featureMapping, featureReportWriter)
 
     @Provides
+    @IntoMap
+    @AnalyticsOptionKey(AnalyticsOption.GENERAL)
+    fun provideGeneralAnalyticReport(
+        featureMapping: FeatureMapping,
+        featureReportWriter: Set<@JvmSuppressWildcards FeatureReportWriter>
+    ): AnalyticReport = GeneralAnalyticReport(featureMapping, featureReportWriter)
+
+
+
+    @Provides
     @IntoSet
     fun provideExcelFeatureReportWriter(@Named(NAMED_OUTPUT_FILE) rootProject: File): FeatureReportWriter =
         ExcelFeatureReportWriter(rootProject)

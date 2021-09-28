@@ -17,6 +17,7 @@ class JsonFeatureReportWriter(
         assetSizes: Long,
         othersSize: Long
     ) {
+
     }
 
     override fun reportTotalFeatures(dexCompressedRatio: Double, allFeatures: Feature) {

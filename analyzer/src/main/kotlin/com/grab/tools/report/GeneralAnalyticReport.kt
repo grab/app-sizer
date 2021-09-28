@@ -31,10 +31,11 @@ class GeneralAnalyticReport(
         val dexCompressedRatio = dexDownloadRatio(apks)
         reportApkSize(dexCompressedRatio, apks)
         val data = sortData(dexCompressedRatio, features)
-        totalLibsContributor(dexCompressedRatio, data)
+//        totalLibsContributor(dexCompressedRatio, data)
         featureReportWriters.forEach {
             it.reportEachFeature(dexCompressedRatio, data)
         }
+        featureReportWriters.forEach { it.save() }
     }
 
     private fun dexDownloadRatio(apks: Set<ApkFileInfo>): Double {

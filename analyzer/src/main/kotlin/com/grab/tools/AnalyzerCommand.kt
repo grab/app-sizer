@@ -65,8 +65,10 @@ class AnalyzerCommand : CliktCommand() {
             )
         val apkComponentAnalytic = component.apkComponentAnalytic()
         val analyticReportMap = component.analyticReportMap()
+
         val jarFileQueryMap = component.jarFileQueryMap()
         val aarFileQueryMap = component.aarFileQueryMap()
+
         val proguardMap = ProguardMappingParser().parse(mappingFile)
         val apkFilesInfo = component.apkParser().parseApks(apkDirs, proguardMap)
         val libDir = librariesDir
@@ -76,6 +78,7 @@ class AnalyzerCommand : CliktCommand() {
             reportOption == AnalyticsOption.GENERAL && libDir != null && projectDir != null -> {
                 val libAarFileQuery = aarFileQueryMap[AnalyticsOption.LIBRARIES_ANALYTICS]!!
                 val libJarFileQuery = jarFileQueryMap[AnalyticsOption.LIBRARIES_ANALYTICS]!!
+
                 val libAarFilesInfo = component.aarFileParser().parseAars(libDir, libAarFileQuery)
                 val libJarFilesInfo = component.jarFileParser().parseJars(libDir, libJarFileQuery)
                 val libProcessedData = apkComponentAnalytic.process(apkFilesInfo, libAarFilesInfo, libJarFilesInfo)
@@ -96,7 +99,7 @@ class AnalyzerCommand : CliktCommand() {
                 val jarFilesInfo = component.jarFileParser().parseJars(projectDir, jarFileQuery)
                 val processedData =
                     apkComponentAnalytic.process(apkFilesInfo, aarFilesInfo, jarFilesInfo) + allLibContributor
-                analyticReportMap[AnalyticsOption.FEATURES_ANALYTICS]?.report(apkFilesInfo, processedData)
+                analyticReportMap[AnalyticsOption.GENERAL]?.report(apkFilesInfo, processedData)
             }
             reportOption == AnalyticsOption.LIBRARIES_ANALYTICS && libDir != null -> {
                 val aarFileQuery = aarFileQueryMap[AnalyticsOption.LIBRARIES_ANALYTICS]
