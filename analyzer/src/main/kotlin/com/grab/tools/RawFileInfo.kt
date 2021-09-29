@@ -1,7 +1,7 @@
 package com.grab.tools
 
 enum class FileType {
-    RESOURCE, NATIVE_LIB, ASSET, DEX, JAR, OTHERS, CLASS
+    RESOURCE, NATIVE_LIB, ASSET, DEX, JAR, OTHERS, CLASS, MANIFEST
 }
 
 interface FileInfo {
@@ -24,6 +24,7 @@ data class RawFileInfo(
             path.endsWith(".dex") -> FileType.DEX
             path.endsWith(".jar") -> FileType.JAR
             path.endsWith(".class") -> FileType.CLASS
+            path.endsWith("AndroidManifest.xml") -> FileType.MANIFEST
             else -> FileType.OTHERS
         }
 

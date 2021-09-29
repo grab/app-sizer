@@ -1,5 +1,6 @@
 package com.grab.tools.apk
 
+import com.grab.tools.FileInfo
 import com.grab.tools.RawFileInfo
 
 data class ApkFileInfo(
@@ -9,7 +10,7 @@ data class ApkFileInfo(
     val resources: Set<RawFileInfo>,
     val nativeLibs: Set<RawFileInfo>,
     val assets: Set<RawFileInfo>,
-    val others: Set<RawFileInfo>,
+    val others: Set<FileInfo>,
     val dexes: Set<DexFileInfo>
 ) {
     val sumComponentsDownloadSize: Long

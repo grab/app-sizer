@@ -7,10 +7,7 @@ import com.grab.tools.aar.AarFileParser
 import com.grab.tools.aar.AarFileParserImpl
 import com.grab.tools.analyzer.Analyzer
 import com.grab.tools.analyzer.AnalyzerClass
-import com.grab.tools.apk.ApkFileParser
-import com.grab.tools.apk.ApkFileParserImpl
-import com.grab.tools.apk.DexFileParser
-import com.grab.tools.apk.DexFileParserImpl
+import com.grab.tools.apk.*
 import com.grab.tools.jar.JarFileParser
 import com.grab.tools.jar.JarFileParserImpl
 import com.grab.tools.jar.JarStreamParser
@@ -25,6 +22,7 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import org.xmlpull.v1.XmlPullParserFactory
 import java.io.File
 import javax.inject.Named
 import javax.inject.Scope
@@ -81,12 +79,22 @@ object AnalyzerModule {
 
     @Provides
     @AppScope
+    fun provideXmlPullParserFactory(): XmlPullParserFactory = XmlPullParserFactory.newInstance()
+
+    @Provides
+    @AppScope
+    fun provideManifestFileParser(xmlPullParserFactory: XmlPullParserFactory): ManifestFileParser =
+        ManifestFileParserImpl(xmlPullParserFactory)
+
+    @Provides
+    @AppScope
     fun provideApkParser(
         fileQuery: FileQuery,
         dexFileParser: DexFileParser,
-        apkSizeCalculator: ApkSizeCalculator
+        apkSizeCalculator: ApkSizeCalculator,
+        manifestFileParser: ManifestFileParser
     ): ApkFileParser =
-        ApkFileParserImpl(fileQuery, dexFileParser, apkSizeCalculator)
+        ApkFileParserImpl(fileQuery, dexFileParser, apkSizeCalculator, manifestFileParser)
 
     @Provides
     @AppScope

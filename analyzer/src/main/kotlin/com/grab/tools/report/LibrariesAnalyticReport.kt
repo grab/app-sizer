@@ -1,6 +1,7 @@
 package com.grab.tools.report
 
 import com.grab.tools.Contributor
+import com.grab.tools.FileInfo
 import com.grab.tools.RawFileInfo
 import com.grab.tools.apk.ApkFileInfo
 import org.apache.poi.ss.usermodel.Sheet
@@ -62,11 +63,11 @@ class LibrariesAnalyticReport(
 
 
         val others = apks.flatMap { it.others }.toList()
-        Collections.sort(others, Comparator<RawFileInfo> { a, b ->
+        Collections.sort(others) { a, b ->
             if (a.downloadSize > b.downloadSize) -1
             else if (a.downloadSize < b.downloadSize) 1
             else 0
-        })
+        }
 
         sheet.createRow(1).apply {
             listOf(
