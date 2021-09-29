@@ -1,4 +1,5 @@
 include 'analyzer'
 include 'analyzer-repo'
 include 'agent-report'
+include 'report-writer'
 

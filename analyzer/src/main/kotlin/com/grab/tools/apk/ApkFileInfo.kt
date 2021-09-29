@@ -11,7 +11,8 @@ data class ApkFileInfo(
     val nativeLibs: Set<RawFileInfo>,
     val assets: Set<RawFileInfo>,
     val others: Set<FileInfo>,
-    val dexes: Set<DexFileInfo>
+    val dexes: Set<DexFileInfo>,
+    val manifestFileInfo : ManifestFileInfo
 ) {
     val sumComponentsDownloadSize: Long
         get() = resources.sumOf { it.downloadSize } +

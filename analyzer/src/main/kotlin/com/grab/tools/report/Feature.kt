@@ -2,7 +2,7 @@ package com.grab.tools.report
 
 import com.grab.tools.Contributor
 
-data class Feature(
+internal data class Feature(
     val name: String,
     val contributors: List<Contributor>
 ) {

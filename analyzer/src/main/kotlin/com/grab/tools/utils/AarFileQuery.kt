@@ -23,11 +23,3 @@ class ModuleAarFileQuery(private val fileQuery: FileQuery = DefaultFileQuery()) 
             .flatMap { fileQuery.query(it, SdkConstants.EXT_AAR) }
     }
 }
-
-fun main() {
-    val jarFileQuery = ModuleAarFileQuery()
-    jarFileQuery.provide(File("/Users/van.minh/Projects/pax-android-v2")).toList()
-        .forEach {
-            println(it.path)
-        }
-}

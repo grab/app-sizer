@@ -1,7 +1,14 @@
 package com.grab.tools.report
 
+import com.google.gson.Gson
+import com.grab.pax.plugins.report.JsonFilePublisher
+import com.grab.pax.plugins.report.MetricsPublisher
 import com.grab.tools.AnalyticsOption
+import com.grab.tools.analyzer.report.ExcelReportWriter
+import com.grab.tools.analyzer.report.MetricsReportWriter
+import com.grab.tools.analyzer.report.ReportWriter
 import com.grab.tools.di.AnalyticsOptionKey
+import com.grab.tools.di.NAMED_DEVICE_NAME
 import com.grab.tools.di.NAMED_FEATURE_MAPPING_FILE
 import com.grab.tools.di.NAMED_OUTPUT_FILE
 import dagger.Module
@@ -31,36 +38,38 @@ object ReportModule {
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.LIBRARIES_ANALYTICS)
     fun provideLibrariesAnalyticReport(
-        @Named(NAMED_OUTPUT_FILE) outPutFile: File
-    ): AnalyticReport = LibrariesAnalyticReport(outPutFile)
+        reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
+        @Named(NAMED_DEVICE_NAME) deviceName: String?
+    ): AnalyticReport = LibrariesAnalyticReport(reportWriters, deviceName)
 
     @Provides
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.FEATURES_ANALYTICS)
     fun provideFeatureAnalyticReport(
         featureMapping: FeatureMapping,
-        featureReportWriter: Set<@JvmSuppressWildcards FeatureReportWriter>
-    ): AnalyticReport = FeatureAnalyticReport(featureMapping, featureReportWriter)
+        reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
+        @Named(NAMED_DEVICE_NAME) deviceName: String?
+    ): AnalyticReport = FeatureAnalyticReport(featureMapping, reportWriters, deviceName)
 
     @Provides
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.GENERAL)
     fun provideGeneralAnalyticReport(
         featureMapping: FeatureMapping,
-        featureReportWriter: Set<@JvmSuppressWildcards FeatureReportWriter>
-    ): AnalyticReport = GeneralAnalyticReport(featureMapping, featureReportWriter)
-
+        reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
+        @Named(NAMED_DEVICE_NAME) deviceName: String?
+    ): AnalyticReport = GeneralAnalyticReport(featureMapping, reportWriters, deviceName)
 
 
     @Provides
     @IntoSet
-    fun provideExcelFeatureReportWriter(@Named(NAMED_OUTPUT_FILE) rootProject: File): FeatureReportWriter =
-        ExcelFeatureReportWriter(rootProject)
+    fun provideExcelFeatureReportWriter(@Named(NAMED_OUTPUT_FILE) file: File): ReportWriter =
+        ExcelReportWriter(file.toExcelFile())
 
     @Provides
     @IntoSet
-    fun provideJsonFeatureReportWriter(@Named(NAMED_OUTPUT_FILE) rootProject: File): FeatureReportWriter =
-        JsonFeatureReportWriter(rootProject)
+    fun provideJsonFeatureReportWriter(metricsPublisher: MetricsPublisher): ReportWriter =
+        MetricsReportWriter(metricsPublisher)
 
     @Provides
     @IntoMap
@@ -68,4 +77,11 @@ object ReportModule {
     fun provideModuleAnalyticReport(
         @Named(NAMED_OUTPUT_FILE) outPutFile: File,
     ): AnalyticReport = ModuleAnalyticReport(outPutFile)
+
+    @Provides
+    fun provideJsonFilePublisher(@Named(NAMED_OUTPUT_FILE) file: File, gson : Gson): MetricsPublisher =
+        JsonFilePublisher(file.toJsonFile(), gson)
 }
+
+private fun File.toExcelFile(): File = File(parentFile, "$nameWithoutExtension.xls")
+private fun File.toJsonFile(): File = File(parentFile, "$nameWithoutExtension.json")

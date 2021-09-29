@@ -1,6 +1,7 @@
 package com.grab.tools.di
 
 import com.android.tools.apk.analyzer.ApkSizeCalculator
+import com.google.gson.Gson
 import com.grab.tools.AnalyticsOption
 import com.grab.tools.ApkComponentAnalytic
 import com.grab.tools.aar.AarFileParser
@@ -31,6 +32,8 @@ const val NAMED_LIB_DIRECTORY = "lib"
 const val NAMED_ROOT_PROJECT = "root"
 const val NAMED_OUTPUT_FILE = "out"
 const val NAMED_FEATURE_MAPPING_FILE = "mapping_file"
+const val NAMED_DEVICE_NAME = "device_name"
+
 
 @Scope
 @Retention
@@ -51,8 +54,8 @@ interface AnalyzerComponent {
     fun aarFileParser(): AarFileParser
     fun jarFileParser(): JarFileParser
     fun analyticReportMap(): Map<AnalyticsOption, @JvmSuppressWildcards AnalyticReport>
-    fun jarFileQueryMap() : Map<AnalyticsOption, @JvmSuppressWildcards JarFileQuery>
-    fun aarFileQueryMap() : Map<AnalyticsOption, @JvmSuppressWildcards AarFileQuery>
+    fun jarFileQueryMap(): Map<AnalyticsOption, @JvmSuppressWildcards JarFileQuery>
+    fun aarFileQueryMap(): Map<AnalyticsOption, @JvmSuppressWildcards AarFileQuery>
 
     @Component.Factory
     interface Factory {
@@ -61,6 +64,7 @@ interface AnalyzerComponent {
             @BindsInstance @Named(NAMED_ROOT_PROJECT) rootProjectDir: File?,
             @BindsInstance @Named(NAMED_FEATURE_MAPPING_FILE) featureMappingFile: File?,
             @BindsInstance @Named(NAMED_OUTPUT_FILE) output: File,
+            @BindsInstance @Named(NAMED_DEVICE_NAME) deviceName: String?,
             @BindsInstance analyticsOption: AnalyticsOption
         ): AnalyzerComponent
     }
@@ -115,4 +119,8 @@ object AnalyzerModule {
     @AppScope
     fun provideApkComponentAnalytic(analytics: Map<AnalyzerClass, @JvmSuppressWildcards Analyzer>): ApkComponentAnalytic =
         ApkComponentAnalytic(analytics)
+
+    @Provides
+    @AppScope
+    fun provideGson() = Gson()
 }

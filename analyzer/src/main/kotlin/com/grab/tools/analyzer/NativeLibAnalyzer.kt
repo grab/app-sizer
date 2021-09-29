@@ -22,7 +22,7 @@ class NativeLibAnalyzer : Analyzer {
             }
         }
         return mutableMapOf<String, MutableSet<RawFileInfo>>().apply {
-            apkLibs?.forEach { resource ->
+            apkLibs.forEach { resource ->
                 val libName = libraryMap[resource]
                 if (libName != null) {
                     putIfAbsent(libName, mutableSetOf())
