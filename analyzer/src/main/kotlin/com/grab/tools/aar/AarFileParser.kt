@@ -44,7 +44,7 @@ class AarFileParserImpl(private val jarParser: JarStreamParser) : AarFileParser 
                     FileType.JAR -> {
                         jars.add(jarParser.parse(entry, zipFile.getInputStream(entry)))
                     }
-                    FileType.OTHERS -> others.add(fileInfo)
+                    else  -> others.add(fileInfo)
                 }
             }
             return AarFileInfo(

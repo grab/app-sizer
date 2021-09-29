@@ -1,49 +1,23 @@
 package com.grab.tools.report
 
 import com.grab.tools.Contributor
-import com.grab.tools.FileInfo
-import com.grab.tools.RawFileInfo
+import com.grab.tools.analyzer.report.ReportItem
+import com.grab.tools.analyzer.report.ReportWriter
 import com.grab.tools.apk.ApkFileInfo
-import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.ss.usermodel.WorkbookFactory
 import java.io.File
 import java.util.*
-import kotlin.Comparator
 
 class LibrariesAnalyticReport(
-    private val outPutFile: File
+    private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
+    private val deviceName: String?
 ) : AnalyticReport {
-    override fun report(apks: Set<ApkFileInfo>, contributor: Set<Contributor>) {
-        val workbook = WorkbookFactory.create(false)
-        val sheet = workbook.createSheet("Libraries contributors")
-        createHeader(sheet)
+    override fun report(apks: Set<ApkFileInfo>, contributors: Set<Contributor>) {
         val dexCompressedRatio = dexDownloadRatio(apks)
-        apksSizeReport(dexCompressedRatio, apks, sheet)
-        val data = sortData(dexCompressedRatio, contributor)
-        totalLibsContributor(dexCompressedRatio, data, sheet)
-        reportEachLib(dexCompressedRatio, data, sheet)
-
-        outPutFile.outputStream().use {
-            workbook.write(it)
-        }
-    }
-
-    private fun createHeader(sheet: Sheet) {
-        sheet.createRow(0).apply {
-            listOf(
-                "Library Name",
-                "Total",
-                "Classes",
-                "Classes (extracted)",
-                "Native libs",
-                "Resource",
-                "Assets",
-                "Others",
-                "Full path"
-            ).forEachIndexed { i, text ->
-                createCell(i).apply { setCellValue(text) }
-            }
-        }
+        val contributorList = sortContributors(dexCompressedRatio, contributors)
+        val apkReport = apks.apksSizeReport(dexCompressedRatio)
+        val totalLibsReport = totalLibrariesReport(dexCompressedRatio, contributorList)
+        val listOfReport = listOf(apkReport, totalLibsReport) + reportPerLibrary(dexCompressedRatio, contributorList)
+        reportWriters.forEach { it.write(apks.toAppInfo(deviceName), listOfReport) }
     }
 
     private fun dexDownloadRatio(apks: Set<ApkFileInfo>): Double {
@@ -52,41 +26,21 @@ class LibrariesAnalyticReport(
         return dexDownloadSize.toDouble() / dexClassesSize
     }
 
-    private fun apksSizeReport(dexCompressedRatio: Double, apks: Set<ApkFileInfo>, sheet: Sheet) {
-        val resourceSize = apks.flatMap { it.resources }.sumOf { it.downloadSize }
-        val nativeLibSize = apks.flatMap { it.nativeLibs }.sumOf { it.downloadSize }
-        val assetSizes = apks.flatMap { it.assets }.sumOf { it.downloadSize }
-        val othersSize = apks.flatMap { it.others }.sumOf { it.downloadSize }
-        val classesSize = apks.flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
-        val classDownloadSize = (classesSize * dexCompressedRatio).toLong()
-        val total = resourceSize + nativeLibSize + assetSizes + othersSize + classDownloadSize
+    private fun Contributor.toReportItem(dexCompressedRatio: Double): ReportItem = ReportItem(
+        name = File(path).nameWithoutExtension,
+        extraInfo = path.substring(path.indexOf("files-2.1/") + 9),
+        id = path,
+        totalDownloadSize = getDownloadSize(dexCompressedRatio),
+        classesDownloadSize = getClassDownloadSize(dexCompressedRatio),
+        classesSize = classSize,
+        nativeLibDownloadSize = nativeLibDownloadSize,
+        resourceDownloadSize = resourcesDownloadSize,
+        assetDownloadSize = assetsDownloadSize,
+        otherDownloadSize = othersDownloadSize,
+    )
 
-
-        val others = apks.flatMap { it.others }.toList()
-        Collections.sort(others) { a, b ->
-            if (a.downloadSize > b.downloadSize) -1
-            else if (a.downloadSize < b.downloadSize) 1
-            else 0
-        }
-
-        sheet.createRow(1).apply {
-            listOf(
-                "Apks",
-                total.reportSize(),
-                classDownloadSize.reportSize(),
-                classesSize.reportSize(),
-                nativeLibSize.reportSize(),
-                resourceSize.reportSize(),
-                assetSizes.reportSize(),
-                othersSize.reportSize()
-            ).forEachIndexed { index, s ->
-                createCell(index).apply { setCellValue(s) }
-            }
-        }
-    }
-
-    private fun totalLibsContributor(dexCompressedRatio: Double, data: List<Contributor>, sheet: Sheet) {
-        data.reduce { pre, cur ->
+    private fun totalLibrariesReport(dexCompressedRatio: Double, data: List<Contributor>): ReportItem {
+        return data.reduce { pre, cur ->
             pre.copy(
                 resources = pre.resources + cur.resources,
                 assets = pre.assets + cur.assets,
@@ -94,45 +48,18 @@ class LibrariesAnalyticReport(
                 classes = pre.classes + cur.classes,
                 others = pre.others + cur.others
             )
-        }.also { allLibs ->
-            sheet.createRow(2).apply {
-                listOf(
-                    "All libs",
-                    allLibs.getDownloadSize(dexCompressedRatio).reportSize(),
-                    allLibs.getClassDownloadSize(dexCompressedRatio).reportSize(),
-                    allLibs.classSize.reportSize(),
-                    allLibs.nativeLibDownloadSize.reportSize(),
-                    allLibs.resourcesDownloadSize.reportSize(),
-                    allLibs.assetsDownloadSize.reportSize(),
-                    allLibs.othersDownloadSize.reportSize()
-                ).forEachIndexed { index, s ->
-                    createCell(index).apply { setCellValue(s) }
-                }
-            }
-        }
+        }.toReportItem(dexCompressedRatio)
+            .copy(
+                name = "All libraries",
+                extraInfo = "Sum up all libraries values",
+                id = "all_libraries",
+            )
     }
 
-    private fun reportEachLib(dexCompressedRatio: Double, data: List<Contributor>, sheet: Sheet) {
-        data.forEachIndexed { row, item ->
-            sheet.createRow(row + 3).apply {
-                listOf(
-                    File(item.path).nameWithoutExtension,
-                    item.getDownloadSize(dexCompressedRatio).reportSize(),
-                    item.getClassDownloadSize(dexCompressedRatio).reportSize(),
-                    item.classSize.reportSize(),
-                    item.nativeLibDownloadSize.reportSize(),
-                    item.resourcesDownloadSize.reportSize(),
-                    item.assetsDownloadSize.reportSize(),
-                    item.othersDownloadSize.reportSize(),
-                    item.path.substring(item.path.indexOf("files-2.1/") + 9)
-                ).forEachIndexed { index, s ->
-                    createCell(index).apply { setCellValue(s) }
-                }
-            }
-        }
-    }
+    private fun reportPerLibrary(dexCompressedRatio: Double, data: List<Contributor>): List<ReportItem> =
+        data.map { it.toReportItem(dexCompressedRatio) }
 
-    private fun sortData(dexCompressedRatio: Double, contributor: Set<Contributor>): List<Contributor> {
+    private fun sortContributors(dexCompressedRatio: Double, contributor: Set<Contributor>): List<Contributor> {
         val data = contributor.toList()
         Collections.sort(data, Comparator<Contributor> { o1, o2 ->
             val size1 = o1.getDownloadSize(dexCompressedRatio)
@@ -145,8 +72,26 @@ class LibrariesAnalyticReport(
     }
 }
 
-internal fun Long.reportSize(): String = when {
-    this < KILO_BYTE -> "$this bytes"
-    this < MEGA_BYTE -> "%.3f KB".format(this.toDouble() / KILO_BYTE)
-    else -> "%.3f MB".format(this.toDouble() / MEGA_BYTE)
+internal fun Set<ApkFileInfo>.apksSizeReport(dexCompressedRatio: Double): ReportItem {
+    val resourceDownloadSize = flatMap { it.resources }.sumOf { it.downloadSize }
+    val nativeLibDownloadSize = flatMap { it.nativeLibs }.sumOf { it.downloadSize }
+    val assetDownloadSize = flatMap { it.assets }.sumOf { it.downloadSize }
+    val otherDownloadSize = flatMap { it.others }.sumOf { it.downloadSize }
+    val classesSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
+    val classDownloadSize = (classesSize * dexCompressedRatio).toLong()
+    val total =
+        resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + classDownloadSize
+    return ReportItem(
+        name = "Apks",
+        id = "apk",
+        totalDownloadSize = total,
+        resourceDownloadSize = resourceDownloadSize,
+        nativeLibDownloadSize = nativeLibDownloadSize,
+        assetDownloadSize = assetDownloadSize,
+        otherDownloadSize = otherDownloadSize,
+        classesSize = classesSize,
+        classesDownloadSize = classDownloadSize,
+        extraInfo = "Apk breakdown by component size"
+    )
 }
+

@@ -38,11 +38,3 @@ internal fun File.queryModules(): Sequence<File> = walk()
     }.filter { file ->
         file.isDirectory && file.listFiles().any { it.name == GRADLE_FILE }
     }
-
-fun main() {
-    val jarFileQuery = ModuleJarFileQuery()
-    jarFileQuery.query(File("/Users/van.minh/Projects/pax-android-v2")).toList()
-        .forEach {
-            println(it.path)
-        }
-}

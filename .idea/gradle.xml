@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/agent-report" />
             <option value="$PROJECT_DIR$/analyzer" />
             <option value="$PROJECT_DIR$/analyzer-repo" />
+            <option value="$PROJECT_DIR$/report-writer" />
           </set>
         </option>
       </GradleProjectSettings>

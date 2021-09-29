@@ -10,6 +10,8 @@ test {
 }
 
 dependencies {
+    implementation project(":report-writer")
+    implementation project(":agent-report")
     implementation("org.smali:dexlib2:2.5.2")
     implementation("com.github.ajalt.clikt:clikt:3.2.0")
     implementation("com.android.tools.build:bundletool:1.8.0")
@@ -23,6 +25,7 @@ dependencies {
 
     implementation("com.google.dagger:dagger:2.38.1")
     kapt("com.google.dagger:dagger-compiler:2.38.1")
+    implementation('com.google.code.gson:gson:2.8.8')
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.5.21")
 }

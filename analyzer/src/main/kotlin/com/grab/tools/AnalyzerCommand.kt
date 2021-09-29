@@ -45,6 +45,12 @@ class AnalyzerCommand : CliktCommand() {
         help = "An yml file to grouped the feature's modules"
     ).convert { File(it) }
 
+    private val deviceName: String? by option(
+        "-d",
+        "--device-name",
+        help = "The device name in the device spec that we generate the APK from the app bundle"
+    )
+
     private val reportOption by option()
         .switch(
             "--libraries" to AnalyticsOption.LIBRARIES_ANALYTICS,
@@ -61,7 +67,8 @@ class AnalyzerCommand : CliktCommand() {
                 rootProjectDir = projectDir,
                 featureMappingFile = featureMappingFile,
                 output = outputFile,
-                analyticsOption = reportOption
+                analyticsOption = reportOption,
+                deviceName = deviceName
             )
         val apkComponentAnalytic = component.apkComponentAnalytic()
         val analyticReportMap = component.analyticReportMap()

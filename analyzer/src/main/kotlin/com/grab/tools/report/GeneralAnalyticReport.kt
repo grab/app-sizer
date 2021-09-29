@@ -1,82 +1,72 @@
 package com.grab.tools.report
 
 import com.grab.tools.Contributor
+import com.grab.tools.analyzer.report.AppInfo
+import com.grab.tools.analyzer.report.ReportItem
+import com.grab.tools.analyzer.report.ReportWriter
 import com.grab.tools.apk.ApkFileInfo
 import java.util.*
 
 
 class GeneralAnalyticReport(
     private val featureMapping: FeatureMapping,
-    private val featureReportWriters: Set<@JvmSuppressWildcards FeatureReportWriter>
+    private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
+    private val deviceName: String?
 ) : AnalyticReport {
     override fun report(androidBinaryInfo: Set<ApkFileInfo>, contributor: Set<Contributor>) {
+        reportFeatures(androidBinaryInfo, buildFeatures(contributor))
+    }
+
+    private fun buildFeatures(contributor: Set<Contributor>): List<Feature> {
         val moduleToContributorMap = contributor.moduleToContributor().toMutableMap()
         val featureToContributorMap = featureMapping.featureToModuleMap.mapValues { entry ->
             entry.value.flatMap { module ->
                 if (moduleToContributorMap[module] == null) println("Can not find: $module")
                 moduleToContributorMap.remove(module) ?: emptyList()
             }
-        }
+        } + moduleToContributorMap
         val features = featureToContributorMap.map {
             Feature(it.key, it.value)
-        } + moduleToContributorMap.map { // module with no feature
-            Feature(it.key, it.value)
         }
-
-        report(androidBinaryInfo, features)
+        return features
     }
 
-    private fun report(apks: Set<ApkFileInfo>, features: List<Feature>) {
-        featureReportWriters.forEach { it.initTile() }
-        val dexCompressedRatio = dexDownloadRatio(apks)
-        reportApkSize(dexCompressedRatio, apks)
-        val data = sortData(dexCompressedRatio, features)
-//        totalLibsContributor(dexCompressedRatio, data)
-        featureReportWriters.forEach {
-            it.reportEachFeature(dexCompressedRatio, data)
-        }
-        featureReportWriters.forEach { it.save() }
-    }
-
-    private fun dexDownloadRatio(apks: Set<ApkFileInfo>): Double {
-        val dexDownloadSize = apks.flatMap { it.dexes }.sumOf { it.downloadSize }
-        val dexClassesSize = apks.flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
-        return dexDownloadSize.toDouble() / dexClassesSize
-    }
-
-    private fun reportApkSize(dexCompressedRatio: Double, apks: Set<ApkFileInfo>) {
-        val resourceSize = apks.flatMap { it.resources }.sumOf { it.downloadSize }
-        val nativeLibSize = apks.flatMap { it.nativeLibs }.sumOf { it.downloadSize }
-        val assetSizes = apks.flatMap { it.assets }.sumOf { it.downloadSize }
-        val othersSize = apks.flatMap { it.others }.sumOf { it.downloadSize }
-        val classesSize = apks.flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
-        val classDownloadSize = (classesSize * dexCompressedRatio).toLong()
-        val total = resourceSize + nativeLibSize + assetSizes + othersSize + classDownloadSize
-        featureReportWriters.forEach {
-            it.reportApksSize(
-                resourceSize = resourceSize,
-                nativeLibSize = nativeLibSize,
-                assetSizes = assetSizes,
-                othersSize = othersSize,
-                classesSize = classesSize,
-                classDownloadSize = classDownloadSize,
-                total = total
-            )
+    private fun reportFeatures(apks: Set<ApkFileInfo>, features: List<Feature>) {
+        val dexCompressedRatio = apks.dexDownloadRatio()
+        val apkReport = apks.apksSizeReport(dexCompressedRatio)
+        val sortedFeaturesReport = sortFeatures(dexCompressedRatio, features)
+            .map { it.toReportItem(dexCompressedRatio) }
+        reportWriters.forEach {
+            it.write(apks.toAppInfo(deviceName), listOf(apkReport) + sortedFeaturesReport)
         }
     }
 
-    private fun totalLibsContributor(dexCompressedRatio: Double, data: List<Feature>) {
+    private fun Feature.toReportItem(dexCompressedRatio: Double): ReportItem = ReportItem(
+        name = name,
+        id = name,
+        extraInfo = "Sum up all codebase for $name",
+        totalDownloadSize = getDownloadSize(dexCompressedRatio),
+        classesSize = classSize,
+        classesDownloadSize = getClassDownloadSize(dexCompressedRatio),
+        nativeLibDownloadSize = nativeLibDownloadSize,
+        resourceDownloadSize = resourcesDownloadSize,
+        assetDownloadSize = assetsDownloadSize,
+        otherDownloadSize = othersDownloadSize
+    )
+
+    private fun totalLibsContributor(dexCompressedRatio: Double, data: List<Feature>): ReportItem =
         data.reduce { pre, cur ->
             pre.copy(
                 name = "All features",
                 contributors = pre.contributors + cur.contributors
             )
-        }.also { allLibs ->
-            featureReportWriters.forEach { it.reportTotalFeatures(dexCompressedRatio, allLibs) }
-        }
-    }
+        }.toReportItem(dexCompressedRatio)
+            .copy(
+                id = "all_features",
+                extraInfo = "Sum up all features values"
+            )
 
-    private fun sortData(dexCompressedRatio: Double, contributor: List<Feature>): List<Feature> {
+    private fun sortFeatures(dexCompressedRatio: Double, contributor: List<Feature>): List<Feature> {
         Collections.sort(contributor, Comparator<Feature> { o1, o2 ->
             val size1 = o1.getDownloadSize(dexCompressedRatio)
             val size2 = o2.getDownloadSize(dexCompressedRatio)
@@ -102,3 +92,14 @@ class GeneralAnalyticReport(
     }
 }
 
+private const val DEFAULT_VERSION_NAME = "0.0.0"
+private const val DEFAULT_DEVICE_NAME = "PreferenceDevice"
+
+internal fun Set<ApkFileInfo>.toAppInfo(deviceName: String?): AppInfo {
+    val versionName =
+        find { it.manifestFileInfo.versionName != null }?.manifestFileInfo?.versionName ?: DEFAULT_VERSION_NAME
+    return AppInfo(
+        versionName = versionName,
+        deviceName = deviceName ?: DEFAULT_DEVICE_NAME,
+    )
+}

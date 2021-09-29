@@ -1,0 +1,9 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.5.10'
+}
+
+dependencies {
+    implementation project(":agent-report")
+    implementation("org.apache.poi:poi-ooxml:5.0.0")
+    implementation("org.jxls:jxls-jexcel:1.0.6")
+}

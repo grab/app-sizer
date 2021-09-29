@@ -2,9 +2,9 @@ package com.grab.tools.apk
 
 import com.android.tools.apk.analyzer.ApkSizeCalculator
 import com.grab.tools.FileInfo
-import com.grab.tools.utils.FileQuery
 import com.grab.tools.FileType
 import com.grab.tools.RawFileInfo
+import com.grab.tools.utils.FileQuery
 import shadow.bundletool.com.android.tools.proguard.ProguardMap
 import java.io.File
 import java.nio.file.Path
@@ -35,13 +35,12 @@ class ApkFileParserImpl(
             val nativeLibs = mutableSetOf<RawFileInfo>()
             val others = mutableSetOf<FileInfo>()
             val dexes = mutableSetOf<DexFileInfo>()
-
+            var manifestFileInfo = ManifestFileInfo(downloadSize = 0, compressedSize = 0, size = 0, path = "")
             while (entries.hasMoreElements()) {
                 val entry = entries.nextElement()
                 val path = entry.getPath()
                 val downloadSize = apkSizeInfo.downloadFileSizeMap[path] ?: 0
                 val rawSize = apkSizeInfo.rawFileSizeMap[path] ?: 0
-
 
                 val fileInfo = RawFileInfo(
                     path = path,
@@ -54,8 +53,18 @@ class ApkFileParserImpl(
                     FileType.RESOURCE -> resources.add(fileInfo)
                     FileType.ASSET -> assets.add(fileInfo)
                     FileType.NATIVE_LIB -> nativeLibs.add(fileInfo)
-                    FileType.DEX -> dexes.add(dexFileParser.parse(entry, zipFile.getInputStream(entry), apkSizeInfo, proguardMap))
-                    FileType.MANIFEST -> others.add(manifestFileParser.parse(zipFile.getInputStream(entry), fileInfo))
+                    FileType.DEX -> dexes.add(
+                        dexFileParser.parse(
+                            entry,
+                            zipFile.getInputStream(entry),
+                            apkSizeInfo,
+                            proguardMap
+                        )
+                    )
+                    FileType.MANIFEST -> {
+                        manifestFileInfo = manifestFileParser.parse(zipFile.getInputStream(entry), fileInfo)
+                        others.add(manifestFileInfo)
+                    }
                     else -> others.add(fileInfo)
                 }
             }
@@ -68,7 +77,8 @@ class ApkFileParserImpl(
                 others = others,
                 dexes = dexes,
                 size = apkSizeInfo.size,
-                downloadSize = apkSizeInfo.downloadSize
+                downloadSize = apkSizeInfo.downloadSize,
+                manifestFileInfo = manifestFileInfo
             )
         }
     }
