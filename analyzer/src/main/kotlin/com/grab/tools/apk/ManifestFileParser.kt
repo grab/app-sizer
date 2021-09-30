@@ -1,8 +1,10 @@
 package com.grab.tools.apk
 
+import com.android.tools.apk.analyzer.BinaryXmlParser
 import com.grab.tools.RawFileInfo
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
+import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.InputStreamReader
 
@@ -23,10 +25,10 @@ class ManifestFileParserImpl(
 
     override fun parse(manifestStream: InputStream, rawFileInfo: RawFileInfo): ManifestFileInfo {
         val infoMap: MutableMap<String, Any?> = mutableMapOf()
-
+        val manifestUTFBytes = BinaryXmlParser.decodeXml("AndroidManifest.xml", manifestStream.readBytes())
         manifestStream.use {
             val xmlPullParser = xmlPullParserFactory.newPullParser()
-            xmlPullParser.setInput(InputStreamReader(it))
+            xmlPullParser.setInput(InputStreamReader(ByteArrayInputStream(manifestUTFBytes)))
 
             var eventType = xmlPullParser.eventType
             while (eventType != XmlPullParser.END_DOCUMENT) {
