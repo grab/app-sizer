@@ -91,15 +91,3 @@ class GeneralAnalyticReport(
             }
     }
 }
-
-private const val DEFAULT_VERSION_NAME = "0.0.0"
-private const val DEFAULT_DEVICE_NAME = "PreferenceDevice"
-
-internal fun Set<ApkFileInfo>.toAppInfo(deviceName: String?): AppInfo {
-    val versionName =
-        find { it.manifestFileInfo.versionName != null }?.manifestFileInfo?.versionName ?: DEFAULT_VERSION_NAME
-    return AppInfo(
-        versionName = versionName,
-        deviceName = deviceName ?: DEFAULT_DEVICE_NAME,
-    )
-}

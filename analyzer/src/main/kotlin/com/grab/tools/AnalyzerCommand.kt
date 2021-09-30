@@ -82,6 +82,9 @@ class AnalyzerCommand : CliktCommand() {
         val projectDir = projectDir
         when {
             // Todo move to a separate class
+            reportOption == AnalyticsOption.APK_ANALYTICS -> {
+                analyticReportMap[AnalyticsOption.APK_ANALYTICS]?.report(apkFilesInfo, setOf())
+            }
             reportOption == AnalyticsOption.GENERAL && libDir != null && projectDir != null -> {
                 val libAarFileQuery = aarFileQueryMap[AnalyticsOption.LIBRARIES_ANALYTICS]!!
                 val libJarFileQuery = jarFileQueryMap[AnalyticsOption.LIBRARIES_ANALYTICS]!!

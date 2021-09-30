@@ -92,9 +92,3 @@ class FeatureAnalyticReport(
             }
     }
 }
-
-internal fun Set<ApkFileInfo>.dexDownloadRatio(): Double {
-    val dexDownloadSize = flatMap { it.dexes }.sumOf { it.downloadSize }
-    val dexClassesSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
-    return dexDownloadSize.toDouble() / dexClassesSize
-}

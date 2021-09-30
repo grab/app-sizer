@@ -72,26 +72,3 @@ class LibrariesAnalyticReport(
     }
 }
 
-internal fun Set<ApkFileInfo>.apksSizeReport(dexCompressedRatio: Double): ReportItem {
-    val resourceDownloadSize = flatMap { it.resources }.sumOf { it.downloadSize }
-    val nativeLibDownloadSize = flatMap { it.nativeLibs }.sumOf { it.downloadSize }
-    val assetDownloadSize = flatMap { it.assets }.sumOf { it.downloadSize }
-    val otherDownloadSize = flatMap { it.others }.sumOf { it.downloadSize }
-    val classesSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
-    val classDownloadSize = (classesSize * dexCompressedRatio).toLong()
-    val total =
-        resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + classDownloadSize
-    return ReportItem(
-        name = "Apks",
-        id = "apk",
-        totalDownloadSize = total,
-        resourceDownloadSize = resourceDownloadSize,
-        nativeLibDownloadSize = nativeLibDownloadSize,
-        assetDownloadSize = assetDownloadSize,
-        otherDownloadSize = otherDownloadSize,
-        classesSize = classesSize,
-        classesDownloadSize = classDownloadSize,
-        extraInfo = "Apk breakdown by component size"
-    )
-}
-
