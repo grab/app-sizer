@@ -32,7 +32,10 @@ object ReportModule {
     @Provides
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.APK_ANALYTICS)
-    fun provideApkAnalyticReport(): AnalyticReport = ApkAnalyticReport()
+    fun provideApkAnalyticReport(
+        reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
+        @Named(NAMED_DEVICE_NAME) deviceName: String?
+    ): AnalyticReport = ApkAnalyticReport(reportWriters, deviceName)
 
     @Provides
     @IntoMap
