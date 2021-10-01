@@ -7,10 +7,7 @@ import com.grab.tools.AnalyticsOption
 import com.grab.tools.analyzer.report.ExcelReportWriter
 import com.grab.tools.analyzer.report.MetricsReportWriter
 import com.grab.tools.analyzer.report.ReportWriter
-import com.grab.tools.di.AnalyticsOptionKey
-import com.grab.tools.di.NAMED_DEVICE_NAME
-import com.grab.tools.di.NAMED_FEATURE_MAPPING_FILE
-import com.grab.tools.di.NAMED_OUTPUT_FILE
+import com.grab.tools.di.*
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
@@ -71,8 +68,8 @@ object ReportModule {
 
     @Provides
     @IntoSet
-    fun provideJsonFeatureReportWriter(metricsPublisher: MetricsPublisher): ReportWriter =
-        MetricsReportWriter(metricsPublisher)
+    fun provideJsonFeatureReportWriter(@Named(NAMED_EXTRA_TAG) extraTag : String?, metricsPublisher: MetricsPublisher): ReportWriter =
+        MetricsReportWriter(metricsPublisher, extraTag?: "0000000")
 
     @Provides
     @IntoMap

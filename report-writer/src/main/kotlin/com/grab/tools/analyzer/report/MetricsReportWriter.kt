@@ -5,10 +5,11 @@ import com.grab.pax.plugins.report.Metrics
 import com.grab.pax.plugins.report.MetricsPublisher
 import com.grab.pax.plugins.report.Tag
 
-private const val METRICS_NAME = "mobile.pax.app.size.contributors"
+private const val METRICS_NAME = "mobile.pax.app.size.breakdown"
 
 class MetricsReportWriter(
-    private val metricsPublisher: MetricsPublisher
+    private val metricsPublisher: MetricsPublisher,
+    private val pipelineId: String,
 ) : ReportWriter {
     override fun write(appInfo: AppInfo, report: List<ReportItem>) {
         val metrics = report.map { item ->
@@ -16,34 +17,38 @@ class MetricsReportWriter(
                 name = METRICS_NAME,
                 datadogName = METRICS_NAME,
                 fields = buildFields(item),
-                tags = buildTags(appInfo),
+                tags = buildTags(appInfo, item),
                 timestamp = System.currentTimeMillis()
             )
         }
-
         metricsPublisher.publish(metrics)
     }
 
     private fun buildFields(report: ReportItem): List<Field> {
         return listOf(
             Field(
-                name = "contributor_id",
-                value = report.id.lowercase(),
-                valueType = "string"
+                name = report.id,
+                value = report.totalDownloadSize.toString(),
+                valueType = "integer"
             ),
             Field(
-                name = "contributor_size",
-                value = report.totalDownloadSize.toString(),
+                name = "pipeline_id",
+                value = pipelineId,
                 valueType = "integer"
             )
         )
     }
 
-    private fun buildTags(appInfo: AppInfo): List<Tag> {
+    private fun buildTags(appInfo: AppInfo, report: ReportItem): List<Tag> {
         return listOf(
             Tag(
                 name = "project",
                 value = "pax-android",
+                valueType = "string"
+            ),
+            Tag(
+                name = "contributor",
+                value = report.id.lowercase(),
                 valueType = "string"
             ),
             Tag(

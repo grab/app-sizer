@@ -51,6 +51,12 @@ class AnalyzerCommand : CliktCommand() {
         help = "The device name in the device spec that we generate the APK from the app bundle"
     )
 
+    private val extraTag: String? by option(
+        "-t",
+        "--tag-value",
+        help = "A tag value send along with the report"
+    )
+
     private val reportOption by option()
         .switch(
             "--libraries" to AnalyticsOption.LIBRARIES_ANALYTICS,
@@ -68,7 +74,8 @@ class AnalyzerCommand : CliktCommand() {
                 featureMappingFile = featureMappingFile,
                 output = outputFile,
                 analyticsOption = reportOption,
-                deviceName = deviceName
+                deviceName = deviceName,
+                extraTag = extraTag
             )
         val apkComponentAnalytic = component.apkComponentAnalytic()
         val analyticReportMap = component.analyticReportMap()

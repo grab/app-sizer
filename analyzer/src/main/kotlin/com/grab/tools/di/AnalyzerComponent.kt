@@ -33,6 +33,8 @@ const val NAMED_ROOT_PROJECT = "root"
 const val NAMED_OUTPUT_FILE = "out"
 const val NAMED_FEATURE_MAPPING_FILE = "mapping_file"
 const val NAMED_DEVICE_NAME = "device_name"
+const val NAMED_EXTRA_TAG = "tag"
+
 
 
 @Scope
@@ -65,6 +67,7 @@ interface AnalyzerComponent {
             @BindsInstance @Named(NAMED_FEATURE_MAPPING_FILE) featureMappingFile: File?,
             @BindsInstance @Named(NAMED_OUTPUT_FILE) output: File,
             @BindsInstance @Named(NAMED_DEVICE_NAME) deviceName: String?,
+            @BindsInstance @Named(NAMED_EXTRA_TAG) extraTag: String?,
             @BindsInstance analyticsOption: AnalyticsOption
         ): AnalyzerComponent
     }
