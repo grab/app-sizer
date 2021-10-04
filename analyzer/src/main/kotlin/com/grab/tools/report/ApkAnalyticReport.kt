@@ -12,20 +12,20 @@ class ApkAnalyticReport(
 
     override fun report(androidBinaryInfo: Set<ApkFileInfo>, contributor: Set<Contributor>) {
         val dexCompressedRatio = androidBinaryInfo.dexDownloadRatio()
-        val apkReport = androidBinaryInfo.apksSizeReport(dexCompressedRatio)
-        val fragmentedReport = androidBinaryInfo.apksSizeBreakdownReport(dexCompressedRatio)
+        val apkSizeReport = androidBinaryInfo.apksSizeReport(dexCompressedRatio)
+        val fragmentedReport = androidBinaryInfo.apksSizeBreakdownReport()
         reportWriters.forEach {
-            it.write(androidBinaryInfo.toAppInfo(deviceName), listOf(apkReport) + fragmentedReport)
+            it.write(androidBinaryInfo.toAppInfo(deviceName), listOf(apkSizeReport) + fragmentedReport, APK_METRICS_ID)
         }
     }
 
-    internal fun Set<ApkFileInfo>.apksSizeBreakdownReport(dexCompressedRatio: Double): List<ReportItem> {
+    private fun Set<ApkFileInfo>.apksSizeBreakdownReport(): List<ReportItem> {
         val resourceDownloadSize = flatMap { it.resources }.sumOf { it.downloadSize }
         val nativeLibDownloadSize = flatMap { it.nativeLibs }.sumOf { it.downloadSize }
         val assetDownloadSize = flatMap { it.assets }.sumOf { it.downloadSize }
         val otherDownloadSize = flatMap { it.others }.sumOf { it.downloadSize }
-        val classesSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
-        val classDownloadSize = (classesSize * dexCompressedRatio).toLong()
+        val dexDownloadFile = flatMap { it.dexes }.sumOf { it.downloadSize }
+
         return listOf(
             ReportItem(
                 id = "resource",
@@ -44,12 +44,8 @@ class ApkAnalyticReport(
                 totalDownloadSize = otherDownloadSize
             ),
             ReportItem(
-                id = "class",
-                totalDownloadSize = classesSize
-            ),
-            ReportItem(
-                id = "class_extracted",
-                totalDownloadSize = classDownloadSize
+                id = "code",
+                totalDownloadSize = dexDownloadFile
             )
         )
     }

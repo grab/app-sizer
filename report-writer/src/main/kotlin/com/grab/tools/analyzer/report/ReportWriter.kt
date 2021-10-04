@@ -15,10 +15,10 @@ data class ReportItem(
 
 data class AppInfo(
     val versionName: String,
-    val deviceName : String,
+    val deviceName: String,
     val tag: String = ""
 )
 
 interface ReportWriter {
-    fun write(appInfo: AppInfo, report: List<ReportItem>)
+    fun write(appInfo: AppInfo, report: List<ReportItem>, reportId: String)
 }

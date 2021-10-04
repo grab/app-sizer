@@ -17,7 +17,7 @@ class LibrariesAnalyticReport(
         val apkReport = apks.apksSizeReport(dexCompressedRatio)
         val totalLibsReport = totalLibrariesReport(dexCompressedRatio, contributorList)
         val listOfReport = listOf(apkReport, totalLibsReport) + reportPerLibrary(dexCompressedRatio, contributorList)
-        reportWriters.forEach { it.write(apks.toAppInfo(deviceName), listOfReport) }
+        reportWriters.forEach { it.write(apks.toAppInfo(deviceName), listOfReport, LIBRARY_METRICS_ID) }
     }
 
     private fun dexDownloadRatio(apks: Set<ApkFileInfo>): Double {

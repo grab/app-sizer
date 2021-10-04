@@ -38,7 +38,7 @@ class FeatureAnalyticReport(
         val sortedFeaturesReport = sortFeatures(dexCompressedRatio, features)
             .map { it.toReportItem(dexCompressedRatio) }
         reportWriters.forEach {
-            it.write(apks.toAppInfo(deviceName), listOf(apkReport, totalFeaturesReport) + sortedFeaturesReport)
+            it.write(apks.toAppInfo(deviceName), listOf(apkReport, totalFeaturesReport) + sortedFeaturesReport, GENERAL_METRICS_ID)
         }
     }
 

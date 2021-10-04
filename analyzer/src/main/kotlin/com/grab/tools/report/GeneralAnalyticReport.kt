@@ -8,6 +8,7 @@ import com.grab.tools.apk.ApkFileInfo
 import java.util.*
 
 
+
 class GeneralAnalyticReport(
     private val featureMapping: FeatureMapping,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
@@ -37,7 +38,7 @@ class GeneralAnalyticReport(
         val sortedFeaturesReport = sortFeatures(dexCompressedRatio, features)
             .map { it.toReportItem(dexCompressedRatio) }
         reportWriters.forEach {
-            it.write(apks.toAppInfo(deviceName), listOf(apkReport) + sortedFeaturesReport)
+            it.write(apks.toAppInfo(deviceName), listOf(apkReport) + sortedFeaturesReport, GENERAL_METRICS_ID)
         }
     }
 
