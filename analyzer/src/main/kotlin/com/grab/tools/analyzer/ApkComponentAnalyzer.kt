@@ -10,7 +10,7 @@ import com.grab.tools.jar.JarFileInfo
  */
 typealias RawContributors = Map<String, Set<FileInfo>>
 
-interface Analyzer {
+interface ApkComponentAnalyzer {
     fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars : Set<JarFileInfo>): RawContributors
 }
 

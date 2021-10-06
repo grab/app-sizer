@@ -4,8 +4,9 @@ import com.grab.tools.RawFileInfo
 import com.grab.tools.aar.AarFileInfo
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.jar.JarFileInfo
+import javax.inject.Inject
 
-class ResourceAnalyzer : Analyzer {
+class ResourceApkComponentAnalyzer @Inject constructor() : ApkComponentAnalyzer {
     override fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): RawContributors {
         val apkResource = apks.flatMap { it.resources }
         val aarsToResMap = mutableMapOf<RawFileInfo, String>().apply {

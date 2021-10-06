@@ -8,7 +8,7 @@ import com.grab.tools.di.NAMED_DEVICE_NAME
 import javax.inject.Inject
 import javax.inject.Named
 
-class ApkAnalyticReport @Inject constructor(
+class BasicApkAnalyticReport @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     @Named(NAMED_DEVICE_NAME)
     private val deviceName: String?

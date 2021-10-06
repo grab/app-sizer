@@ -4,11 +4,17 @@ import com.grab.tools.Contributor
 import com.grab.tools.analyzer.report.ReportItem
 import com.grab.tools.analyzer.report.ReportWriter
 import com.grab.tools.apk.ApkFileInfo
+import com.grab.tools.di.NAMED_DEVICE_NAME
 import java.io.File
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Named
 
-class LibrariesAnalyticReport(
+private const val CODE_BASE_ID = "Codebase"
+
+class LibrariesAnalyticReport @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
+    @Named(NAMED_DEVICE_NAME)
     private val deviceName: String?
 ) : AnalyticReport {
     override fun report(apks: Set<ApkFileInfo>, contributors: Set<Contributor>) {
@@ -16,9 +22,25 @@ class LibrariesAnalyticReport(
         val contributorList = sortContributors(dexCompressedRatio, contributors)
         val apkReport = apks.apksSizeReport(dexCompressedRatio)
         val totalLibsReport = totalLibrariesReport(dexCompressedRatio, contributorList)
-        val listOfReport = listOf(apkReport, totalLibsReport) + reportPerLibrary(dexCompressedRatio, contributorList)
+        val codeBaseReport = codeBaseReport(totalLibsReport, apkReport)
+        val listOfReport =
+            listOf(apkReport, codeBaseReport, totalLibsReport) + reportPerLibrary(dexCompressedRatio, contributorList)
         reportWriters.forEach { it.write(apks.toAppInfo(deviceName), listOfReport, LIBRARY_METRICS_ID) }
     }
+
+    private fun codeBaseReport(
+        totalLibsReport: ReportItem,
+        apkReport: ReportItem
+    ): ReportItem = ReportItem(
+        id = CODE_BASE_ID,
+        name = CODE_BASE_ID,
+        totalDownloadSize = apkReport.totalDownloadSize - totalLibsReport.totalDownloadSize,
+        otherDownloadSize = apkReport.otherDownloadSize - totalLibsReport.otherDownloadSize,
+        resourceDownloadSize = apkReport.resourceDownloadSize - totalLibsReport.resourceDownloadSize,
+        nativeLibDownloadSize = apkReport.nativeLibDownloadSize - totalLibsReport.nativeLibDownloadSize,
+        classesDownloadSize = apkReport.classesDownloadSize - totalLibsReport.classesDownloadSize,
+        classesSize = apkReport.classesSize - totalLibsReport.classesSize
+    )
 
     private fun dexDownloadRatio(apks: Set<ApkFileInfo>): Double {
         val dexDownloadSize = apks.flatMap { it.dexes }.sumOf { it.downloadSize }
@@ -29,7 +51,7 @@ class LibrariesAnalyticReport(
     private fun Contributor.toReportItem(dexCompressedRatio: Double): ReportItem = ReportItem(
         name = File(path).nameWithoutExtension,
         extraInfo = path.substring(path.indexOf("files-2.1/") + 9),
-        id = path,
+        id = File(path).nameWithoutExtension,
         totalDownloadSize = getDownloadSize(dexCompressedRatio),
         classesDownloadSize = getClassDownloadSize(dexCompressedRatio),
         classesSize = classSize,

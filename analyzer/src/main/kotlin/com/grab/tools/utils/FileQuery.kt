@@ -2,13 +2,14 @@ package com.grab.tools.utils
 
 import java.io.File
 import java.io.IOException
+import javax.inject.Inject
 
 
 interface FileQuery{
     fun query(dir: File, vararg extensions: String): Sequence<File>
 }
 
-class DefaultFileQuery : FileQuery {
+class DefaultFileQuery @Inject constructor() : FileQuery {
 
     @Throws(IOException::class)
     override fun query(dir: File, vararg extensions: String): Sequence<File> {

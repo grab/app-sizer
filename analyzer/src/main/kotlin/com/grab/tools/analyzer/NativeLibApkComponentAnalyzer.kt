@@ -4,9 +4,8 @@ import com.grab.tools.RawFileInfo
 import com.grab.tools.aar.AarFileInfo
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.jar.JarFileInfo
-import com.grab.tools.log.log
 
-class NativeLibAnalyzer : Analyzer {
+class NativeLibApkComponentAnalyzer : ApkComponentAnalyzer {
     override fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): RawContributors {
         val apkLibs = apks.flatMap { apk -> apk.nativeLibs }
         val libraryMap = mutableMapOf<RawFileInfo, String>().apply {

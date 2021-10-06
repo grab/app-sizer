@@ -6,7 +6,7 @@ import com.grab.tools.aar.AarFileInfo
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.jar.JarFileInfo
 
-class AssetsAnalyzer : Analyzer {
+class AssetsApkComponentAnalyzer : ApkComponentAnalyzer {
     override fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars : Set<JarFileInfo>): RawContributors {
         val apkAssets = apks.flatMap { apk -> apk.assets }
 

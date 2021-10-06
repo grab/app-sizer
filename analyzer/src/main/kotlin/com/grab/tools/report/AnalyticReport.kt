@@ -8,6 +8,7 @@ internal const val MEGA_BYTE = 1024L * 1024L
 
 internal const val LIBRARY_METRICS_ID = "mobile.pax.app.size.breakdown.lib"
 internal const val GENERAL_METRICS_ID = "mobile.pax.app.size.breakdown.tfs"
+internal const val MODULES_METRICS_ID = "mobile.pax.app.size.breakdown.mds"
 internal const val APK_METRICS_ID = "mobile.pax.app.size.breakdown.components"
 
 interface AnalyticReport {

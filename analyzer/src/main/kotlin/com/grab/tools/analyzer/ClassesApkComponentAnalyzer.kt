@@ -6,7 +6,7 @@ import com.grab.tools.aar.AarFileInfo
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.jar.JarFileInfo
 
-class ClassesAnalyzer : Analyzer {
+class ClassesApkComponentAnalyzer : ApkComponentAnalyzer {
     override fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): RawContributors {
         val apkClasses = apks.flatMap { apk -> apk.dexes }.flatMap { dex -> dex.classes }
         val libClassMap = mutableMapOf<ClassFileInfo, String>().apply {

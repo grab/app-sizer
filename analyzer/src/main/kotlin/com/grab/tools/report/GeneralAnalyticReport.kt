@@ -1,17 +1,19 @@
 package com.grab.tools.report
 
 import com.grab.tools.Contributor
-import com.grab.tools.analyzer.report.AppInfo
 import com.grab.tools.analyzer.report.ReportItem
 import com.grab.tools.analyzer.report.ReportWriter
 import com.grab.tools.apk.ApkFileInfo
+import com.grab.tools.di.NAMED_DEVICE_NAME
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Named
 
 
-
-class GeneralAnalyticReport(
+class GeneralAnalyticReport @Inject constructor(
     private val featureMapping: FeatureMapping,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
+    @Named(NAMED_DEVICE_NAME)
     private val deviceName: String?
 ) : AnalyticReport {
     override fun report(androidBinaryInfo: Set<ApkFileInfo>, contributor: Set<Contributor>) {
@@ -19,7 +21,7 @@ class GeneralAnalyticReport(
     }
 
     private fun buildFeatures(contributor: Set<Contributor>): List<Feature> {
-        val moduleToContributorMap = contributor.moduleToContributor().toMutableMap()
+        val moduleToContributorMap = contributor.moduleToContributors().toMutableMap()
         val featureToContributorMap = featureMapping.featureToModuleMap.mapValues { entry ->
             entry.value.flatMap { module ->
                 if (moduleToContributorMap[module] == null) println("Can not find: $module")
@@ -38,8 +40,20 @@ class GeneralAnalyticReport(
         val sortedFeaturesReport = sortFeatures(dexCompressedRatio, features)
             .map { it.toReportItem(dexCompressedRatio) }
         reportWriters.forEach {
-            it.write(apks.toAppInfo(deviceName), listOf(apkReport) + sortedFeaturesReport, GENERAL_METRICS_ID)
+            it.write(
+                apks.toAppInfo(deviceName),
+                listOf(apkReport, otherReport(apkReport)) + sortedFeaturesReport,
+                GENERAL_METRICS_ID
+            )
         }
+    }
+
+    private fun otherReport(apkReport: ReportItem): ReportItem {
+        return ReportItem(
+            id = NON_TRACKING_ID,
+            name = NON_TRACKING_ID,
+            totalDownloadSize = apkReport.otherDownloadSize
+        )
     }
 
     private fun Feature.toReportItem(dexCompressedRatio: Double): ReportItem = ReportItem(
@@ -77,18 +91,37 @@ class GeneralAnalyticReport(
         })
         return contributor
     }
+}
 
-    private fun Set<Contributor>.moduleToContributor(): Map<String, List<Contributor>> {
-        return asSequence()
-            .map { it.path to it }
-            .map {
-                val segments = it.first.removeRange(it.first.indexOf("/build/"), it.first.length).split("/")
-                val moduleName = segments[segments.size - 1]
-                moduleName to it.second
-            }
-            .groupBy { it.first }
-            .mapValues { item ->
-                item.value.map { it.second }
-            }
-    }
+internal fun Set<Contributor>.moduleToContributors(): Map<String, List<Contributor>> {
+    return asSequence()
+        .map { it.path to it }
+        .map {
+            val segments = it.first.removeRange(it.first.indexOf("/build/"), it.first.length).split("/")
+            val moduleName = segments[segments.size - 1]
+            moduleName to it.second
+        }
+        .groupBy { it.first }
+        .mapValues { item ->
+            item.value.map { it.second }
+        }
+}
+
+
+private data class Feature(
+    val name: String,
+    val contributors: List<Contributor>
+) {
+    val resourcesDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.resourcesDownloadSize } }
+    val nativeLibDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.nativeLibDownloadSize } }
+    val assetsDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.assetsDownloadSize } }
+    val othersDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.othersDownloadSize } }
+    val classSize: Long by lazy { contributors.sumOf { contributor -> contributor.classSize } }
+
+    fun getClassDownloadSize(downloadSizeRatio: Double): Long = (classSize * downloadSizeRatio).toLong()
+
+    fun getDownloadSize(downloadSizeRatio: Double): Long =
+        resourcesDownloadSize + nativeLibDownloadSize + assetsDownloadSize + othersDownloadSize + getClassDownloadSize(
+            downloadSizeRatio
+        )
 }

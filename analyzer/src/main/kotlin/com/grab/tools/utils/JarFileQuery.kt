@@ -2,6 +2,7 @@ package com.grab.tools.utils
 
 import java.io.File
 import java.io.IOException
+import javax.inject.Inject
 
 private const val APP_MODULE = "app"
 private const val JAR_EXTENSION = "jar"
@@ -13,11 +14,11 @@ interface JarFileQuery {
     fun query(dir: File): Sequence<File>
 }
 
-class DefaultJarFileQuery(private val fileQuery: FileQuery = DefaultFileQuery()) : JarFileQuery {
+class DefaultJarFileQuery @Inject constructor(private val fileQuery: FileQuery) : JarFileQuery {
     override fun query(dir: File): Sequence<File> = fileQuery.query(dir, JAR_EXTENSION)
 }
 
-class ModuleJarFileQuery(private val fileQuery: FileQuery = DefaultFileQuery()) : JarFileQuery {
+class ModuleJarFileQuery @Inject constructor(private val fileQuery: FileQuery) : JarFileQuery {
     override fun query(dir: File): Sequence<File> {
         if (dir.isFile) throw IOException("${dir.path} is not a directory")
         return dir.queryModules()

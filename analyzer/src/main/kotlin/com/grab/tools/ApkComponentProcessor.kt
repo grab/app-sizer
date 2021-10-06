@@ -6,7 +6,7 @@ import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.jar.JarFileInfo
 
 
-class ApkComponentAnalytic(private val analytics: Map<AnalyzerClass, Analyzer>) {
+class ApkComponentAnalytic(private val analytics: Map<AnalyzerClass, ApkComponentAnalyzer>) {
 
     fun process(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): Set<Contributor> {
         val rawContributorMap = analytics.mapValues { it.value.analyze(apks, aars, jars) }
@@ -20,7 +20,7 @@ class ApkComponentAnalytic(private val analytics: Map<AnalyzerClass, Analyzer>) 
     }
 
     private fun MutableMap<String, Contributor>.createAssetContributors(rawContributorMap: Map<AnalyzerClass, RawContributors>) {
-        rawContributorMap[AssetsAnalyzer::class.java]?.forEach { rawEntry ->
+        rawContributorMap[AssetsApkComponentAnalyzer::class.java]?.forEach { rawEntry ->
             val libName = rawEntry.key
             val assets = rawEntry.value
             var contributor = get(libName)
@@ -31,7 +31,7 @@ class ApkComponentAnalytic(private val analytics: Map<AnalyzerClass, Analyzer>) 
     }
 
     private fun MutableMap<String, Contributor>.createResourceContributors(rawContributorMap: Map<AnalyzerClass, RawContributors>) {
-        rawContributorMap[ResourceAnalyzer::class.java]?.forEach { rawEntry ->
+        rawContributorMap[ResourceApkComponentAnalyzer::class.java]?.forEach { rawEntry ->
             val libName = rawEntry.key
             val data = rawEntry.value
             var contributor = get(libName)
@@ -42,7 +42,7 @@ class ApkComponentAnalytic(private val analytics: Map<AnalyzerClass, Analyzer>) 
     }
 
     private fun MutableMap<String, Contributor>.createNativeLibsContributors(rawContributorMap: Map<AnalyzerClass, RawContributors>) {
-        rawContributorMap[NativeLibAnalyzer::class.java]?.forEach { rawEntry ->
+        rawContributorMap[NativeLibApkComponentAnalyzer::class.java]?.forEach { rawEntry ->
             val libName = rawEntry.key
             val data = rawEntry.value
             var contributor = get(libName)
@@ -53,7 +53,7 @@ class ApkComponentAnalytic(private val analytics: Map<AnalyzerClass, Analyzer>) 
     }
 
     private fun MutableMap<String, Contributor>.createOtherContributors(rawContributorMap: Map<AnalyzerClass, RawContributors>) {
-        rawContributorMap[OtherAnalyzer::class.java]?.forEach { rawEntry ->
+        rawContributorMap[OtherApkComponentAnalyzer::class.java]?.forEach { rawEntry ->
             val libName = rawEntry.key
             val data = rawEntry.value
             var contributor = get(libName)
@@ -64,7 +64,7 @@ class ApkComponentAnalytic(private val analytics: Map<AnalyzerClass, Analyzer>) 
     }
 
     private fun MutableMap<String, Contributor>.createClassContributors(rawContributorMap: Map<AnalyzerClass, RawContributors>) {
-        rawContributorMap[ClassesAnalyzer::class.java]?.forEach { rawEntry ->
+        rawContributorMap[ClassesApkComponentAnalyzer::class.java]?.forEach { rawEntry ->
             val libName = rawEntry.key
             val data = rawEntry.value
             var contributor = get(libName)
