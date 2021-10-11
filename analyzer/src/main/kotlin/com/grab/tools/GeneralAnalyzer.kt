@@ -1,11 +1,12 @@
 package com.grab.tools
 
 import com.grab.tools.aar.AarFileParser
+import com.grab.tools.analyzer.ApkComponentProcessor
 import com.grab.tools.apk.ApkFileParser
 import com.grab.tools.apk.ProguardMappingParser
 import com.grab.tools.di.*
 import com.grab.tools.jar.JarFileParser
-import com.grab.tools.report.GeneralAnalyticReport
+import com.grab.tools.report.FeatureAnalyticReport
 import com.grab.tools.utils.DefaultAarFileQuery
 import com.grab.tools.utils.DefaultJarFileQuery
 import com.grab.tools.utils.ModuleAarFileQuery
@@ -19,7 +20,7 @@ interface Analyzer {
 
 @AppScope
 class GeneralAnalyzer @Inject constructor(
-    private val apkComponentAnalytic: ApkComponentAnalytic,
+    private val apkComponentProcessor: ApkComponentProcessor,
     private val proguardMappingParser: ProguardMappingParser,
     private val apkFileParser: ApkFileParser,
     private val aarFileParser: AarFileParser,
@@ -28,7 +29,7 @@ class GeneralAnalyzer @Inject constructor(
     private val libJarFileQuery: DefaultJarFileQuery,
     private val moduleAarFileQuery: ModuleAarFileQuery,
     private val moduleJarFileQuery: ModuleJarFileQuery,
-    private val generalAnalyticReport: GeneralAnalyticReport,
+    private val featureAnalyticReport: FeatureAnalyticReport,
     @AnalyzerInputFile(INPUT_FILE_PROGUARD_MAPPING_FILE)
     private val proguardMappingFile: File?,
     @AnalyzerInputFile(INPUT_FILE_LIB_DIRECTORY)
@@ -44,25 +45,27 @@ class GeneralAnalyzer @Inject constructor(
 
         val proguardMap = proguardMappingFile?.run { proguardMappingParser.parse(this) }
         val apkFilesInfo = apkFileParser.parseApks(apkDirs, proguardMap)
-
         val libAarFilesInfo = aarFileParser.parseAars(librariesDirectory, libAarFileQuery)
         val libJarFilesInfo = jarFileParser.parseJars(librariesDirectory, libJarFileQuery)
-
-        val libProcessedData = apkComponentAnalytic.process(apkFilesInfo, libAarFilesInfo, libJarFilesInfo)
-        val allLibContributor = libProcessedData.reduce { acc, contributor ->
-            Contributor(
-                path = "All-libraries/build/",
-                assets = acc.assets + contributor.assets,
-                resources = acc.resources + contributor.resources,
-                nativeLibs = acc.nativeLibs + contributor.nativeLibs,
-                classes = acc.classes + contributor.classes,
-                others = acc.others + contributor.others
-            )
-        }
         val aarFilesInfo = aarFileParser.parseAars(projectDir, moduleAarFileQuery)
         val jarFilesInfo = jarFileParser.parseJars(projectDir, moduleJarFileQuery)
-        val processedData =
-            apkComponentAnalytic.process(apkFilesInfo, aarFilesInfo, jarFilesInfo) + allLibContributor
-        generalAnalyticReport.report(apkFilesInfo, processedData)
+
+        /**
+         * Process the whole project to get the app module information
+         */
+        val wholeProject =
+            apkComponentProcessor.process(apkFilesInfo, libAarFilesInfo + aarFilesInfo, libJarFilesInfo + jarFilesInfo)
+        val appModule = Contributor(
+            path = "root/app/build/",
+            assets = wholeProject.noOwnerAssets.castToRawFile(),
+            resources = wholeProject.noOwnerResources.castToRawFile(),
+            nativeLibs = wholeProject.noOwnerNativeLibs.castToRawFile(),
+            classes = wholeProject.noOwnerClasses.castToClass(),
+            //others = wholeProject.noOwnerOthers.castToRawFile()
+        )
+
+        val modulesData =
+            apkComponentProcessor.process(apkFilesInfo, aarFilesInfo, jarFilesInfo)
+        featureAnalyticReport.report(apkFilesInfo, modulesData.contributors + appModule)
     }
 }

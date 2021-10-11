@@ -1,5 +1,6 @@
 package com.grab.tools.analyzer
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.ClassKey
@@ -9,29 +10,65 @@ import dagger.multibindings.IntoMap
 typealias AnalyzerClass = Class<*>
 
 @Module
-object ApkComponentAnalyzerModule {
-    @Provides
+interface ApkComponentAnalyzerModule {
+    @Binds
     @IntoMap
     @ClassKey(ResourceApkComponentAnalyzer::class)
-    fun provideResourceAnalyzer(): ApkComponentAnalyzer = ResourceApkComponentAnalyzer()
+    fun ResourceApkComponentAnalyzer.bindResourceAnalyzer(): ApkComponentAnalyzer
 
-    @Provides
+    @Binds
     @IntoMap
     @ClassKey(NativeLibApkComponentAnalyzer::class)
-    fun provideNativeLibAnalyzer(): ApkComponentAnalyzer = NativeLibApkComponentAnalyzer()
+    fun NativeLibApkComponentAnalyzer.bindNativeLibAnalyzer(): ApkComponentAnalyzer
 
-    @Provides
+    @Binds
     @IntoMap
     @ClassKey(AssetsApkComponentAnalyzer::class)
-    fun provideAssetsAnalyzer(): ApkComponentAnalyzer = AssetsApkComponentAnalyzer()
+    fun AssetsApkComponentAnalyzer.bindAssetsAnalyzer(): ApkComponentAnalyzer
 
-    @Provides
+    @Binds
     @IntoMap
     @ClassKey(ClassesApkComponentAnalyzer::class)
-    fun provideClassesAnalyzer(): ApkComponentAnalyzer = ClassesApkComponentAnalyzer()
+    fun ClassesApkComponentAnalyzer.bindClassesAnalyzer(): ApkComponentAnalyzer
 
-    @Provides
+    @Binds
     @IntoMap
     @ClassKey(OtherApkComponentAnalyzer::class)
-    fun provideOtherAnalyzer(): ApkComponentAnalyzer = OtherApkComponentAnalyzer()
+    fun OtherApkComponentAnalyzer.bindOtherAnalyzer(): ApkComponentAnalyzer
+
+
+    @Binds
+    fun DefaultApkComponentProcessor.bindApkComponentProcessor(): ApkComponentProcessor
 }
+
+//@Module
+//object ApkComponentAnalyzerModule {
+//    @Provides
+//    @IntoMap
+//    @ClassKey(ResourceApkComponentAnalyzer::class)
+//    fun ResourceApkComponentAnalyzer.bindResourceAnalyzer(): ApkComponentAnalyzer = this
+//
+//    @Provides
+//    @IntoMap
+//    @ClassKey(NativeLibApkComponentAnalyzer::class)
+//    fun NativeLibApkComponentAnalyzer.bindNativeLibAnalyzer(): ApkComponentAnalyzer = this
+//
+//    @Provides
+//    @IntoMap
+//    @ClassKey(AssetsApkComponentAnalyzer::class)
+//    fun AssetsApkComponentAnalyzer.bindAssetsAnalyzer(): ApkComponentAnalyzer = this
+//
+//    @Provides
+//    @IntoMap
+//    @ClassKey(ClassesApkComponentAnalyzer::class)
+//    fun ClassesApkComponentAnalyzer.bindClassesAnalyzer(): ApkComponentAnalyzer = this
+//
+//    @Provides
+//    @IntoMap
+//    @ClassKey(OtherApkComponentAnalyzer::class)
+//    fun OtherApkComponentAnalyzer.bindOtherAnalyzer(): ApkComponentAnalyzer = this
+//
+//
+//    @Binds
+//    fun DefaultApkComponentProcessor.bindApkComponentProcessor(): ApkComponentProcessor
+//}

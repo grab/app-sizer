@@ -5,52 +5,125 @@ import com.grab.tools.analyzer.report.ReportItem
 import com.grab.tools.analyzer.report.ReportWriter
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.di.NAMED_DEVICE_NAME
+import java.io.File
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
+
+private const val CODE_BASE_ID = "Codebase"
 
 class ApkAnalyticReport @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     @Named(NAMED_DEVICE_NAME)
     private val deviceName: String?
 ) : AnalyticReport {
-
-    override fun report(androidBinaryInfo: Set<ApkFileInfo>, contributor: Set<Contributor>) {
-        val dexCompressedRatio = androidBinaryInfo.dexDownloadRatio()
-        val apkSizeReport = androidBinaryInfo.apksSizeReport(dexCompressedRatio)
-        val fragmentedReport = androidBinaryInfo.apksSizeBreakdownReport()
-        reportWriters.forEach {
-            it.write(androidBinaryInfo.toAppInfo(deviceName), listOf(apkSizeReport) + fragmentedReport, APK_METRICS_ID)
-        }
+    override fun report(apks: Set<ApkFileInfo>, contributors: Set<Contributor>) {
+        val dexCompressedRatio = dexDownloadRatio(apks)
+        val contributorList = sortContributors(dexCompressedRatio, contributors)
+        val apkReport = apks.apksSizeReport(dexCompressedRatio)
+        val totalLibsReport = totalLibrariesReport(dexCompressedRatio, contributorList)
+        val libComponentReport = libComponentReport(totalLibsReport)
+        val codeBaseReports = codeBaseComponentReport(codeBaseReport(totalLibsReport, apkReport))
+        val listOfReport = listOf(apkReport) + codeBaseReports + libComponentReport
+        reportWriters.forEach { it.write(apks.toAppInfo(deviceName), listOfReport, METRICS_ID_APK) }
     }
 
-    private fun Set<ApkFileInfo>.apksSizeBreakdownReport(): List<ReportItem> {
-        val resourceDownloadSize = flatMap { it.resources }.sumOf { it.downloadSize }
-        val nativeLibDownloadSize = flatMap { it.nativeLibs }.sumOf { it.downloadSize }
-        val assetDownloadSize = flatMap { it.assets }.sumOf { it.downloadSize }
-        val otherDownloadSize = flatMap { it.others }.sumOf { it.downloadSize }
-        val dexDownloadFile = flatMap { it.dexes }.sumOf { it.downloadSize }
+    private fun codeBaseReport(
+        totalLibsReport: ReportItem,
+        apkReport: ReportItem
+    ): ReportItem = ReportItem(
+        id = CODE_BASE_ID,
+        name = CODE_BASE_ID,
+        totalDownloadSize = apkReport.totalDownloadSize - totalLibsReport.totalDownloadSize,
+        otherDownloadSize = apkReport.otherDownloadSize - totalLibsReport.otherDownloadSize,
+        resourceDownloadSize = apkReport.resourceDownloadSize - totalLibsReport.resourceDownloadSize,
+        nativeLibDownloadSize = apkReport.nativeLibDownloadSize - totalLibsReport.nativeLibDownloadSize,
+        assetDownloadSize = apkReport.assetDownloadSize - totalLibsReport.assetDownloadSize,
+        classesDownloadSize = apkReport.classesDownloadSize - totalLibsReport.classesDownloadSize,
+        classesSize = apkReport.classesSize - totalLibsReport.classesSize
+    )
 
-        return listOf(
-            ReportItem(
-                id = "resource",
-                totalDownloadSize = resourceDownloadSize
-            ),
-            ReportItem(
-                id = "native_lib",
-                totalDownloadSize = nativeLibDownloadSize
-            ),
-            ReportItem(
-                id = "asset",
-                totalDownloadSize = assetDownloadSize
-            ),
-            ReportItem(
-                id = "other",
-                totalDownloadSize = otherDownloadSize
-            ),
-            ReportItem(
-                id = "code",
-                totalDownloadSize = dexDownloadFile
-            )
+    private fun Contributor.toReportItem(dexCompressedRatio: Double): ReportItem = ReportItem(
+        name = File(path).nameWithoutExtension,
+        extraInfo = path.substring(path.indexOf("files-2.1/") + 9),
+        id = File(path).nameWithoutExtension,
+        totalDownloadSize = getDownloadSize(dexCompressedRatio),
+        classesDownloadSize = getClassDownloadSize(dexCompressedRatio),
+        classesSize = classSize,
+        nativeLibDownloadSize = nativeLibDownloadSize,
+        resourceDownloadSize = resourcesDownloadSize,
+        assetDownloadSize = assetsDownloadSize,
+        otherDownloadSize = othersDownloadSize,
+    )
+
+    private fun libComponentReport(allLibReport: ReportItem): List<ReportItem> = listOf(
+        ReportItem(
+            id = "android-java-libraries",
+            totalDownloadSize = allLibReport.totalDownloadSize - allLibReport.nativeLibDownloadSize
+        ),
+        ReportItem(
+            id = "native-libraries",
+            totalDownloadSize = allLibReport.totalDownloadSize - allLibReport.nativeLibDownloadSize
         )
+    )
+
+    private fun codeBaseComponentReport(codeBaseReport: ReportItem): List<ReportItem> = listOf(
+        ReportItem(
+            id = "codebase-kotlin-java",
+            totalDownloadSize = codeBaseReport.classesDownloadSize,
+        ),
+        ReportItem(
+            id = "codebase-resources",
+            totalDownloadSize = codeBaseReport.resourceDownloadSize,
+        ),
+        ReportItem(
+            id = "codebase-assets",
+            totalDownloadSize = codeBaseReport.assetDownloadSize,
+        ),
+        ReportItem(
+            id = "codebase-native",
+            totalDownloadSize = codeBaseReport.nativeLibDownloadSize,
+        ),
+        ReportItem(
+            id = "others",
+            totalDownloadSize = codeBaseReport.otherDownloadSize,
+        ),
+    )
+
+    private fun dexDownloadRatio(apks: Set<ApkFileInfo>): Double {
+        val dexDownloadSize = apks.flatMap { it.dexes }.sumOf { it.downloadSize }
+        val dexClassesSize = apks.flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
+        return dexDownloadSize.toDouble() / dexClassesSize
+    }
+
+    private fun totalLibrariesReport(dexCompressedRatio: Double, data: List<Contributor>): ReportItem {
+        return data.reduce { pre, cur ->
+            pre.copy(
+                resources = pre.resources + cur.resources,
+                assets = pre.assets + cur.assets,
+                nativeLibs = pre.nativeLibs + cur.nativeLibs,
+                classes = pre.classes + cur.classes,
+                others = pre.others + cur.others
+            )
+        }.toReportItem(dexCompressedRatio)
+            .copy(
+                name = "All libraries",
+                extraInfo = "Sum up all libraries values",
+                id = "all_libraries",
+            )
+    }
+
+
+    private fun sortContributors(dexCompressedRatio: Double, contributor: Set<Contributor>): List<Contributor> {
+        val data = contributor.toList()
+        Collections.sort(data, Comparator<Contributor> { o1, o2 ->
+            val size1 = o1.getDownloadSize(dexCompressedRatio)
+            val size2 = o2.getDownloadSize(dexCompressedRatio)
+            if (size1 > size2) -1
+            else if (size1 < size2) 1
+            else 0
+        })
+        return data
     }
 }
+

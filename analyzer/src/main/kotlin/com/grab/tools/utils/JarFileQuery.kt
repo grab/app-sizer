@@ -26,7 +26,7 @@ class ModuleJarFileQuery @Inject constructor(private val fileQuery: FileQuery) :
             .filter { it.exists() && it.isDirectory }
             .flatMap {
                 fileQuery.query(it, JAR_EXTENSION)
-            } + appModule(dir)
+            }
     }
 
     private fun appModule(dir: File): Sequence<File> = fileQuery.query(File(dir, APP_MODULE), JAR_EXTENSION)

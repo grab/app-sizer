@@ -14,26 +14,27 @@ internal const val NON_TRACKING_ID = "Others"
 
 class ModuleAnalyticReport @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
+    private val featureMapping: FeatureMapping,
     @Named(NAMED_DEVICE_NAME)
     private val deviceName: String?
 ) : AnalyticReport {
-    override fun report(androidBinaryInfo: Set<ApkFileInfo>, contributor: Set<Contributor>) {
-        reportFeatures(androidBinaryInfo, buildFeatures(contributor))
+    override fun report(androidBinaryInfo: Set<ApkFileInfo>, contributors: Set<Contributor>) {
+        reportFeatures(androidBinaryInfo, buildFeatures(contributors))
     }
 
     private fun reportFeatures(apks: Set<ApkFileInfo>, modules: List<Module>) {
         val dexCompressedRatio = apks.dexDownloadRatio()
         val apkReport = apks.apksSizeReport(dexCompressedRatio)
         val sortedFeaturesReport = sortFeatures(dexCompressedRatio, modules)
-            .map { it.toReportItem(dexCompressedRatio) }
+            .map { it.toReportItem(dexCompressedRatio, featureMapping.moduleToFeatureMap) }
         val totalModuleReport = totalModuleReport(sortedFeaturesReport)
         val librariesReport = librariesReport(apkReport, totalModuleReport)
-
+        featureMapping.moduleToFeatureMap
         reportWriters.forEach {
             it.write(
                 apks.toAppInfo(deviceName),
-                listOf(apkReport, librariesReport, otherReport(apkReport)) + sortedFeaturesReport,
-                MODULES_METRICS_ID
+                listOf(apkReport, librariesReport) + sortedFeaturesReport,
+                METRICS_ID_MODULES
             )
         }
     }
@@ -83,30 +84,20 @@ class ModuleAnalyticReport @Inject constructor(
         return features
     }
 
-    private fun Module.toReportItem(dexCompressedRatio: Double): ReportItem = ReportItem(
-        name = name,
-        id = name,
-        extraInfo = "Sum up all codebase for $name",
-        totalDownloadSize = getDownloadSize(dexCompressedRatio),
-        classesSize = classSize,
-        classesDownloadSize = getClassDownloadSize(dexCompressedRatio),
-        nativeLibDownloadSize = nativeLibDownloadSize,
-        resourceDownloadSize = resourcesDownloadSize,
-        assetDownloadSize = assetsDownloadSize,
-        otherDownloadSize = othersDownloadSize
-    )
-
-    private fun totalLibsContributor(dexCompressedRatio: Double, data: List<Module>): ReportItem =
-        data.reduce { pre, cur ->
-            pre.copy(
-                name = "All Module",
-                contributors = pre.contributors + cur.contributors
-            )
-        }.toReportItem(dexCompressedRatio)
-            .copy(
-                id = "all_modules",
-                extraInfo = "Sum up all modules values"
-            )
+    private fun Module.toReportItem(dexCompressedRatio: Double, moduleToFeatureMap: Map<String, String>): ReportItem =
+        ReportItem(
+            name = name,
+            id = name,
+            owner = moduleToFeatureMap[name],
+            extraInfo = "Sum up all codebase for $name",
+            totalDownloadSize = getDownloadSize(dexCompressedRatio),
+            classesSize = classSize,
+            classesDownloadSize = getClassDownloadSize(dexCompressedRatio),
+            nativeLibDownloadSize = nativeLibDownloadSize,
+            resourceDownloadSize = resourcesDownloadSize,
+            assetDownloadSize = assetsDownloadSize,
+            otherDownloadSize = othersDownloadSize
+        )
 
     private fun sortFeatures(dexCompressedRatio: Double, contributor: List<Module>): List<Module> {
         Collections.sort(contributor, Comparator<Module> { o1, o2 ->

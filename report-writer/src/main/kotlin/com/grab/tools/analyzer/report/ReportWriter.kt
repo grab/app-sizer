@@ -5,17 +5,19 @@ data class ReportItem(
     val totalDownloadSize: Long,
     val name: String = "",
     val extraInfo: String = "",
+    val owner: String? = null,
     val classesSize: Long = 0L,
     val classesDownloadSize: Long = 0L,
     val nativeLibDownloadSize: Long = 0L,
     val resourceDownloadSize: Long = 0L,
     val assetDownloadSize: Long = 0L,
-    val otherDownloadSize: Long = 0L
+    val otherDownloadSize: Long = 0L,
 )
 
 data class AppInfo(
     val versionName: String,
     val deviceName: String,
+    val buildType: String = "production",
     val tag: String = ""
 )
 

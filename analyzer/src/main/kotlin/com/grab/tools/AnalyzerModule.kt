@@ -33,5 +33,4 @@ interface AnalyzerModule {
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.APK_ANALYTICS)
     fun ApkAnalyzer.bindApkAnalyzer(): Analyzer
-
 }

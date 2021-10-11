@@ -4,15 +4,18 @@ import com.grab.tools.ClassFileInfo
 import com.grab.tools.FileType
 import com.grab.tools.RawFileInfo
 import com.grab.tools.apk.getPath
+import com.grab.tools.di.AppScope
 import java.io.InputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
+import javax.inject.Inject
 
 interface JarStreamParser {
     fun parse(entry: ZipEntry, inputStream: InputStream): JarFileInfo
 }
 
-class JarStreamParserImpl : JarStreamParser {
+@AppScope
+class DefaultJarStreamParser @Inject constructor() : JarStreamParser {
     override fun parse(jarEntry: ZipEntry, inputStream: InputStream): JarFileInfo {
         ZipInputStream(inputStream).use { entries ->
             val others = mutableSetOf<RawFileInfo>()

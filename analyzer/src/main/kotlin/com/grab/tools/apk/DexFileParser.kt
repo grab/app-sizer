@@ -2,6 +2,7 @@ package com.grab.tools.apk
 
 
 import com.grab.tools.ClassFileInfo
+import com.grab.tools.di.AppScope
 import com.grab.tools.log.log
 import org.jf.dexlib2.dexbacked.DexBackedClassDef
 import org.jf.dexlib2.dexbacked.DexBackedDexFile
@@ -9,6 +10,7 @@ import shadow.bundletool.com.android.tools.proguard.ProguardMap
 import java.io.BufferedInputStream
 import java.io.InputStream
 import java.util.zip.ZipEntry
+import javax.inject.Inject
 
 interface DexFileParser {
     fun parse(
@@ -19,7 +21,8 @@ interface DexFileParser {
     ): DexFileInfo
 }
 
-class DexFileParserImpl() : DexFileParser {
+@AppScope
+class DefaultDexFileParser @Inject constructor() : DexFileParser {
     override fun parse(
         entry: ZipEntry,
         inputStream: InputStream,

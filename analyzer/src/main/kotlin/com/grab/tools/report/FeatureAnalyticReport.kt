@@ -10,14 +10,14 @@ import javax.inject.Inject
 import javax.inject.Named
 
 
-class GeneralAnalyticReport @Inject constructor(
+class FeatureAnalyticReport @Inject constructor(
     private val featureMapping: FeatureMapping,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     @Named(NAMED_DEVICE_NAME)
     private val deviceName: String?
 ) : AnalyticReport {
-    override fun report(androidBinaryInfo: Set<ApkFileInfo>, contributor: Set<Contributor>) {
-        reportFeatures(androidBinaryInfo, buildFeatures(contributor))
+    override fun report(androidBinaryInfo: Set<ApkFileInfo>, contributors: Set<Contributor>) {
+        reportFeatures(androidBinaryInfo, buildFeatures(contributors))
     }
 
     private fun buildFeatures(contributor: Set<Contributor>): List<Feature> {
@@ -42,8 +42,8 @@ class GeneralAnalyticReport @Inject constructor(
         reportWriters.forEach {
             it.write(
                 apks.toAppInfo(deviceName),
-                listOf(apkReport, otherReport(apkReport)) + sortedFeaturesReport,
-                GENERAL_METRICS_ID
+                listOf(apkReport) + sortedFeaturesReport,
+                METRICS_ID_FEATURES
             )
         }
     }

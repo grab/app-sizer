@@ -14,12 +14,16 @@ class BasicApkAnalyticReport @Inject constructor(
     private val deviceName: String?
 ) : AnalyticReport {
 
-    override fun report(androidBinaryInfo: Set<ApkFileInfo>, contributor: Set<Contributor>) {
+    override fun report(androidBinaryInfo: Set<ApkFileInfo>, contributors: Set<Contributor>) {
         val dexCompressedRatio = androidBinaryInfo.dexDownloadRatio()
         val apkSizeReport = androidBinaryInfo.apksSizeReport(dexCompressedRatio)
         val fragmentedReport = androidBinaryInfo.apksSizeBreakdownReport()
         reportWriters.forEach {
-            it.write(androidBinaryInfo.toAppInfo(deviceName), listOf(apkSizeReport) + fragmentedReport, APK_METRICS_ID)
+            it.write(
+                androidBinaryInfo.toAppInfo(deviceName),
+                listOf(apkSizeReport) + fragmentedReport,
+                METRICS_ID_BASIC_APK
+            )
         }
     }
 

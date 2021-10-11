@@ -7,6 +7,7 @@ import com.grab.tools.di.AppScope
 import com.grab.tools.di.INPUT_FILE_APK_DIRECTORY
 import com.grab.tools.di.INPUT_FILE_PROGUARD_MAPPING_FILE
 import com.grab.tools.report.ApkAnalyticReport
+import com.grab.tools.report.BasicApkAnalyticReport
 import java.io.File
 import javax.inject.Inject
 
@@ -14,7 +15,7 @@ import javax.inject.Inject
 class BasicApkAnalyzer @Inject constructor(
     private val proguardMappingParser: ProguardMappingParser,
     private val apkFileParser: ApkFileParser,
-    private val analyticReport: ApkAnalyticReport,
+    private val analyticReport: BasicApkAnalyticReport,
     @AnalyzerInputFile(INPUT_FILE_PROGUARD_MAPPING_FILE)
     private val proguardMappingFile: File?,
     @AnalyzerInputFile(INPUT_FILE_APK_DIRECTORY)

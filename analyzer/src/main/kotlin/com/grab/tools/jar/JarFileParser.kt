@@ -4,16 +4,19 @@ import com.grab.tools.ClassFileInfo
 import com.grab.tools.FileType
 import com.grab.tools.RawFileInfo
 import com.grab.tools.apk.getPath
+import com.grab.tools.di.AppScope
 import com.grab.tools.utils.JarFileQuery
 import java.io.File
 import java.util.zip.ZipFile
+import javax.inject.Inject
 
 interface JarFileParser {
     fun parse(file: File): JarFileInfo
     fun parseJars(dir: File, jarFileQuery: JarFileQuery): Set<JarFileInfo>
 }
 
-class JarFileParserImpl() : JarFileParser {
+@AppScope
+class DefaultJarFileParser @Inject constructor() : JarFileParser {
     override fun parse(file: File): JarFileInfo {
         ZipFile(file).use { zipFile ->
             val entries = zipFile.entries()

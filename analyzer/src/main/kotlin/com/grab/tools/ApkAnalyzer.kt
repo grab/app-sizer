@@ -1,6 +1,7 @@
 package com.grab.tools
 
 import com.grab.tools.aar.AarFileParser
+import com.grab.tools.analyzer.ApkComponentProcessor
 import com.grab.tools.apk.ApkFileParser
 import com.grab.tools.apk.ProguardMappingParser
 import com.grab.tools.di.*
@@ -13,7 +14,7 @@ import javax.inject.Inject
 
 @AppScope
 class ApkAnalyzer @Inject constructor(
-    private val apkComponentAnalytic: ApkComponentAnalytic,
+    private val apkComponentAnalytic: ApkComponentProcessor,
     private val proguardMappingParser: ProguardMappingParser,
     private val apkFileParser: ApkFileParser,
     private val aarFileParser: AarFileParser,
@@ -38,8 +39,6 @@ class ApkAnalyzer @Inject constructor(
         val aarFilesInfo = aarFileParser.parseAars(librariesDirectory, aarFileQuery)
         val jarFilesInfo = jarFileParser.parseJars(librariesDirectory, jarFileQuery)
         val processedData = apkComponentAnalytic.process(apkFilesInfo, aarFilesInfo, jarFilesInfo)
-        apkAnalyticReport.report(apkFilesInfo, processedData)
+        apkAnalyticReport.report(apkFilesInfo, processedData.contributors)
     }
-
-
 }

@@ -2,27 +2,20 @@ package com.grab.tools.di
 
 import com.android.tools.apk.analyzer.ApkSizeCalculator
 import com.google.gson.Gson
-import com.grab.tools.AnalyticsOption
-import com.grab.tools.Analyzer
-import com.grab.tools.AnalyzerModule
-import com.grab.tools.ApkComponentAnalytic
+import com.grab.tools.*
 import com.grab.tools.aar.AarFileParser
-import com.grab.tools.aar.AarFileParserImpl
-import com.grab.tools.analyzer.AnalyzerClass
-import com.grab.tools.analyzer.ApkComponentAnalyzer
+import com.grab.tools.aar.DefaultAarFileParser
 import com.grab.tools.analyzer.ApkComponentAnalyzerModule
+import com.grab.tools.analyzer.ApkComponentProcessor
+import com.grab.tools.analyzer.DefaultApkComponentProcessor
 import com.grab.tools.apk.*
+import com.grab.tools.jar.DefaultJarFileParser
+import com.grab.tools.jar.DefaultJarStreamParser
 import com.grab.tools.jar.JarFileParser
-import com.grab.tools.jar.JarFileParserImpl
 import com.grab.tools.jar.JarStreamParser
-import com.grab.tools.jar.JarStreamParserImpl
 import com.grab.tools.report.ReportModule
 import com.grab.tools.utils.FileProviderModule
-import com.grab.tools.utils.FileQuery
-import dagger.BindsInstance
-import dagger.Component
-import dagger.Module
-import dagger.Provides
+import dagger.*
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.File
 import javax.inject.Named
@@ -41,7 +34,8 @@ annotation class AppScope
         ApkComponentAnalyzerModule::class,
         ReportModule::class,
         FileProviderModule::class,
-        AnalyzerModule::class
+        AnalyzerModule::class,
+        AppModuleBinder::class
     ]
 )
 @AppScope
@@ -64,13 +58,9 @@ interface AppComponent {
     }
 }
 
+
 @Module
 object AppModule {
-
-    @Provides
-    @AppScope
-    fun provideDexFileParser(): DexFileParser = DexFileParserImpl()
-
     @Provides
     @AppScope
     fun provideApkSizeCalculator(): ApkSizeCalculator = ApkSizeCalculator.getDefault()
@@ -86,35 +76,23 @@ object AppModule {
 
     @Provides
     @AppScope
-    fun provideApkParser(
-        fileQuery: FileQuery,
-        dexFileParser: DexFileParser,
-        apkSizeCalculator: ApkSizeCalculator,
-        manifestFileParser: ManifestFileParser
-    ): ApkFileParser =
-        ApkFileParserImpl(fileQuery, dexFileParser, apkSizeCalculator, manifestFileParser)
-
-    @Provides
-    @AppScope
-    fun provideJarStreamParser(): JarStreamParser = JarStreamParserImpl()
-
-    @Provides
-    @AppScope
-    fun provideJarFileParser(): JarFileParser = JarFileParserImpl()
-
-    @Provides
-    @AppScope
-    fun provideAarFileParser(
-        jarFileParser: JarStreamParser
-    ): AarFileParser =
-        AarFileParserImpl(jarFileParser)
-
-    @Provides
-    @AppScope
-    fun provideApkComponentAnalytic(analytics: Map<AnalyzerClass, @JvmSuppressWildcards ApkComponentAnalyzer>): ApkComponentAnalytic =
-        ApkComponentAnalytic(analytics)
-
-    @Provides
-    @AppScope
     fun provideGson() = Gson()
+}
+
+@Module
+interface AppModuleBinder {
+    @Binds
+    fun DefaultDexFileParser.bindDexFileParser(): DexFileParser
+
+    @Binds
+    fun DefaultApkFileParser.bindApkParser(): ApkFileParser
+
+    @Binds
+    fun DefaultJarStreamParser.bindJarStreamParser(): JarStreamParser
+
+    @Binds
+    fun DefaultJarFileParser.bindJarFileParser(): JarFileParser
+
+    @Binds
+    fun DefaultAarFileParser.bindAarFileParser(): AarFileParser
 }

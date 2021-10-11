@@ -30,11 +30,6 @@ class MetricsReportWriter(
                 valueType = "integer"
             ),
             Field(
-                name = report.id,
-                value = report.totalDownloadSize.toString(),
-                valueType = "integer"
-            ),
-            Field(
                 name = "pipeline_id",
                 value = pipelineId,
                 valueType = "integer"
@@ -43,6 +38,15 @@ class MetricsReportWriter(
     }
 
     private fun buildTags(appInfo: AppInfo, report: ReportItem): List<Tag> {
+        val owner = if (report.owner != null) {
+            listOf(
+                Tag(
+                    name = "owner",
+                    value = report.owner,
+                    valueType = "string"
+                )
+            )
+        } else emptyList()
         return listOf(
             Tag(
                 name = "project",
@@ -61,7 +65,7 @@ class MetricsReportWriter(
             ),
             Tag(
                 name = "build_type",
-                value = "production",
+                value = appInfo.buildType,
                 valueType = "string"
             ),
             Tag(
@@ -69,6 +73,6 @@ class MetricsReportWriter(
                 value = appInfo.deviceName,
                 valueType = "string"
             )
-        )
+        ) + owner
     }
 }

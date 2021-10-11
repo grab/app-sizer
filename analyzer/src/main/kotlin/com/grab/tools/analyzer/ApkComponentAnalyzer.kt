@@ -10,8 +10,13 @@ import com.grab.tools.jar.JarFileInfo
  */
 typealias RawContributors = Map<String, Set<FileInfo>>
 
+data class ComponentAnalyzerResult(
+    val noOwnerData: Set<FileInfo>,
+    val contributors: RawContributors
+)
+
 interface ApkComponentAnalyzer {
-    fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars : Set<JarFileInfo>): RawContributors
+    fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): ComponentAnalyzerResult
 }
 
 

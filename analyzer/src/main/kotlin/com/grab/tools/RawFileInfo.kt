@@ -37,3 +37,6 @@ data class RawFileInfo(
         return path.hashCode()
     }
 }
+
+internal fun Set<FileInfo>.castToClass(): Set<ClassFileInfo> = filterIsInstance<ClassFileInfo>().toSet()
+internal fun Set<FileInfo>.castToRawFile(): Set<RawFileInfo> = filterIsInstance<RawFileInfo>().toSet()
