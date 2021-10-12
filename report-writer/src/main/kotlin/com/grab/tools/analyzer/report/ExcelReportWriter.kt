@@ -10,7 +10,7 @@ private const val MEGA_BYTE = 1024L * 1024L
 class ExcelReportWriter(
     private val outputFile: File
 ) : ReportWriter {
-    override fun write(appInfo: AppInfo, reports: List<ReportItem>, reportId : String) {
+    override fun write(appInfo: AppInfo, reports: List<ReportItem>, reportId: String) {
         val workbook = WorkbookFactory.create(false)
         val sheet = workbook.createSheet("Apk Analyzer Report")
         createHeader(sheet)
@@ -31,7 +31,16 @@ class ExcelReportWriter(
                 }
             }
         }
+        outputFile.initOutPutFile()
         workbook.write(outputFile.outputStream())
+    }
+
+    private fun File.initOutPutFile() {
+        if (!exists()) {
+            if (!parentFile.exists())
+                parentFile.mkdirs()
+            createNewFile()
+        }
     }
 
     private fun createHeader(sheet: Sheet) {

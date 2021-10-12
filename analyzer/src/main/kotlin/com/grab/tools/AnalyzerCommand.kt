@@ -3,6 +3,7 @@ package com.grab.tools
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.*
 import com.grab.tools.di.DaggerAppComponent
+import com.grab.tools.log.log
 import java.io.File
 
 
@@ -66,6 +67,12 @@ class AnalyzerCommand : CliktCommand() {
         ).default(AnalyticsOption.LIBRARIES_ANALYTICS)
 
     override fun run() {
+        librariesDir?.run { log("Lib directory $librariesDir") }
+        projectDir?.run { log("Project directory $projectDir") }
+        featureMappingFile?.run { log("TF mapping file $featureMappingFile") }
+        mappingFile.run { log("Proguard mapping file $mappingFile") }
+        apkDirs.run { log("Apk directory $apkDirs") }
+
         val component = DaggerAppComponent.factory()
             .create(
                 libsDir = librariesDir,
