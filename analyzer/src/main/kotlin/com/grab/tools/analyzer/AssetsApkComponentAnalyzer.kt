@@ -1,7 +1,7 @@
 package com.grab.tools.analyzer
 
 
-import com.grab.tools.RawFileInfo
+import com.grab.tools.model.RawFileInfo
 import com.grab.tools.aar.AarFileInfo
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.jar.JarFileInfo

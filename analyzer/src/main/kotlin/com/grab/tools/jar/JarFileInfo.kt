@@ -1,7 +1,7 @@
 package com.grab.tools.jar
 
-import com.grab.tools.ClassFileInfo
-import com.grab.tools.RawFileInfo
+import com.grab.tools.model.ClassFileInfo
+import com.grab.tools.model.RawFileInfo
 
 data class JarFileInfo(
     val name: String,

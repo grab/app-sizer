@@ -1,7 +1,7 @@
 package com.grab.tools.apk
 
 
-import com.grab.tools.ClassFileInfo
+import com.grab.tools.model.ClassFileInfo
 import com.grab.tools.di.AppScope
 import com.grab.tools.log.log
 import org.jf.dexlib2.dexbacked.DexBackedClassDef

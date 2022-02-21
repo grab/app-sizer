@@ -1,9 +1,14 @@
-package com.grab.tools.analyzer
+package com.grab.tools.processor
 
-import com.grab.tools.*
 import com.grab.tools.aar.AarFileInfo
+import com.grab.tools.analyzer.*
 import com.grab.tools.apk.ApkFileInfo
+import com.grab.tools.di.AnalyzerClass
 import com.grab.tools.jar.JarFileInfo
+import com.grab.tools.model.Contributor
+import com.grab.tools.model.FileInfo
+import com.grab.tools.model.castToClass
+import com.grab.tools.model.castToRawFile
 import javax.inject.Inject
 
 

@@ -1,6 +1,6 @@
 package com.grab.tools.apk
 
-import com.grab.tools.FileInfo
+import com.grab.tools.model.FileInfo
 
 data class ManifestFileInfo(
     val path: String,

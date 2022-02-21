@@ -1,4 +1,4 @@
-package com.grab.tools
+package com.grab.tools.analyzer
 
 import com.grab.tools.apk.ApkFileParser
 import com.grab.tools.apk.ProguardMappingParser
@@ -6,7 +6,6 @@ import com.grab.tools.di.AnalyzerInputFile
 import com.grab.tools.di.AppScope
 import com.grab.tools.di.INPUT_FILE_APK_DIRECTORY
 import com.grab.tools.di.INPUT_FILE_PROGUARD_MAPPING_FILE
-import com.grab.tools.report.ApkAnalyticReport
 import com.grab.tools.report.BasicApkAnalyticReport
 import java.io.File
 import javax.inject.Inject
