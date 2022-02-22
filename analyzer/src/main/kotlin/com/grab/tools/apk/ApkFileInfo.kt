@@ -1,7 +1,7 @@
 package com.grab.tools.apk
 
-import com.grab.tools.FileInfo
-import com.grab.tools.RawFileInfo
+import com.grab.tools.model.FileInfo
+import com.grab.tools.model.RawFileInfo
 
 data class ApkFileInfo(
     val name: String,

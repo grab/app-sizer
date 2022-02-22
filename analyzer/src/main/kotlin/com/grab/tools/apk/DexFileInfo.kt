@@ -1,7 +1,7 @@
 package com.grab.tools.apk
 
-import com.grab.tools.ClassFileInfo
-import com.grab.tools.RawFileInfo
+import com.grab.tools.model.ClassFileInfo
+import com.grab.tools.model.RawFileInfo
 
 data class DexFileInfo(
     val name: String,

@@ -1,7 +1,7 @@
 package com.grab.tools.aar
 
-import com.grab.tools.FileType
-import com.grab.tools.RawFileInfo
+import com.grab.tools.model.FileType
+import com.grab.tools.model.RawFileInfo
 import com.grab.tools.apk.getPath
 import com.grab.tools.di.AppScope
 import com.grab.tools.jar.JarFileInfo

@@ -1,4 +1,4 @@
-package com.grab.tools
+package com.grab.tools.model
 
 enum class FileType {
     RESOURCE, NATIVE_LIB, ASSET, DEX, JAR, OTHERS, CLASS, MANIFEST

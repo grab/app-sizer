@@ -1,4 +1,4 @@
-package com.grab.tools
+package com.grab.tools.model
 
 data class Contributor(
     val path: String,

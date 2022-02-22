@@ -1,6 +1,6 @@
 package com.grab.tools.report
 
-import com.grab.tools.Contributor
+import com.grab.tools.model.Contributor
 import com.grab.tools.analyzer.report.ReportItem
 import com.grab.tools.analyzer.report.ReportWriter
 import com.grab.tools.apk.ApkFileInfo

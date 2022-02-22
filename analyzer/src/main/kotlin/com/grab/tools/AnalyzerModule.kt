@@ -1,5 +1,6 @@
 package com.grab.tools
 
+import com.grab.tools.analyzer.*
 import com.grab.tools.di.AnalyticsOptionKey
 import dagger.Binds
 import dagger.Module

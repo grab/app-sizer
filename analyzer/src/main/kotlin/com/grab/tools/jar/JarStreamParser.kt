@@ -1,8 +1,8 @@
 package com.grab.tools.jar
 
-import com.grab.tools.ClassFileInfo
-import com.grab.tools.FileType
-import com.grab.tools.RawFileInfo
+import com.grab.tools.model.ClassFileInfo
+import com.grab.tools.model.FileType
+import com.grab.tools.model.RawFileInfo
 import com.grab.tools.apk.getPath
 import com.grab.tools.di.AppScope
 import java.io.InputStream

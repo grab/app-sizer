@@ -5,9 +5,7 @@ import com.google.gson.Gson
 import com.grab.tools.*
 import com.grab.tools.aar.AarFileParser
 import com.grab.tools.aar.DefaultAarFileParser
-import com.grab.tools.analyzer.ApkComponentAnalyzerModule
-import com.grab.tools.analyzer.ApkComponentProcessor
-import com.grab.tools.analyzer.DefaultApkComponentProcessor
+import com.grab.tools.analyzer.Analyzer
 import com.grab.tools.apk.*
 import com.grab.tools.jar.DefaultJarFileParser
 import com.grab.tools.jar.DefaultJarStreamParser

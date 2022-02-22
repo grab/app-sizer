@@ -1,9 +1,9 @@
 package com.grab.tools.apk
 
 import com.android.tools.apk.analyzer.ApkSizeCalculator
-import com.grab.tools.FileInfo
-import com.grab.tools.FileType
-import com.grab.tools.RawFileInfo
+import com.grab.tools.model.FileInfo
+import com.grab.tools.model.FileType
+import com.grab.tools.model.RawFileInfo
 import com.grab.tools.di.AppScope
 import com.grab.tools.utils.FileQuery
 import shadow.bundletool.com.android.tools.proguard.ProguardMap
