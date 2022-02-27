@@ -64,14 +64,15 @@ class AnalyzerCommand : CliktCommand() {
             "--apk" to AnalyticsOption.APK_ANALYTICS,
             "--basic" to AnalyticsOption.BASIC_APK_ANALYTICS,
             "--general" to AnalyticsOption.GENERAL,
-        ).default(AnalyticsOption.LIBRARIES_ANALYTICS)
+            "--largefiles" to AnalyticsOption.LARGE_FILE,
+            ).default(AnalyticsOption.LIBRARIES_ANALYTICS)
 
     override fun run() {
-        librariesDir?.run { log("Lib directory $librariesDir") }
-        projectDir?.run { log("Project directory $projectDir") }
-        featureMappingFile?.run { log("TF mapping file $featureMappingFile") }
-        mappingFile.run { log("Proguard mapping file $mappingFile") }
-        apkDirs.run { log("Apk directory $apkDirs") }
+        librariesDir?.run { log("Lib directory -l $librariesDir") }
+        projectDir?.run { log("Project directory -p $projectDir") }
+        featureMappingFile?.run { log("TF mapping file -f $featureMappingFile") }
+        mappingFile.run { log("Proguard mapping file -m $mappingFile") }
+        apkDirs.run { log("Apk directory -a $apkDirs") }
 
         val component = DaggerAppComponent.factory()
             .create(

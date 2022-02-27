@@ -26,6 +26,7 @@ class ExcelReportWriter(
                     report.assetDownloadSize.reportSize(),
                     report.otherDownloadSize.reportSize(),
                     report.extraInfo,
+                    report.owner
                 ).forEachIndexed { index, s ->
                     createCell(index).apply { setCellValue(s) }
                 }

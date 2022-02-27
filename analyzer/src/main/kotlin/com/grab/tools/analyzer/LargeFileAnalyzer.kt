@@ -1,14 +1,15 @@
 package com.grab.tools.analyzer
 
-import com.grab.tools.model.Contributor
 import com.grab.tools.aar.AarFileParser
 import com.grab.tools.apk.ApkFileParser
 import com.grab.tools.apk.ProguardMappingParser
-import com.grab.tools.model.castToClass
-import com.grab.tools.model.castToRawFile
 import com.grab.tools.di.*
 import com.grab.tools.jar.JarFileParser
+import com.grab.tools.model.Contributor
+import com.grab.tools.model.castToClass
+import com.grab.tools.model.castToRawFile
 import com.grab.tools.processor.ApkComponentProcessor
+import com.grab.tools.report.LargeFileReport
 import com.grab.tools.report.ModuleAnalyticReport
 import com.grab.tools.utils.DefaultAarFileQuery
 import com.grab.tools.utils.DefaultJarFileQuery
@@ -18,7 +19,7 @@ import java.io.File
 import javax.inject.Inject
 
 @AppScope
-class ModuleAnalyzer @Inject constructor(
+class LargeFileAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val proguardMappingParser: ProguardMappingParser,
     private val apkFileParser: ApkFileParser,
@@ -28,7 +29,7 @@ class ModuleAnalyzer @Inject constructor(
     private val libJarFileQuery: DefaultJarFileQuery,
     private val moduleAarFileQuery: ModuleAarFileQuery,
     private val moduleJarFileQuery: ModuleJarFileQuery,
-    private val analyticReport: ModuleAnalyticReport,
+    private val analyticReport: LargeFileReport,
     @AnalyzerInputFile(INPUT_FILE_PROGUARD_MAPPING_FILE)
     private val proguardMappingFile: File?,
     @AnalyzerInputFile(INPUT_FILE_ROOT_PROJECT)
@@ -62,7 +63,6 @@ class ModuleAnalyzer @Inject constructor(
             resources = wholeProject.noOwnerResources.castToRawFile(),
             nativeLibs = wholeProject.noOwnerNativeLibs.castToRawFile(),
             classes = wholeProject.noOwnerClasses.castToClass(),
-            //others = wholeProject.noOwnerOthers.castToRawFile()
         )
 
         val processedData = apkComponentProcessor.process(apkFilesInfo, aarFilesInfo, jarFilesInfo)
