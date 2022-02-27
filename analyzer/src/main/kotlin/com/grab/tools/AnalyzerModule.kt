@@ -34,4 +34,9 @@ interface AnalyzerModule {
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.APK_ANALYTICS)
     fun ApkAnalyzer.bindApkAnalyzer(): Analyzer
+
+    @Binds
+    @IntoMap
+    @AnalyticsOptionKey(AnalyticsOption.LARGE_FILE)
+    fun LargeFileAnalyzer.bindLargeFileAnalyzer(): Analyzer
 }

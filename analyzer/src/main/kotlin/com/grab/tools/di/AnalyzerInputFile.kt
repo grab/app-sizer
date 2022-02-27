@@ -1,8 +1,5 @@
 package com.grab.tools.di
 
-import java.lang.annotation.Documented
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
 import javax.inject.Qualifier
 
 
@@ -14,8 +11,8 @@ const val INPUT_FILE_FEATURE_MAPPING_FILE = "mapping_file"
 const val INPUT_FILE_PROGUARD_MAPPING_FILE = "proguard"
 
 @Qualifier
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
+@MustBeDocumented
+@Retention(AnnotationRetention.RUNTIME)
 annotation class AnalyzerInputFile(
     /** The name.  */
     val value: String = ""
