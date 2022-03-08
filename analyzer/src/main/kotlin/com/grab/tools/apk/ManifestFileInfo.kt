@@ -1,6 +1,7 @@
 package com.grab.tools.apk
 
 import com.grab.tools.model.FileInfo
+import java.io.File
 
 data class ManifestFileInfo(
     val path: String,
@@ -9,4 +10,7 @@ data class ManifestFileInfo(
     override val downloadSize: Long,
     override val compressedSize: Long,
     override val size: Long
-) : FileInfo
+) : FileInfo{
+    override val name: String
+        get() = File(path).name
+}

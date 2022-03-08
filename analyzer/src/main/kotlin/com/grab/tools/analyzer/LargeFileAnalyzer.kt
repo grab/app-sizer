@@ -1,6 +1,7 @@
 package com.grab.tools.analyzer
 
 import com.grab.tools.aar.AarFileParser
+import com.grab.tools.analyzer.apk.ApkComponentProcessor
 import com.grab.tools.apk.ApkFileParser
 import com.grab.tools.apk.ProguardMappingParser
 import com.grab.tools.di.*
@@ -8,9 +9,7 @@ import com.grab.tools.jar.JarFileParser
 import com.grab.tools.model.Contributor
 import com.grab.tools.model.castToClass
 import com.grab.tools.model.castToRawFile
-import com.grab.tools.processor.ApkComponentProcessor
 import com.grab.tools.report.LargeFileReport
-import com.grab.tools.report.ModuleAnalyticReport
 import com.grab.tools.utils.DefaultAarFileQuery
 import com.grab.tools.utils.DefaultJarFileQuery
 import com.grab.tools.utils.ModuleAarFileQuery

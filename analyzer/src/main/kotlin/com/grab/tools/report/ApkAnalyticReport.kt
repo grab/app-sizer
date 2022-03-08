@@ -1,32 +1,51 @@
 package com.grab.tools.report
 
-import com.grab.tools.model.Contributor
-import com.grab.tools.analyzer.report.ReportItem
+import com.grab.tools.analyzer.report.HybridField
+import com.grab.tools.analyzer.report.Report
 import com.grab.tools.analyzer.report.ReportWriter
+import com.grab.tools.analyzer.report.Row
 import com.grab.tools.apk.ApkFileInfo
-import com.grab.tools.di.NAMED_DEVICE_NAME
+import com.grab.tools.model.Contributor
 import java.io.File
-import java.util.*
 import javax.inject.Inject
-import javax.inject.Named
 
 private const val CODE_BASE_ID = "Codebase"
 
 class ApkAnalyticReport @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
-    @Named(NAMED_DEVICE_NAME)
-    private val deviceName: String?
+    private val projectInfoFactory: ProjectInfoFactory
 ) : AnalyticReport {
     override fun report(apks: Set<ApkFileInfo>, contributors: Set<Contributor>) {
-        val dexCompressedRatio = dexDownloadRatio(apks)
-        val contributorList = sortContributors(dexCompressedRatio, contributors)
-        val apkReport = apks.apksSizeReport(dexCompressedRatio)
+        val dexCompressedRatio = apks.dexDownloadRatio()
+        val contributorList = contributors.sortedBy { it.getDownloadSize(dexCompressedRatio) }
+        val apkReportRow = createApkReportRow(apks, dexCompressedRatio)
         val totalLibsReport = totalLibrariesReport(dexCompressedRatio, contributorList)
         val libComponentReport = libComponentReport(totalLibsReport)
+        val apkReport = apks.apksSizeReport(dexCompressedRatio)
         val codeBaseReports = codeBaseComponentReport(codeBaseReport(totalLibsReport, apkReport))
-        val listOfReport = listOf(apkReport) + codeBaseReports + libComponentReport
-        reportWriters.forEach { it.write(apks.toAppInfo(deviceName), listOfReport, METRICS_ID_APK) }
+        val listOfReport = listOf(apkReportRow) + codeBaseReports + libComponentReport
+
+        reportWriters.forEach {
+            it.write(
+                Report(
+                    projectInfo = projectInfoFactory.create(apks.getVersionName()),
+                    rows = listOfReport,
+                    id = METRICS_ID_APK,
+                    name = METRICS_ID_APK
+                )
+            )
+        }
     }
+
+    private fun createApkReportRow(
+        apks: Set<ApkFileInfo>,
+        dexCompressedRatio: Double
+    ) = Row(
+        fields = listOf(
+            apks.toReportField(dexCompressedRatio)
+        ),
+        name = "Apk"
+    )
 
     private fun codeBaseReport(
         totalLibsReport: ReportItem,
@@ -56,45 +75,50 @@ class ApkAnalyticReport @Inject constructor(
         otherDownloadSize = othersDownloadSize,
     )
 
-    private fun libComponentReport(allLibReport: ReportItem): List<ReportItem> = listOf(
-        ReportItem(
-            id = "android-java-libraries",
-            totalDownloadSize = allLibReport.totalDownloadSize - allLibReport.nativeLibDownloadSize
+
+    private fun libComponentReport(allLibReport: ReportItem): List<Row> = listOf(
+        createRow(
+            name = "android-java-libraries",
+            value = allLibReport.totalDownloadSize - allLibReport.nativeLibDownloadSize
         ),
-        ReportItem(
-            id = "native-libraries",
-            totalDownloadSize = allLibReport.totalDownloadSize - allLibReport.nativeLibDownloadSize
+        createRow(
+            name = "native-libraries",
+            value = allLibReport.totalDownloadSize - allLibReport.nativeLibDownloadSize
         )
     )
 
-    private fun codeBaseComponentReport(codeBaseReport: ReportItem): List<ReportItem> = listOf(
-        ReportItem(
-            id = "codebase-kotlin-java",
-            totalDownloadSize = codeBaseReport.classesDownloadSize,
+    private fun codeBaseComponentReport(codeBaseReport: ReportItem): List<Row> = listOf(
+        createRow(
+            name = "codebase-kotlin-java",
+            value = codeBaseReport.classesDownloadSize,
         ),
-        ReportItem(
-            id = "codebase-resources",
-            totalDownloadSize = codeBaseReport.resourceDownloadSize,
+        createRow(
+            name = "codebase-resources",
+            value = codeBaseReport.resourceDownloadSize,
         ),
-        ReportItem(
-            id = "codebase-assets",
-            totalDownloadSize = codeBaseReport.assetDownloadSize,
+        createRow(
+            name = "codebase-assets",
+            value = codeBaseReport.assetDownloadSize,
         ),
-        ReportItem(
-            id = "codebase-native",
-            totalDownloadSize = codeBaseReport.nativeLibDownloadSize,
+        createRow(
+            name = "codebase-native",
+            value = codeBaseReport.nativeLibDownloadSize,
         ),
-        ReportItem(
-            id = "others",
-            totalDownloadSize = codeBaseReport.otherDownloadSize,
+        createRow(
+            name = "others",
+            value = codeBaseReport.otherDownloadSize,
         ),
     )
 
-    private fun dexDownloadRatio(apks: Set<ApkFileInfo>): Double {
-        val dexDownloadSize = apks.flatMap { it.dexes }.sumOf { it.downloadSize }
-        val dexClassesSize = apks.flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
-        return dexDownloadSize.toDouble() / dexClassesSize
-    }
+    private fun createRow(name: String, value: Long): Row = Row(
+        fields = listOf(
+            HybridField(
+                name = name,
+                value = value
+            )
+        ),
+        name = name
+    )
 
     private fun totalLibrariesReport(dexCompressedRatio: Double, data: List<Contributor>): ReportItem {
         return data.reduce { pre, cur ->
@@ -112,18 +136,6 @@ class ApkAnalyticReport @Inject constructor(
                 id = "all_libraries",
             )
     }
-
-
-    private fun sortContributors(dexCompressedRatio: Double, contributor: Set<Contributor>): List<Contributor> {
-        val data = contributor.toList()
-        Collections.sort(data, Comparator<Contributor> { o1, o2 ->
-            val size1 = o1.getDownloadSize(dexCompressedRatio)
-            val size2 = o2.getDownloadSize(dexCompressedRatio)
-            if (size1 > size2) -1
-            else if (size1 < size2) 1
-            else 0
-        })
-        return data
-    }
 }
+
 

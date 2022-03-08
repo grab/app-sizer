@@ -6,5 +6,6 @@ enum class AnalyticsOption {
     BASIC_APK_ANALYTICS,
     MODULE_ANALYTICS,
     GENERAL,
-    LARGE_FILE
+    LARGE_FILE,
+    LIB_CONTENT
 }

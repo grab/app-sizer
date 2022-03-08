@@ -1,10 +1,13 @@
 package com.grab.tools.model
 
+import java.io.File
+
 enum class FileType {
     RESOURCE, NATIVE_LIB, ASSET, DEX, JAR, OTHERS, CLASS, MANIFEST
 }
 
 interface FileInfo {
+    val name: String
     val compressedSize: Long
     val downloadSize: Long
     val size: Long
@@ -27,15 +30,15 @@ data class RawFileInfo(
             path.endsWith("AndroidManifest.xml") -> FileType.MANIFEST
             else -> FileType.OTHERS
         }
+    override val name: String
+        get() = File(path).name
 
     override fun equals(other: Any?): Boolean {
         if (other is RawFileInfo) return path == other.path
         return super.equals(other)
     }
 
-    override fun hashCode(): Int {
-        return path.hashCode()
-    }
+    override fun hashCode(): Int = path.hashCode()
 }
 
 internal fun Set<FileInfo>.castToClass(): Set<ClassFileInfo> = filterIsInstance<ClassFileInfo>().toSet()

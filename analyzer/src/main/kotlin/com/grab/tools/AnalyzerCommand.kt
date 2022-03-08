@@ -9,52 +9,16 @@ import java.io.File
 
 class AnalyzerCommand : CliktCommand() {
 
-    private val apkDirs: File by option(
-        "-a",
-        "--apk-dir",
-        help = "Path to the input apks directory"
+    private val settingFile: File by option(
+        "-s",
+        "--setting-file",
+        help = "Path to the config file"
     ).convert { File(it) }.required()
 
-    private val librariesDir: File? by option(
+    private val libName: String? by option(
         "-l",
-        "--lib-dir",
-        help = "Path to the directory contains all libs (aar & jar) files"
-    ).convert { File(it) }
-
-    private val projectDir: File? by option(
-        "-p",
-        "--project-dir",
-        help = "Path to the project's root folder"
-    ).convert { File(it) }
-
-    private val outputFile: File by option(
-        "-o",
-        "--output-file",
-        help = "Path to the output excel file"
-    ).convert { File(it) }.required()
-
-    private val mappingFile: File by option(
-        "-m",
-        "--mapping-file",
-        help = "Path to the R8/Proguard mapping file"
-    ).convert { File(it) }.required()
-
-    private val featureMappingFile: File? by option(
-        "-f",
-        "--feature-mapping-file",
-        help = "An yml file to grouped the feature's modules"
-    ).convert { File(it) }
-
-    private val deviceName: String? by option(
-        "-d",
-        "--device-name",
-        help = "The device name in the device spec that we generate the APK from the app bundle"
-    )
-
-    private val extraTag: String? by option(
-        "-t",
-        "--tag-value",
-        help = "A tag value send along with the report"
+        "--lib-name",
+        help = "Name of the lib/module you want to list the content contributed to the apks"
     )
 
     private val reportOption by option()
@@ -64,27 +28,37 @@ class AnalyzerCommand : CliktCommand() {
             "--apk" to AnalyticsOption.APK_ANALYTICS,
             "--basic" to AnalyticsOption.BASIC_APK_ANALYTICS,
             "--general" to AnalyticsOption.GENERAL,
-            "--largefiles" to AnalyticsOption.LARGE_FILE,
-            ).default(AnalyticsOption.LIBRARIES_ANALYTICS)
+            "--large-files" to AnalyticsOption.LARGE_FILE,
+            "--lib-content" to AnalyticsOption.LIB_CONTENT,
+        ).default(AnalyticsOption.LIBRARIES_ANALYTICS)
+
+    private fun validateCommand(){
+        if(reportOption == AnalyticsOption.LIB_CONTENT && libName == null){
+            throw IllegalArgumentException("You have to pass the --lib-name to execute this option")
+        }
+    }
 
     override fun run() {
-        librariesDir?.run { log("Lib directory -l $librariesDir") }
-        projectDir?.run { log("Project directory -p $projectDir") }
-        featureMappingFile?.run { log("TF mapping file -f $featureMappingFile") }
-        mappingFile.run { log("Proguard mapping file -m $mappingFile") }
-        apkDirs.run { log("Apk directory -a $apkDirs") }
-
+        val settings = SettingYmlLoader().load(settingFile)
+        log("Lib directory ${settings.libraryDirectoryPath}")
+        log("Project directory ${settings.projectDirectoryPath}")
+        log("Feature mapping file ${settings.featureMappingFilePath}")
+        log("Proguard mapping file ${settings.mappingFilePath}")
+        log("Apk directory ${settings.apkDirectoryPath}")
+        validateCommand()
         val component = DaggerAppComponent.factory()
             .create(
-                libsDir = librariesDir,
-                rootProjectDir = projectDir,
-                featureMappingFile = featureMappingFile,
-                output = outputFile,
+                libsDir = settings.libraryDirectory,
+                rootProjectDir = settings.projectDirectory,
+                featureMappingFile = settings.featureMappingFile,
+                output = settings.outputFile,
                 analyticsOption = reportOption,
-                deviceName = deviceName,
-                extraTag = extraTag,
-                proguardMappingFile = mappingFile,
-                apkDirectory = apkDirs
+                deviceName = settings.deviceName,
+                extraTag = settings.extraTag,
+                proguardMappingFile = settings.mappingFile,
+                apkDirectory = settings.apkDirectory,
+                libName = libName,
+                projectName = settings.projectName
             )
         component.analyzerMap()[reportOption]?.process()
     }

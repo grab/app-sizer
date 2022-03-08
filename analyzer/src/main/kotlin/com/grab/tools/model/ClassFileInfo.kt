@@ -2,7 +2,7 @@ package com.grab.tools.model
 
 
 data class ClassFileInfo(
-    val name: String,
+    override val name: String,
     override val size: Long,
     override val compressedSize: Long = 0,
     override val downloadSize: Long = 0,

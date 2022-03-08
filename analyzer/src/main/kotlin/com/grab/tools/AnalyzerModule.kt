@@ -19,6 +19,10 @@ interface AnalyzerModule {
     @AnalyticsOptionKey(AnalyticsOption.LIBRARIES_ANALYTICS)
     fun LibrariesAnalyzer.bindLibrariesAnalyzer(): Analyzer
 
+    @Binds
+    @IntoMap
+    @AnalyticsOptionKey(AnalyticsOption.LIB_CONTENT)
+    fun LibContentAnalyzer.bindAnalyzer(): Analyzer
 
     @Binds
     @IntoMap

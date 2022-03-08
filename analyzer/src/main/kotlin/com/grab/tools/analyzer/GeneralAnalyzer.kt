@@ -8,7 +8,7 @@ import com.grab.tools.model.castToClass
 import com.grab.tools.model.castToRawFile
 import com.grab.tools.di.*
 import com.grab.tools.jar.JarFileParser
-import com.grab.tools.processor.ApkComponentProcessor
+import com.grab.tools.analyzer.apk.ApkComponentProcessor
 import com.grab.tools.report.FeatureAnalyticReport
 import com.grab.tools.utils.DefaultAarFileQuery
 import com.grab.tools.utils.DefaultJarFileQuery

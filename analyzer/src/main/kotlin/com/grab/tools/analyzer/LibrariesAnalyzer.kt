@@ -5,7 +5,7 @@ import com.grab.tools.apk.ApkFileParser
 import com.grab.tools.apk.ProguardMappingParser
 import com.grab.tools.di.*
 import com.grab.tools.jar.JarFileParser
-import com.grab.tools.processor.ApkComponentProcessor
+import com.grab.tools.analyzer.apk.ApkComponentProcessor
 import com.grab.tools.report.LibrariesAnalyticReport
 import com.grab.tools.utils.DefaultAarFileQuery
 import com.grab.tools.utils.DefaultJarFileQuery
@@ -21,8 +21,6 @@ class LibrariesAnalyzer @Inject constructor(
     private val jarFileParser: JarFileParser,
     private val aarFileQuery: DefaultAarFileQuery,
     private val jarFileQuery: DefaultJarFileQuery,
-    private val libAarFileQuery: DefaultAarFileQuery,
-    private val libJarFileQuery: DefaultJarFileQuery,
     private val librariesAnalyticReport: LibrariesAnalyticReport,
     @AnalyzerInputFile(INPUT_FILE_PROGUARD_MAPPING_FILE)
     private val proguardMappingFile: File?,
@@ -40,9 +38,6 @@ class LibrariesAnalyzer @Inject constructor(
 
         val aarFilesInfo = aarFileParser.parseAars(librariesDirectory, aarFileQuery)
         val jarFilesInfo = jarFileParser.parseJars(librariesDirectory, jarFileQuery)
-        val libAarFilesInfo = aarFileParser.parseAars(librariesDirectory, libAarFileQuery)
-        val libJarFilesInfo = jarFileParser.parseJars(librariesDirectory, libJarFileQuery)
-
 
         val processedData = apkComponentProcessor.process(apkFilesInfo, aarFilesInfo, jarFilesInfo)
         librariesAnalyticReport.report(apkFilesInfo, processedData.contributors)
