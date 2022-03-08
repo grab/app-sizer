@@ -1,45 +1,59 @@
 package com.grab.tools.report
 
-import com.grab.tools.model.Contributor
-import com.grab.tools.analyzer.report.ReportItem
-import com.grab.tools.analyzer.report.ReportWriter
+import com.grab.tools.analyzer.report.*
 import com.grab.tools.apk.ApkFileInfo
-import com.grab.tools.di.NAMED_DEVICE_NAME
-import com.grab.tools.utils.ModuleUtils
+import com.grab.tools.model.Contributor
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Named
 
 private const val LIBRARIES_ID = "Libraries"
-internal const val NON_TRACKING_ID = "Others"
 
 class ModuleAnalyticReport @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val featureMapping: FeatureMapping,
-    @Named(NAMED_DEVICE_NAME)
-    private val deviceName: String?
+    private val projectInfoFactory: ProjectInfoFactory
 ) : AnalyticReport {
     override fun report(apks: Set<ApkFileInfo>, contributors: Set<Contributor>) {
-        val modules = ModuleUtils.mapContributorToModule(contributors)
-        reportFeatures(apks, modules)
+        contributors.toModules().also { modules -> report(apks, modules) }
     }
 
-    private fun reportFeatures(apks: Set<ApkFileInfo>, modules: List<Module>) {
+    private fun report(apks: Set<ApkFileInfo>, modules: List<Module>) {
         val dexCompressedRatio = apks.dexDownloadRatio()
         val apkReport = apks.apksSizeReport(dexCompressedRatio)
-        val sortedFeaturesReport = sortFeatures(dexCompressedRatio, modules)
+        val sortedFeaturesReport = modules.sortedBy { it.getDownloadSize(dexCompressedRatio) }
             .map { it.toReportItem(dexCompressedRatio, featureMapping.moduleToFeatureMap) }
         val totalModuleReport = totalModuleReport(sortedFeaturesReport)
         val librariesReport = librariesReport(apkReport, totalModuleReport)
-        featureMapping.moduleToFeatureMap
+        val reportItems = listOf(apkReport, librariesReport) + sortedFeaturesReport
         reportWriters.forEach {
             it.write(
-                apks.toAppInfo(deviceName),
-                listOf(apkReport, librariesReport) + sortedFeaturesReport,
-                METRICS_ID_MODULES
+                Report(
+                    id = METRICS_ID_MODULES,
+                    name = METRICS_ID_MODULES,
+                    projectInfo = projectInfoFactory.create(apks.getVersionName()),
+                    rows = toReportRows(reportItems)
+                )
             )
         }
     }
+
+    private fun toReportRows(reportItems: List<ReportItem>) =
+        reportItems.map { reportItem ->
+            Row(
+                name = reportItem.name,
+                fields = listOf(
+                    HybridField(
+                        name = reportItem.id,
+                        value = reportItem.totalDownloadSize,
+                        tag = reportItem.extraInfo
+                    ),
+                    TagField(
+                        name = "owner",
+                        value = reportItem.owner ?: ""
+                    )
+                )
+            )
+        }
 
     private fun totalModuleReport(data: List<ReportItem>): ReportItem {
         return data.reduce { pre, cur ->
@@ -69,16 +83,9 @@ class ModuleAnalyticReport @Inject constructor(
         classesDownloadSize = apkReport.classesDownloadSize - totalModuleReport.classesDownloadSize,
         classesSize = apkReport.classesSize - totalModuleReport.classesSize
     )
-
-    private fun sortFeatures(dexCompressedRatio: Double, contributor: List<Module>): List<Module> {
-        Collections.sort(contributor, Comparator<Module> { o1, o2 ->
-            val size1 = o1.getDownloadSize(dexCompressedRatio)
-            val size2 = o2.getDownloadSize(dexCompressedRatio)
-            if (size1 > size2) -1
-            else if (size1 < size2) 1
-            else 0
-        })
-        return contributor
-    }
 }
+
+internal fun Set<Contributor>.toModules(): List<Module> = moduleToContributors().map { Module(it.key, it.value) }
+
+
 

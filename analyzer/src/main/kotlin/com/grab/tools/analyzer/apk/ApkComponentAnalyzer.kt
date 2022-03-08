@@ -1,4 +1,4 @@
-package com.grab.tools.analyzer
+package com.grab.tools.analyzer.apk
 
 import com.grab.tools.model.FileInfo
 import com.grab.tools.aar.AarFileInfo

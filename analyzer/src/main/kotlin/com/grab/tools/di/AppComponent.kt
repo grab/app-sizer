@@ -2,7 +2,8 @@ package com.grab.tools.di
 
 import com.android.tools.apk.analyzer.ApkSizeCalculator
 import com.google.gson.Gson
-import com.grab.tools.*
+import com.grab.tools.AnalyticsOption
+import com.grab.tools.AnalyzerModule
 import com.grab.tools.aar.AarFileParser
 import com.grab.tools.aar.DefaultAarFileParser
 import com.grab.tools.analyzer.Analyzer
@@ -20,7 +21,9 @@ import javax.inject.Named
 import javax.inject.Scope
 
 const val NAMED_DEVICE_NAME = "device_name"
+const val NAMED_PROJECT_NAME = "project_name"
 const val NAMED_EXTRA_TAG = "tag"
+const val NAMED_LIB_NAME = "lib_name"
 
 @Scope
 @Retention
@@ -43,14 +46,16 @@ interface AppComponent {
     @Component.Factory
     interface Factory {
         fun create(
-            @BindsInstance @AnalyzerInputFile(INPUT_FILE_LIB_DIRECTORY) libsDir: File?,
-            @BindsInstance @AnalyzerInputFile(INPUT_FILE_ROOT_PROJECT) rootProjectDir: File?,
+            @BindsInstance @AnalyzerInputFile(INPUT_FILE_LIB_DIRECTORY) libsDir: File,
+            @BindsInstance @AnalyzerInputFile(INPUT_FILE_ROOT_PROJECT) rootProjectDir: File,
             @BindsInstance @AnalyzerInputFile(INPUT_FILE_OUTPUT_FILE) output: File,
-            @BindsInstance @AnalyzerInputFile(INPUT_FILE_FEATURE_MAPPING_FILE) featureMappingFile: File?,
-            @BindsInstance @AnalyzerInputFile(INPUT_FILE_PROGUARD_MAPPING_FILE) proguardMappingFile: File?,
+            @BindsInstance @AnalyzerInputFile(INPUT_FILE_PROGUARD_MAPPING_FILE) proguardMappingFile: File,
             @BindsInstance @AnalyzerInputFile(INPUT_FILE_APK_DIRECTORY) apkDirectory: File,
-            @BindsInstance @Named(NAMED_DEVICE_NAME) deviceName: String?,
-            @BindsInstance @Named(NAMED_EXTRA_TAG) extraTag: String?,
+            @BindsInstance @Named(NAMED_DEVICE_NAME) deviceName: String,
+            @BindsInstance @Named(NAMED_PROJECT_NAME) projectName: String,
+            @BindsInstance @Named(NAMED_EXTRA_TAG) extraTag: String,
+            @BindsInstance @Named(NAMED_LIB_NAME) libName: String?,
+            @BindsInstance @AnalyzerInputFile(INPUT_FILE_FEATURE_MAPPING_FILE) featureMappingFile: File?,
             @BindsInstance analyticsOption: AnalyticsOption
         ): AppComponent
     }

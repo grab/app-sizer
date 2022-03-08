@@ -1,7 +1,6 @@
-package com.grab.tools.processor
+package com.grab.tools.analyzer.apk
 
 import com.grab.tools.aar.AarFileInfo
-import com.grab.tools.analyzer.*
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.di.AnalyzerClass
 import com.grab.tools.jar.JarFileInfo

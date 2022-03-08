@@ -1,60 +1,79 @@
 package com.grab.tools.report
 
-import com.grab.tools.model.Contributor
-import com.grab.tools.analyzer.report.ReportItem
+import com.grab.tools.analyzer.report.HybridField
+import com.grab.tools.analyzer.report.Report
 import com.grab.tools.analyzer.report.ReportWriter
+import com.grab.tools.analyzer.report.Row
 import com.grab.tools.apk.ApkFileInfo
-import com.grab.tools.di.NAMED_DEVICE_NAME
+import com.grab.tools.model.Contributor
 import javax.inject.Inject
-import javax.inject.Named
 
 class BasicApkAnalyticReport @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
-    @Named(NAMED_DEVICE_NAME)
-    private val deviceName: String?
+    private val projectInfoFactory: ProjectInfoFactory
 ) : AnalyticReport {
 
     override fun report(androidBinaryInfo: Set<ApkFileInfo>, contributors: Set<Contributor>) {
         val dexCompressedRatio = androidBinaryInfo.dexDownloadRatio()
-        val apkSizeReport = androidBinaryInfo.apksSizeReport(dexCompressedRatio)
-        val fragmentedReport = androidBinaryInfo.apksSizeBreakdownReport()
         reportWriters.forEach {
             it.write(
-                androidBinaryInfo.toAppInfo(deviceName),
-                listOf(apkSizeReport) + fragmentedReport,
-                METRICS_ID_BASIC_APK
+                Report(
+                    projectInfo = projectInfoFactory.create(androidBinaryInfo.getVersionName()),
+                    rows = androidBinaryInfo.createApkReportRows(dexCompressedRatio),
+                    id = METRICS_ID_BASIC_APK,
+                    name = METRICS_ID_BASIC_APK
+                )
             )
         }
     }
 
-    private fun Set<ApkFileInfo>.apksSizeBreakdownReport(): List<ReportItem> {
+    private fun Set<ApkFileInfo>.createApkReportRows(dexCompressedRatio: Double): List<Row> {
         val resourceDownloadSize = flatMap { it.resources }.sumOf { it.downloadSize }
         val nativeLibDownloadSize = flatMap { it.nativeLibs }.sumOf { it.downloadSize }
         val assetDownloadSize = flatMap { it.assets }.sumOf { it.downloadSize }
         val otherDownloadSize = flatMap { it.others }.sumOf { it.downloadSize }
         val dexDownloadFile = flatMap { it.dexes }.sumOf { it.downloadSize }
 
+        val classesSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
+        val classDownloadSize = (classesSize * dexCompressedRatio).toLong()
+        val total =
+            resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + classDownloadSize
+
         return listOf(
-            ReportItem(
-                id = "resource",
-                totalDownloadSize = resourceDownloadSize
+            createRow(
+                name = "apk",
+                value = total
             ),
-            ReportItem(
-                id = "native_lib",
-                totalDownloadSize = nativeLibDownloadSize
+            createRow(
+                name = "resource",
+                value = resourceDownloadSize
             ),
-            ReportItem(
-                id = "asset",
-                totalDownloadSize = assetDownloadSize
+            createRow(
+                name = "native_lib",
+                value = nativeLibDownloadSize
             ),
-            ReportItem(
-                id = "other",
-                totalDownloadSize = otherDownloadSize
+            createRow(
+                name = "asset",
+                value = assetDownloadSize
             ),
-            ReportItem(
-                id = "code",
-                totalDownloadSize = dexDownloadFile
+            createRow(
+                name = "other",
+                value = otherDownloadSize
+            ),
+            createRow(
+                name = "code",
+                value = dexDownloadFile
             )
         )
     }
+
+    private fun createRow(name: String, value: Long): Row = Row(
+        fields = listOf(
+            HybridField(
+                name = name,
+                value = value
+            )
+        ),
+        name = name
+    )
 }

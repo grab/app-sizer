@@ -8,9 +8,10 @@ class JsonFilePublisher(private val file: File,
                         private val gson: Gson = Gson()) : MetricsPublisher {
     override fun publish(metrics: List<Metrics>) {
         initOutPutFile()
-        val output = FileWriter(file)
-        gson.toJson(metrics, output)
-        output.close()
+        FileWriter(file).run {
+            gson.toJson(metrics, this)
+            this.close()
+        }
     }
 
     private fun initOutPutFile() {
