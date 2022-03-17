@@ -1,0 +1,7 @@
+apkDirectoryPath: "<apk dirs>"
+libraryDirectoryPath: "<library dir>"
+projectDirectoryPath: "<project-dir>"
+outputFilePath: "<output-path>"
+mappingFilePath: "<mapping-file>"
+featureMappingFilePath: "<feature-mapping>"
+projectName: "<project name>"

@@ -20,14 +20,10 @@ data class Settings(
     var mappingFilePath: String,
     // A yml file to group the feature's modules
     var featureMappingFilePath: String,
-    // The device name in the device spec that we generate the APK from the app bundle
-    var deviceName: String,
     // The project name
     var projectName: String,
-    // A tag value send along with the report
-    var extraTag: String
 ) {
-    constructor() : this("", "", "", "", "", "", "", "", "")
+    constructor() : this("", "", "", "", "", "", "")
 
     val apkDirectory: File = File(apkDirectoryPath)
     val libraryDirectory: File = File(libraryDirectoryPath)
