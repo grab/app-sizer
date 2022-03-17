@@ -15,6 +15,18 @@ class AnalyzerCommand : CliktCommand() {
         help = "Path to the config file"
     ).convert { File(it) }.required()
 
+    private val deviceName: String by option(
+        "-d",
+        "--device-name",
+        help = "The device name in the device spec that we generate the APK from the app bundle"
+    ).required()
+
+    private val extraTag: String by option(
+        "-t",
+        "--tag",
+        help = "A tag value send along with the report"
+    ).required()
+
     private val libName: String? by option(
         "-l",
         "--lib-name",
@@ -53,8 +65,8 @@ class AnalyzerCommand : CliktCommand() {
                 featureMappingFile = settings.featureMappingFile,
                 output = settings.outputFile,
                 analyticsOption = reportOption,
-                deviceName = settings.deviceName,
-                extraTag = settings.extraTag,
+                deviceName = deviceName,
+                extraTag = extraTag,
                 proguardMappingFile = settings.mappingFile,
                 apkDirectory = settings.apkDirectory,
                 libName = libName,
