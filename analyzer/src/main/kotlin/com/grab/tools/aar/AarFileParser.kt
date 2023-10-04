@@ -6,21 +6,19 @@ import com.grab.tools.apk.getPath
 import com.grab.tools.di.AppScope
 import com.grab.tools.jar.JarFileInfo
 import com.grab.tools.jar.JarStreamParser
-import com.grab.tools.utils.AarFileQuery
 import java.io.File
 import java.util.zip.ZipFile
 import javax.inject.Inject
 
 interface AarFileParser {
-    fun parse(file: File): AarFileInfo
-    fun parseAars(dir: File, aarFileProvider: AarFileQuery): Set<AarFileInfo>
+    fun parseAars(files : Sequence<File>): Set<AarFileInfo>
 }
 
 // http://tools.android.com/tech-docs/new-build-system/aar-format
 @AppScope
 class DefaultAarFileParser @Inject constructor(private val jarParser: JarStreamParser) : AarFileParser {
 
-    override fun parse(file: File): AarFileInfo {
+    private fun parse(file: File): AarFileInfo {
         ZipFile(file).use { zipFile ->
             val entries = zipFile.entries()
             val resources = mutableSetOf<RawFileInfo>()
@@ -62,10 +60,8 @@ class DefaultAarFileParser @Inject constructor(private val jarParser: JarStreamP
         }
     }
 
-    override fun parseAars(dir: File, aarFileProvider: AarFileQuery): Set<AarFileInfo> {
-        return aarFileProvider.provide(dir)
-            .map { file -> parse(file) }
-            .toSet()
+    override fun parseAars(files : Sequence<File>): Set<AarFileInfo> {
+        return files.map { file -> parse(file) }.toSet()
     }
 }
 

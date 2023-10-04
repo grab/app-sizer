@@ -14,7 +14,7 @@ class DummyFeatureMapping : FeatureMapping {
     override val moduleToFeatureMap: Map<String, String> = emptyMap()
 }
 
-class DefaultFeatureMapping(
+class YmlFeatureMapping(
     private val ymlFile: File
 ) : FeatureMapping {
     override val featureToModuleMap: Map<String, List<String>> by lazy {

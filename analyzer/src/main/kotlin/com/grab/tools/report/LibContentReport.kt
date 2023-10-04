@@ -2,7 +2,6 @@ package com.grab.tools.report
 
 import com.grab.tools.analyzer.report.*
 import com.grab.tools.apk.ApkFileInfo
-import com.grab.tools.di.NAMED_LIB_NAME
 import com.grab.tools.model.Contributor
 import com.grab.tools.model.FileInfo
 import java.io.File
@@ -12,7 +11,7 @@ import javax.inject.Named
 
 class LibContentReport @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
-    private val projectInfoFactory: ProjectInfoFactory,
+    private val projectInfoProvider: ProjectInfoProvider,
     @Named(NAMED_LIB_NAME)
     private val libName: String?,
 ) : AnalyticReport {
@@ -32,7 +31,7 @@ class LibContentReport @Inject constructor(
         reportWriters.forEach {
             it.write(
                 Report(
-                    projectInfo = projectInfoFactory.create(apks.getVersionName()),
+                    projectInfo = projectInfoProvider.get(),
                     id = LIB_CONTENT_METRICS_ID,
                     name = LIB_CONTENT_METRICS_ID,
                     rows = resourceRows + assetRows + nativeLibRows + otherRows + classRows

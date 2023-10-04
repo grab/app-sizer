@@ -13,7 +13,7 @@ private const val CODE_BASE_ID = "Codebase"
 
 class ApkAnalyticReport @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
-    private val projectInfoFactory: ProjectInfoFactory
+    private val projectInfoProvider: ProjectInfoProvider
 ) : AnalyticReport {
     override fun report(apks: Set<ApkFileInfo>, contributors: Set<Contributor>) {
         val dexCompressedRatio = apks.dexDownloadRatio()
@@ -28,7 +28,7 @@ class ApkAnalyticReport @Inject constructor(
         reportWriters.forEach {
             it.write(
                 Report(
-                    projectInfo = projectInfoFactory.create(apks.getVersionName()),
+                    projectInfo = projectInfoProvider.get(),
                     rows = listOfReport,
                     id = METRICS_ID_APK,
                     name = METRICS_ID_APK

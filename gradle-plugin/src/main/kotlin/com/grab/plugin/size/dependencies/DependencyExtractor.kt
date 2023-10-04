@@ -7,6 +7,10 @@ import com.grab.plugin.size.utils.isAndroidLibrary
 import com.grab.plugin.size.utils.isKotlinJvm
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ResolveException
+import org.gradle.api.artifacts.ResolvedDependency
+import org.gradle.api.internal.artifacts.DefaultResolvedDependency
+import org.gradle.api.internal.artifacts.DependencyGraphNodeResult
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.jvm.tasks.Jar
@@ -15,28 +19,64 @@ import java.util.*
 
 
 interface DependencyExtractor {
-    fun extract(project: Project, variant: BaseVariant): DependencyGraph
+    fun extract(): DependencyGraph
 }
 
-class DependencyExtractorImpl : DependencyExtractor {
-    override fun extract(appProject: Project, variant: BaseVariant): DependencyGraph {
+class DependencyExtractorImpl(
+    private val appProject: Project,
+    private val variant: BaseVariant,
+) : DependencyExtractor {
+    override fun extract(): DependencyGraph {
         val dependencyGraph = DependencyGraph()
         val queue: Queue<Project> = LinkedList()
         queue.add(appProject)
         while (queue.isNotEmpty()) {
             val project = queue.poll()
-            val archiveDependency = project.toArchiveDependency(variant)
-            project.filteredConfigurations(variant).flatMap { it.dependencies }
+            val projectArchiveDependency = project.toArchiveDependency(variant)
+            project.filteredConfigurations(variant)
+                .flatMap { it.dependencies }
                 .filterIsInstance<DefaultProjectDependency>()
                 .map { it.dependencyProject }
-                .map { dependencyProject ->
+                .forEach { dependencyProject ->
                     val archive = dependencyProject.toArchiveDependency(variant)
-                    dependencyGraph.addDependency(archiveDependency, archive)
+                    dependencyGraph.addDependency(projectArchiveDependency, archive)
                     queue.add(dependencyProject)
                 }
+            fetchExternalDependency(project, variant, dependencyGraph, projectArchiveDependency)
         }
-
         return dependencyGraph
+    }
+
+    private fun fetchExternalDependency(
+        project: Project,
+        variant: BaseVariant,
+        dependencyGraph: DependencyGraph,
+        root: ArchiveDependency
+    ) {
+        project.filteredConfigurations(variant)
+            .filter { it.isCanBeResolved }
+            .map { it.resolvedConfiguration }
+            .flatMap {
+                try {
+                    it.firstLevelModuleDependencies
+                } catch (e: ResolveException) {
+                    emptySet<ResolvedDependency>()
+                }
+            }
+            .filterIsInstance<DefaultResolvedDependency>()
+            .forEach { resolvedDep ->
+                val directDep = resolvedDep.toArchiveDependency()
+                dependencyGraph.addDependency(root, directDep)
+                val transitiveQueue = LinkedList<DependencyGraphNodeResult>()
+                transitiveQueue.add(resolvedDep)
+                while (transitiveQueue.isNotEmpty()) {
+                    val item = transitiveQueue.poll()
+                    item.outgoingEdges.forEach {
+                        val transitiveDep = it.toArchiveDependency()
+                        dependencyGraph.addDependency(directDep, transitiveDep)
+                    }
+                }
+            }
     }
 
     private fun Project.filteredConfigurations(variant: BaseVariant?): Sequence<Configuration> {
@@ -46,11 +86,25 @@ class DependencyExtractorImpl : DependencyExtractor {
             .filter { !it.name.contains("coreLibraryDesugaring") }
             .filter { !it.name.startsWith("_") }
             .filter { !it.name.contains("archives") }
+            // Todo : ensure filter by artifact applied
 //            .filter { if (variant != null) it.name.contains(variant.name, true) else true }
             .filter { it.isNotTest() }
     }
 }
 
+internal fun DependencyGraphNodeResult.toArchiveDependency(): ArchiveDependency = ExternalDependency(
+    name = publicView.name,
+    group = publicView.moduleGroup,
+    version = publicView.moduleVersion,
+    pathToArtifact = publicView.allModuleArtifacts.first().file.path
+)
+
+internal fun DefaultResolvedDependency.toArchiveDependency(): ArchiveDependency = ExternalDependency(
+    name = name,
+    group = moduleGroup,
+    version = moduleVersion,
+    pathToArtifact = allModuleArtifacts.first().file.path
+)
 
 internal fun Project.toArchiveDependency(variant: BaseVariant): ArchiveDependency {
     return when {

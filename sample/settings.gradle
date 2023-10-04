@@ -1,0 +1,29 @@
+
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+
+includeBuild("../") {
+    dependencySubstitution {
+        substitute module("com.grab:size-analysis") with project(":gradle-plugin")
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "sample"
+include ':app'
+
+
+include ':android-module-level1'
+include ':android-module-level2'
+include ':kotlin-module'

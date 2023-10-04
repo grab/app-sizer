@@ -30,6 +30,9 @@ interface ArchiveDependency {
     val pathToArtifact: String
 }
 
-data class ExternalDependency(override val name: String, override val pathToArtifact: String) : ArchiveDependency
+data class ExternalDependency(override val name: String,
+                              override val pathToArtifact: String,
+                              val group : String,
+                              val version : String) : ArchiveDependency
 data class ModuleDependency(override val name: String, override val pathToArtifact: String) : ArchiveDependency
 data class AppDependency(override val name: String, override val pathToArtifact: String) : ArchiveDependency

@@ -26,13 +26,11 @@ class AppSizePlugin : Plugin<Project> {
         project.afterEvaluate {
             project.the<AppExtension>().applicationVariants.forEach { variant ->
                 project.tasks.register("appSizeAnalysis${variant.name.capitalize()}", AppSizeAnalysisTask::class.java) {
-//                    dependsOn(variant.assembleProvider)
-//                dependsOn("assemble${variant.name.capitalize()}")
+                    dependsOn(variant.assembleProvider)
+                    dependsOn("assemble${variant.name.capitalize()}")
                     this.variant = variant
                 }
             }
-
-
         }
     }
 }

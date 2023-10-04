@@ -6,43 +6,41 @@ import com.grab.pax.plugins.report.MetricsPublisher
 import com.grab.tools.analyzer.report.AgentReportWriter
 import com.grab.tools.analyzer.report.ReportWriter
 import com.grab.tools.analyzer.report.XlsReportWriter
-import com.grab.tools.di.*
+import com.grab.tools.utils.InputFileProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import java.io.File
-import javax.inject.Named
+
+const val NAMED_DEVICE_NAME = "device_name"
+const val NAMED_PROJECT_NAME = "project_name"
+const val NAMED_EXTRA_TAG = "tag"
+const val NAMED_LIB_NAME = "lib_name"
 
 @Module
 object ReportModule {
 
     @Provides
     fun provideFeatureMapping(
-        @AnalyzerInputFile(INPUT_FILE_FEATURE_MAPPING_FILE) ymlFile: File?
+        inputFileProvider: InputFileProvider
     ): FeatureMapping {
-        return if (ymlFile == null) DummyFeatureMapping()
-        else DefaultFeatureMapping(ymlFile)
+        val ownerMapping = inputFileProvider.provideOwnerMappingFile()
+        return if (ownerMapping == null) DummyFeatureMapping()
+        else YmlFeatureMapping(ownerMapping)
     }
 
     @Provides
     @IntoSet
-    fun provideXlsReportWriter(@AnalyzerInputFile(INPUT_FILE_OUTPUT_FILE) file: File): ReportWriter =
-        XlsReportWriter(file.toExcelFile())
+    fun provideXlsReportWriter(inputFileProvider: InputFileProvider): ReportWriter =
+        XlsReportWriter(inputFileProvider.provideOutPutFile().toExcelFile())
 
     @Provides
     @IntoSet
     fun provideAgentReportWriter(metricsPublisher: MetricsPublisher): ReportWriter = AgentReportWriter(metricsPublisher)
 
     @Provides
-    fun provideJsonFilePublisher(@AnalyzerInputFile(INPUT_FILE_OUTPUT_FILE) file: File, gson: Gson): MetricsPublisher =
-        JsonFilePublisher(file.toJsonFile(), gson)
-
-    @Provides
-    fun provideProjectInfoFactory(
-        @Named(NAMED_DEVICE_NAME) deviceName: String,
-        @Named(NAMED_PROJECT_NAME) projectName: String,
-        @Named(NAMED_EXTRA_TAG) pipelineId: String,
-    ) = ProjectInfoFactory(deviceName = deviceName, projectName = projectName, pipelineId = pipelineId)
+    fun provideJsonFilePublisher(inputFileProvider: InputFileProvider, gson: Gson): MetricsPublisher =
+        JsonFilePublisher(inputFileProvider.provideOutPutFile().toJsonFile(), gson)
 }
 
 private fun File.toExcelFile(): File = File(parentFile, "$nameWithoutExtension.xls")

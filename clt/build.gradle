@@ -1,0 +1,42 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+    id "org.jetbrains.kotlin.kapt"
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+}
+group = "com.grab.tool"
+version = "1.1-SNAPSHOT"
+
+test {
+    useJUnitPlatform()
+}
+
+shadowJar {
+    zip64 true
+
+    manifest {
+        attributes 'Main-Class': 'com.grab.tools.MainKt'
+    }
+
+    mergeServiceFiles()
+}
+
+dependencies {
+    implementation project(":analyzer")
+    implementation project(":agent-report")
+    implementation project(":report-writer")
+    implementation libs.google.dagger
+    kapt libs.dagger.compiler
+    implementation libs.clikt
+    implementation libs.jackson.module.kotlin
+    implementation libs.jackson.dataformat.yaml
+    implementation libs.kxml2
+    implementation libs.gson
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}

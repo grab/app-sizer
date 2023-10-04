@@ -1,11 +1,10 @@
 package com.grab.tools.apk
 
 import com.android.tools.apk.analyzer.ApkSizeCalculator
+import com.grab.tools.di.AppScope
 import com.grab.tools.model.FileInfo
 import com.grab.tools.model.FileType
 import com.grab.tools.model.RawFileInfo
-import com.grab.tools.di.AppScope
-import com.grab.tools.utils.FileQuery
 import shadow.bundletool.com.android.tools.proguard.ProguardMap
 import java.io.File
 import java.nio.file.Path
@@ -14,23 +13,21 @@ import java.util.zip.ZipFile
 import javax.inject.Inject
 
 interface ApkFileParser {
-    fun parse(file: File, proguardMap: ProguardMap?): ApkFileInfo
-    fun parseApks(dir: File, proguardMap: ProguardMap?): Set<ApkFileInfo>
+    fun parseApks(apks: Sequence<File>, proguardMap: ProguardMap): Set<ApkFileInfo>
 }
 
 @AppScope
 class DefaultApkFileParser @Inject constructor(
-    private val fileQuery: FileQuery,
     private val dexFileParser: DexFileParser,
     private val apkSizeCalculator: ApkSizeCalculator,
     private val manifestFileParser: ManifestFileParser
 ) : ApkFileParser {
-    override fun parse(file: File, proguardMap: ProguardMap?): ApkFileInfo {
+    private fun parse(file: File, proguardMap: ProguardMap): ApkFileInfo {
         val apkSizeInfo = apkSizeCalculator.parseSize(file.toPath())
         return parseApkFile(file, apkSizeInfo, proguardMap)
     }
 
-    private fun parseApkFile(file: File, apkSizeInfo: ApkSizeInfo, proguardMap: ProguardMap?): ApkFileInfo {
+    private fun parseApkFile(file: File, apkSizeInfo: ApkSizeInfo, proguardMap: ProguardMap): ApkFileInfo {
         ZipFile(file).use { zipFile ->
             val entries = zipFile.entries()
             val resources = mutableSetOf<RawFileInfo>()
@@ -86,10 +83,9 @@ class DefaultApkFileParser @Inject constructor(
         }
     }
 
-    override fun parseApks(dir: File, proguardMap: ProguardMap?): Set<ApkFileInfo> =
-        fileQuery.query(dir, "apk")
-            .map { apkFile -> parse(apkFile, proguardMap) }
-            .toSet()
+    override fun parseApks(apks: Sequence<File>, proguardMap: ProguardMap): Set<ApkFileInfo> = apks
+        .map { apkFile -> parse(apkFile, proguardMap) }
+        .toSet()
 
     private fun ApkSizeCalculator.parseSize(path: Path): ApkSizeInfo = ApkSizeInfo(
         downloadSize = apkSizeCalculator.getFullApkDownloadSize(path),

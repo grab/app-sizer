@@ -32,9 +32,10 @@ dependencies {
 gradlePlugin {
     // Define the plugin
     plugins {
-        analysis {
-            id = 'size-analysis'
+        sizeAnalysis {
+            id = 'com.grab.size-analysis'
             implementationClass = 'com.grab.plugin.size.AppSizePlugin'
+            displayName = "SizeAnalysis"
         }
     }
 }

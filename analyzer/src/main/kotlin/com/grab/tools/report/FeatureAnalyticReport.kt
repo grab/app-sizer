@@ -9,7 +9,7 @@ import javax.inject.Inject
 class FeatureAnalyticReport @Inject constructor(
     private val featureMapping: FeatureMapping,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
-    private val projectInfoFactory: ProjectInfoFactory
+    private val projectInfoProvider: ProjectInfoProvider
 ) : AnalyticReport {
     override fun report(androidBinaryInfo: Set<ApkFileInfo>, contributors: Set<Contributor>) {
         reportFeatures(androidBinaryInfo, contributors.toFeatures(featureMapping))
@@ -26,7 +26,7 @@ class FeatureAnalyticReport @Inject constructor(
                     id = METRICS_ID_FEATURES,
                     name = METRICS_ID_FEATURES,
                     rows = listOf(apkReport) + sortedFeaturesReport,
-                    projectInfo = projectInfoFactory.create(apks.getVersionName())
+                    projectInfo = projectInfoProvider.get()
                 )
             )
         }

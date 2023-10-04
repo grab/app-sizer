@@ -3,37 +3,28 @@ package com.grab.tools.analyzer
 import com.grab.tools.aar.AarFileParser
 import com.grab.tools.analyzer.apk.ApkComponentProcessor
 import com.grab.tools.apk.ApkFileParser
-import com.grab.tools.apk.ProguardMappingParser
-import com.grab.tools.di.*
+import com.grab.tools.apk.ProguardMappingProvider
+import com.grab.tools.di.AppScope
 import com.grab.tools.jar.JarFileParser
 import com.grab.tools.report.LibContentReport
-import com.grab.tools.utils.DefaultAarFileQuery
-import com.grab.tools.utils.DefaultJarFileQuery
-import java.io.File
+import com.grab.tools.utils.InputFileProvider
 import javax.inject.Inject
 
 @AppScope
 class LibContentAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
-    private val proguardMappingParser: ProguardMappingParser,
+    private val proguardMappingProvider: ProguardMappingProvider,
     private val apkFileParser: ApkFileParser,
     private val aarFileParser: AarFileParser,
     private val jarFileParser: JarFileParser,
-    private val aarFileQuery: DefaultAarFileQuery,
-    private val jarFileQuery: DefaultJarFileQuery,
-    private val reporter: LibContentReport,
-    @AnalyzerInputFile(INPUT_FILE_PROGUARD_MAPPING_FILE)
-    private val proguardMappingFile: File,
-    @AnalyzerInputFile(INPUT_FILE_LIB_DIRECTORY)
-    private val librariesDirectory: File,
-    @AnalyzerInputFile(INPUT_FILE_APK_DIRECTORY)
-    private val apkDirs: File,
+    private val inputFileProvider: InputFileProvider,
+    private val reporter: LibContentReport
 ) : Analyzer {
     override fun process() {
-        val proguardMap = proguardMappingFile.run { proguardMappingParser.parse(this) }
-        val apkFilesInfo = apkFileParser.parseApks(apkDirs, proguardMap)
-        val aarFilesInfo = aarFileParser.parseAars(librariesDirectory, aarFileQuery)
-        val jarFilesInfo = jarFileParser.parseJars(librariesDirectory, jarFileQuery)
+        val proguardMap = proguardMappingProvider.provide()
+        val apkFilesInfo = apkFileParser.parseApks(inputFileProvider.provideApkFiles(), proguardMap)
+        val aarFilesInfo = aarFileParser.parseAars(inputFileProvider.provideLibraryAar())
+        val jarFilesInfo = jarFileParser.parseJars(inputFileProvider.provideLibraryJar())
 
         val processedData = apkComponentProcessor.process(apkFilesInfo, aarFilesInfo, jarFilesInfo)
         reporter.report(apkFilesInfo, processedData.contributors)

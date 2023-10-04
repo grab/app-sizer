@@ -24,7 +24,7 @@ data class ComponentProcessorResult(
     val noOwnerOthers: Set<FileInfo>,
 )
 
-class DefaultApkComponentProcessor @Inject constructor(private val analytics: Map<AnalyzerClass, @JvmSuppressWildcards ApkComponentAnalyzer>) :
+class DefaultApkComponentProcessor @Inject constructor(private val analytics: Map<AnalyzerClass, @JvmSuppressWildcards ComponentMapper>) :
     ApkComponentProcessor {
 
     override fun process(
@@ -42,11 +42,11 @@ class DefaultApkComponentProcessor @Inject constructor(private val analytics: Ma
         }.values.toSet()
         return ComponentProcessorResult(
             contributors = contributors,
-            noOwnerAssets = rawContributorMap.getNoOwnerData(AssetsApkComponentAnalyzer::class.java),
-            noOwnerResources = rawContributorMap.getNoOwnerData(ResourceApkComponentAnalyzer::class.java),
-            noOwnerNativeLibs = rawContributorMap.getNoOwnerData(NativeLibApkComponentAnalyzer::class.java),
-            noOwnerClasses = rawContributorMap.getNoOwnerData(ClassesApkComponentAnalyzer::class.java),
-            noOwnerOthers = rawContributorMap.getNoOwnerData(OtherApkComponentAnalyzer::class.java),
+            noOwnerAssets = rawContributorMap.getNoOwnerData(AssetsComponentMapper::class.java),
+            noOwnerResources = rawContributorMap.getNoOwnerData(ResourceComponentMapper::class.java),
+            noOwnerNativeLibs = rawContributorMap.getNoOwnerData(NativeLibComponentMapper::class.java),
+            noOwnerClasses = rawContributorMap.getNoOwnerData(ClassesComponentMapper::class.java),
+            noOwnerOthers = rawContributorMap.getNoOwnerData(OtherComponentMapper::class.java),
         )
     }
 
@@ -54,7 +54,7 @@ class DefaultApkComponentProcessor @Inject constructor(private val analytics: Ma
         get(clazz)?.noOwnerData ?: emptySet()
 
     private fun MutableMap<String, Contributor>.createAssetContributors(rawContributorMap: Map<AnalyzerClass, ComponentAnalyzerResult>) {
-        rawContributorMap[AssetsApkComponentAnalyzer::class.java]?.contributors?.forEach { rawEntry ->
+        rawContributorMap[AssetsComponentMapper::class.java]?.contributors?.forEach { rawEntry ->
             val libName = rawEntry.key
             val assets = rawEntry.value
             var contributor = get(libName)
@@ -65,7 +65,7 @@ class DefaultApkComponentProcessor @Inject constructor(private val analytics: Ma
     }
 
     private fun MutableMap<String, Contributor>.createResourceContributors(rawContributorMap: Map<AnalyzerClass, ComponentAnalyzerResult>) {
-        rawContributorMap[ResourceApkComponentAnalyzer::class.java]?.contributors?.forEach { rawEntry ->
+        rawContributorMap[ResourceComponentMapper::class.java]?.contributors?.forEach { rawEntry ->
             val libName = rawEntry.key
             val data = rawEntry.value
             var contributor = get(libName)
@@ -76,7 +76,7 @@ class DefaultApkComponentProcessor @Inject constructor(private val analytics: Ma
     }
 
     private fun MutableMap<String, Contributor>.createNativeLibsContributors(rawContributorMap: Map<AnalyzerClass, ComponentAnalyzerResult>) {
-        rawContributorMap[NativeLibApkComponentAnalyzer::class.java]?.contributors?.forEach { rawEntry ->
+        rawContributorMap[NativeLibComponentMapper::class.java]?.contributors?.forEach { rawEntry ->
             val libName = rawEntry.key
             val data = rawEntry.value
             var contributor = get(libName)
@@ -87,7 +87,7 @@ class DefaultApkComponentProcessor @Inject constructor(private val analytics: Ma
     }
 
     private fun MutableMap<String, Contributor>.createOtherContributors(rawContributorMap: Map<AnalyzerClass, ComponentAnalyzerResult>) {
-        rawContributorMap[OtherApkComponentAnalyzer::class.java]?.contributors?.forEach { rawEntry ->
+        rawContributorMap[OtherComponentMapper::class.java]?.contributors?.forEach { rawEntry ->
             val libName = rawEntry.key
             val data = rawEntry.value
             var contributor = get(libName)
@@ -98,7 +98,7 @@ class DefaultApkComponentProcessor @Inject constructor(private val analytics: Ma
     }
 
     private fun MutableMap<String, Contributor>.createClassContributors(rawContributorMap: Map<AnalyzerClass, ComponentAnalyzerResult>) {
-        rawContributorMap[ClassesApkComponentAnalyzer::class.java]?.contributors?.forEach { rawEntry ->
+        rawContributorMap[ClassesComponentMapper::class.java]?.contributors?.forEach { rawEntry ->
             val libName = rawEntry.key
             val data = rawEntry.value
             var contributor = get(libName)

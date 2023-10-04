@@ -14,6 +14,9 @@ pluginManagement {
     }
     plugins {
         id 'com.jfrog.artifactory' version '4.24.5'
+        id 'com.android.application' version '7.3.1'
+        id 'org.jetbrains.kotlin.jvm' version '1.8.10'
+        id 'org.jetbrains.kotlin.kapt' version "1.8.10"
     }
 }
 
@@ -31,5 +34,7 @@ include 'analyzer'
 include 'analyzer-repo'
 include 'agent-report'
 include 'gradle-plugin'
+include 'clt'
 include 'report-writer'
+
 
