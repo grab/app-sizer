@@ -15,24 +15,14 @@ class DependencyGraph {
         return adjacencyList[module] ?: emptyList()
     }
 
+    fun getAll(): Sequence<ArchiveDependency> = adjacencyList.values.asSequence().flatMap { it }
+
     override fun toString(): String {
-        val builder = StringBuilder()
-        builder.append("Dependency Graph:\n")
-        adjacencyList.forEach { (key, value) ->
-            builder.append("$key -> ${value.joinToString(", ")}\n")
-        }
-        return builder.toString()
+        return StringBuilder().apply {
+            append("Dependency Graph:\n")
+            adjacencyList.forEach { (key, value) ->
+                append("$key -> ${value.joinToString(", ")}\n")
+            }
+        }.toString()
     }
 }
-
-interface ArchiveDependency {
-    val name: String
-    val pathToArtifact: String
-}
-
-data class ExternalDependency(override val name: String,
-                              override val pathToArtifact: String,
-                              val group : String,
-                              val version : String) : ArchiveDependency
-data class ModuleDependency(override val name: String, override val pathToArtifact: String) : ArchiveDependency
-data class AppDependency(override val name: String, override val pathToArtifact: String) : ArchiveDependency

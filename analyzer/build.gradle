@@ -3,13 +3,10 @@ plugins {
     id "org.jetbrains.kotlin.kapt"
 }
 
-test {
-    useJUnitPlatform()
-}
-
 dependencies {
     implementation project(":report-writer")
     implementation project(":agent-report")
+
     implementation libs.dexlib2
     implementation libs.clikt
     implementation libs.bundletool
@@ -22,7 +19,17 @@ dependencies {
     implementation libs.poi.ooxml
     implementation libs.jxls.jexcel
     implementation libs.google.dagger
-    kapt libs.dagger.compiler
     implementation libs.gson
+
+    kapt libs.dagger.compiler
+
     testImplementation libs.kotlin.test
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '11'
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = '11'
 }

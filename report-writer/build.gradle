@@ -1,11 +1,11 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.5.10'
+    id 'org.jetbrains.kotlin.jvm'
 }
 
 dependencies {
     implementation project(":agent-report")
-    implementation("org.apache.poi:poi-ooxml:5.0.0")
-    implementation("org.jxls:jxls-jexcel:1.0.6")
+    implementation('org.apache.poi:poi-ooxml:5.2.2')
+    implementation('org.jxls:jxls-jexcel:1.0.9')
 }
 
 compileKotlin {

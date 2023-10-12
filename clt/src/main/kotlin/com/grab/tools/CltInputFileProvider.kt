@@ -8,7 +8,7 @@ import java.io.IOException
 
 private const val EXT_AAR = "aar"
 private const val EXT_APK = "apk"
-private const val JAR_EXTENSION = "jar"
+private const val EXT_JAR = "jar"
 private const val DEFAULT_JAR_DIR = "build/libs"
 private const val GRADLE_FILE = "build.gradle"
 private const val DEFAULT_AAR_FOLDER = "/build/outputs/aar"
@@ -36,10 +36,10 @@ class CltInputFileProvider constructor(
         return rootProjectDir.queryModules()
             .map { File(it, DEFAULT_JAR_DIR) }
             .filter { it.exists() && it.isDirectory }
-            .flatMap { fileQuery.query(it, JAR_EXTENSION) }
+            .flatMap { fileQuery.query(it, EXT_JAR) }
     }
 
-    override fun provideLibraryJar(): Sequence<File> = fileQuery.query(libsDir, JAR_EXTENSION)
+    override fun provideLibraryJar(): Sequence<File> = fileQuery.query(libsDir, EXT_JAR)
 
     override fun provideLibraryAar(): Sequence<File> = fileQuery.query(libsDir, EXT_AAR)
 
@@ -47,7 +47,7 @@ class CltInputFileProvider constructor(
 
     override fun provideR8MappingFile(): File? = r8MappingFile
 
-    override fun provideOwnerMappingFile(): File? = ymlFeatureMappingFile
+    override fun provideFeatureMappingFile(): File? = ymlFeatureMappingFile
 
     override fun provideOutPutFile(): File = outputFile
 }

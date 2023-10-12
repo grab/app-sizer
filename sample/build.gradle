@@ -17,19 +17,3 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.20' apply false
 }
 
-
-task buildClt(type: Exec) {
-    workingDir '../clt'
-    commandLine 'gradle', 'shadowJar'
-}
-
-task grantExecutePermission(dependsOn: 'buildClt', type: Exec) {
-    commandLine 'chmod', '+x', '../clt/build/libs/clt-1.1-SNAPSHOT-all.jar'
-}
-
-task runCommandline(dependsOn: 'grantExecutePermission', type: Exec) {
-    commandLine 'java', '-jar', '../clt/build/libs/clt-1.1-SNAPSHOT-all.jar'
-
-}
-
-

@@ -131,7 +131,7 @@ internal fun Project.toArchiveDependency(variant: BaseVariant): ArchiveDependenc
         }
         isKotlinJvm -> {
             val jarTask = tasks.findByName(JavaPlugin.JAR_TASK_NAME) as Jar
-            return ModuleDependency(
+            return JavaModuleDependency(
                 name = name,
                 pathToArtifact = jarTask.archiveFile.get().asFile.absolutePath
             )

@@ -1,14 +1,10 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
     id "org.jetbrains.kotlin.kapt"
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'com.github.johnrengelman.shadow'
 }
 group = "com.grab.tool"
 version = "1.1-SNAPSHOT"
-
-test {
-    useJUnitPlatform()
-}
 
 shadowJar {
     zip64 true
@@ -34,9 +30,9 @@ dependencies {
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = '1.8'
+    kotlinOptions.jvmTarget = '11'
 }
 
 compileTestKotlin {
-    kotlinOptions.jvmTarget = '1.8'
+    kotlinOptions.jvmTarget = '11'
 }

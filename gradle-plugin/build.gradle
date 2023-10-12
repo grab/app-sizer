@@ -8,6 +8,7 @@
  */
 
 plugins {
+    id 'org.jetbrains.kotlin.jvm'
     id 'java-gradle-plugin'
     alias(libs.plugins.kotlin.dsl)
 }
@@ -25,6 +26,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
 }
 
 dependencies {
+    implementation project(":analyzer")
     implementation libs.android.gradle.plugin
     implementation libs.gradle.api
 }

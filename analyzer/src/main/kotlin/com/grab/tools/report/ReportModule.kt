@@ -24,7 +24,7 @@ object ReportModule {
     fun provideFeatureMapping(
         inputFileProvider: InputFileProvider
     ): FeatureMapping {
-        val ownerMapping = inputFileProvider.provideOwnerMappingFile()
+        val ownerMapping = inputFileProvider.provideFeatureMappingFile()
         return if (ownerMapping == null) DummyFeatureMapping()
         else YmlFeatureMapping(ownerMapping)
     }

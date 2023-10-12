@@ -37,7 +37,41 @@ android {
         viewBinding true
     }
 
+    signingConfigs {
+        release {
+            // You need to specify these in your local.properties file or
+            // as environment variables
+            storeFile file("$rootProject.projectDir/buildsystem/sample-release.keystore")
+            storePassword '12345678'
+            keyAlias 'key0'
+            keyPassword '12345678'
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            // Other release configs
+        }
+    }
+
     with flavorConfig
+}
+
+appSizeAnalysis {
+    outputFolder = project.buildDir
+    featureMappingFile = new File(project.rootDir, 'module-owner.yml')
+    bundleToolPath = new File(project.rootDir, '/binary/bundletool-all-1.15.4.jar').toString()
+    bundleFilePath = "${project.buildDir}/outputs/bundle/gpsRelease/app-gps-release.aab"
+    tag = "tag-anything"
+    deviceConfig = """
+        {
+            "supportedAbis": ["armeabi-v7a", "armeabi"],
+            "supportedLocales": ["en", "fr"],
+            "screenDensity": 480,
+            "sdkVersion": 23
+        }
+    """
 }
 
 dependencies {
