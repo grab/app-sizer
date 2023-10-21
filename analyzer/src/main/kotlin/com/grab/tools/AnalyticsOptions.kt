@@ -7,5 +7,19 @@ enum class AnalyticsOption {
     MODULE_ANALYTICS,
     GENERAL,
     LARGE_FILE,
-    LIB_CONTENT
+    LIB_CONTENT;
+
+    companion object {
+        fun fromString(value: String): AnalyticsOption = when (value) {
+            "libraries" -> AnalyticsOption.LIBRARIES_ANALYTICS
+            "modules" -> AnalyticsOption.MODULE_ANALYTICS
+            "apk" -> AnalyticsOption.APK_ANALYTICS
+            "basic" -> AnalyticsOption.BASIC_APK_ANALYTICS
+            "general" -> AnalyticsOption.GENERAL
+            "large-files" -> AnalyticsOption.LARGE_FILE
+            "lib-content" -> AnalyticsOption.LIB_CONTENT
+            else -> AnalyticsOption.GENERAL
+        }
+    }
 }
+

@@ -32,7 +32,7 @@ object ReportModule {
     @Provides
     @IntoSet
     fun provideXlsReportWriter(inputFileProvider: InputFileProvider): ReportWriter =
-        XlsReportWriter(inputFileProvider.provideOutPutFile().toExcelFile())
+        XlsReportWriter(inputFileProvider.provideOutPutDirectory().toExcelFile())
 
     @Provides
     @IntoSet
@@ -40,8 +40,8 @@ object ReportModule {
 
     @Provides
     fun provideJsonFilePublisher(inputFileProvider: InputFileProvider, gson: Gson): MetricsPublisher =
-        JsonFilePublisher(inputFileProvider.provideOutPutFile().toJsonFile(), gson)
+        JsonFilePublisher(inputFileProvider.provideOutPutDirectory().toJsonFile(), gson)
 }
 
-private fun File.toExcelFile(): File = File(parentFile, "$nameWithoutExtension.xls")
-private fun File.toJsonFile(): File = File(parentFile, "$nameWithoutExtension.json")
+private fun File.toExcelFile(): File = File(this, "$nameWithoutExtension.xls")
+private fun File.toJsonFile(): File = File(this, "$nameWithoutExtension.json")

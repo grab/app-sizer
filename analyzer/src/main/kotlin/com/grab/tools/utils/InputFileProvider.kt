@@ -8,7 +8,7 @@ interface InputFileProvider {
     fun provideLibraryJar(): Sequence<File>
     fun provideLibraryAar(): Sequence<File>
     fun provideApkFiles(): Sequence<File>
-    fun provideOutPutFile() : File
+    fun provideOutPutDirectory() : File
     fun provideR8MappingFile() : File?
     fun provideFeatureMappingFile() : File?
 }

@@ -25,6 +25,11 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -59,19 +64,11 @@ android {
 }
 
 appSizeAnalysis {
-    outputFolder = project.buildDir
+    outputDirectory = project.buildDir
     featureMappingFile = new File(project.rootDir, 'module-owner.yml')
     bundleToolPath = new File(project.rootDir, '/binary/bundletool-all-1.15.4.jar').toString()
     bundleFilePath = "${project.buildDir}/outputs/bundle/gpsRelease/app-gps-release.aab"
     tag = "tag-anything"
-    deviceConfig = """
-        {
-            "supportedAbis": ["armeabi-v7a", "armeabi"],
-            "supportedLocales": ["en", "fr"],
-            "screenDensity": 480,
-            "sdkVersion": 23
-        }
-    """
 }
 
 dependencies {

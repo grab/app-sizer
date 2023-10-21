@@ -1,16 +1,28 @@
 package com.grab.plugin.size
 
 import com.android.builder.model.SigningConfig
+import com.grab.tools.analyzer.report.ProjectInfo
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
+private const val DEFAULT_DEVICE_SPEC = """
+    {
+  "supportedAbis": ["armeabi-v7a", "arm64-v8a"],
+  "supportedLocales": ["en", "es"],
+  "screenDensity": 480,
+  "sdkVersion": 30
+}
+"""
+
+internal const val DEFAULT_DEVICE_NAME = "default_device"
 
 abstract class GenerateApkTask : DefaultTask() {
 
@@ -18,7 +30,8 @@ abstract class GenerateApkTask : DefaultTask() {
     abstract val bundleToolPath: Property<String>
 
     @get:Input
-    abstract val androidDeviceConfig: Property<String>
+    @get:Optional
+    abstract val deviceSpecFilePath: Property<String?>
 
     @get:InputFile
     abstract val bundleFile: RegularFileProperty
@@ -26,37 +39,78 @@ abstract class GenerateApkTask : DefaultTask() {
     @get:Input
     abstract val signingConfig: Property<InternalSigningConfig>
 
-    @get:OutputFile
-    abstract val outputFile: RegularFileProperty
+    @get:OutputDirectory
+    abstract val outputDirectory: RegularFileProperty
 
     @TaskAction
     fun generateApk() {
+        val apksTempFile = File.createTempFile("app", ".apks")
+        var tempDeviceConfigFile: File? = null
 
-        val tempFile = File.createTempFile("deviceConfig", ".json").apply {
-            writeText(androidDeviceConfig.get())
+        val deviceSpec = if (deviceSpecFilePath.orNull != null) {
+            deviceSpecFilePath.get()
+        } else {
+            tempDeviceConfigFile = File.createTempFile("device_config", ".json")
+                .apply {
+                    writeBytes(
+                        DEFAULT_DEVICE_SPEC.toByteArray()
+                    )
+                }
+            tempDeviceConfigFile.path
         }
+
         try {
-            val realSigningConfig = signingConfig.get()
-            project.exec {
-                commandLine(
-                    "java",
-                    "-jar",
-                    bundleToolPath,
-                    "build-apks",
-                    "--bundle=${bundleFile.asFile.get().path}",
-                    "--output=${outputFile.asFile.get().path}",
-                    "--ks=${realSigningConfig.storeFile}",
-                    "--ks-pass=pass:${realSigningConfig.storePassword}",
-                    "--ks-key-alias=${realSigningConfig.keyAlias}",
-                    "--device-spec=$tempFile"
-                )
-            }
-            project.logger.log(LogLevel.QUIET, "APK generated successfully")
+            generateApksFile(apksTempFile, deviceSpec)
+            emptyOutPutDirectory()
+            extractApksToDirectory(apksTempFile, deviceSpec)
         } finally {
-            tempFile.delete()
+            apksTempFile.delete()
+            tempDeviceConfigFile?.delete()
+            project.logger.log(LogLevel.INFO, "Temp files were deleted")
         }
+    }
 
+    private fun extractApksToDirectory(apksTempFile: File, deviceSpec: String?) {
+        project.exec {
+            commandLine(
+                "java",
+                "-jar",
+                bundleToolPath.get(),
+                "extract-apks",
+                "--apks=${apksTempFile.path}",
+                "--output-dir=${outputDirectory.asFile.get().path}",
+                "--device-spec=${deviceSpec}",
+            )
+        }
+        project.logger.log(LogLevel.QUIET, "The Apks were extracted successfully")
+    }
 
+    private fun generateApksFile(apksTempFile: File, deviceSpec: String?) {
+        val realSigningConfig = signingConfig.get()
+        project.exec {
+            commandLine(
+                "java",
+                "-jar",
+                bundleToolPath.get(),
+                "build-apks",
+                "--bundle=${bundleFile.asFile.get().path}",
+                "--output=${apksTempFile.path}",
+                "--ks=${realSigningConfig.storeFile}",
+                "--ks-pass=pass:${realSigningConfig.storePassword}",
+                "--ks-key-alias=${realSigningConfig.keyAlias}",
+                "--device-spec=${deviceSpec}",
+                "--overwrite"
+            )
+        }
+        project.logger.log(LogLevel.QUIET, "The app.apks generated successfully")
+    }
+
+    private fun emptyOutPutDirectory() {
+        outputDirectory.asFile.get()
+            .listFiles()
+            ?.forEach { apk ->
+                apk.delete()
+            }
     }
 }
 

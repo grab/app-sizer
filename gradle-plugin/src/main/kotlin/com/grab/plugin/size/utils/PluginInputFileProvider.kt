@@ -5,6 +5,7 @@ import com.grab.plugin.size.AppSizePluginExtension
 import com.grab.plugin.size.dependencies.*
 import com.grab.tools.utils.InputFileProvider
 import org.gradle.api.Project
+import org.gradle.api.file.RegularFileProperty
 import java.io.File
 
 private const val EXT_AAR = "aar"
@@ -14,7 +15,8 @@ class PluginInputFileProvider(
     private val dependencyGraph: DependencyGraph,
     private val extension: AppSizePluginExtension,
     private val project: Project,
-    private val variant: BaseVariant
+    private val variant: BaseVariant,
+    private val apksDirectory: RegularFileProperty
 ) : InputFileProvider {
     override fun provideModuleAar(): Sequence<File> =
         dependencyGraph.getModuleDependency().map { File(it.pathToArtifact) }
@@ -31,14 +33,18 @@ class PluginInputFileProvider(
         .filter { it.extension.equals(EXT_AAR, true) }
 
     override fun provideApkFiles(): Sequence<File> {
-        TODO("Not yet implemented")
+        return apksDirectory.asFile.get()
+            .listFiles()
+            ?.asSequence() ?: emptySequence()
     }
 
-    override fun provideOutPutFile(): File {
-        TODO("Not yet implemented")
-    }
+    override fun provideOutPutDirectory(): File = extension.outputDirectory.asFile.get()
 
-    override fun provideR8MappingFile(): File? = variant.mappingFileProvider.get().files.first()
+    override fun provideR8MappingFile(): File? {
+        return if (variant.mappingFileProvider.isPresent) {
+            variant.mappingFileProvider.get().files.first()
+        } else null
+    }
 
     override fun provideFeatureMappingFile(): File? = extension.featureMappingFile.asFile.get()
 }

@@ -78,18 +78,6 @@ class DependencyExtractorImpl(
                 }
             }
     }
-
-    private fun Project.filteredConfigurations(variant: BaseVariant?): Sequence<Configuration> {
-        return configurations
-            .asSequence()
-            .filter { !it.name.contains("classpath", true) && !it.name.contains("lint") }
-            .filter { !it.name.contains("coreLibraryDesugaring") }
-            .filter { !it.name.startsWith("_") }
-            .filter { !it.name.contains("archives") }
-            // Todo : ensure filter by artifact applied
-//            .filter { if (variant != null) it.name.contains(variant.name, true) else true }
-            .filter { it.isNotTest() }
-    }
 }
 
 internal fun DependencyGraphNodeResult.toArchiveDependency(): ArchiveDependency = ExternalDependency(

@@ -80,7 +80,7 @@ class AnalyzerCommand : CliktCommand() {
             libsDir = settings.libraryDirectory,
             rootProjectDir = settings.projectDirectory,
             apkDirectory = settings.apkDirectory,
-            outputFile = settings.outputFile,
+            outputDirectory = settings.outputFile,
             r8MappingFile = settings.mappingFile,
             ymlFeatureMappingFile = settings.featureMappingFile
         )

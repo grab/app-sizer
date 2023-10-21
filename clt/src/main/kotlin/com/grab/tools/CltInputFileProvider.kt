@@ -19,7 +19,7 @@ class CltInputFileProvider constructor(
     private val libsDir: File,
     private val rootProjectDir: File,
     private val apkDirectory: File,
-    private val outputFile: File,
+    private val outputDirectory: File,
     private val r8MappingFile: File? = null,
     private val ymlFeatureMappingFile: File? = null,
 ) : InputFileProvider {
@@ -44,12 +44,11 @@ class CltInputFileProvider constructor(
     override fun provideLibraryAar(): Sequence<File> = fileQuery.query(libsDir, EXT_AAR)
 
     override fun provideApkFiles(): Sequence<File> = fileQuery.query(apkDirectory, EXT_APK)
+    override fun provideOutPutDirectory(): File = outputDirectory
 
     override fun provideR8MappingFile(): File? = r8MappingFile
 
     override fun provideFeatureMappingFile(): File? = ymlFeatureMappingFile
-
-    override fun provideOutPutFile(): File = outputFile
 }
 
 

@@ -5,9 +5,9 @@ data class ProjectInfo(
     val versionName: String,
     val projectName: String,
     val deviceName: String,
-    val pipelineId: String,
+    val pipelineId: String?,
     val buildType: String = "production",
-    val tag: String = ""
+    val tag: String?
 )
 
 
