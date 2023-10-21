@@ -1,0 +1,8 @@
+Platform:
+  - app
+Team1:
+  - android-module-level1
+  - kotlin-module
+Team2:
+  - android-module-level2
+

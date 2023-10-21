@@ -3,7 +3,6 @@ package com.grab.tools.report
 import com.grab.tools.analyzer.report.*
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.model.Contributor
-import java.util.*
 import javax.inject.Inject
 
 private const val LIBRARIES_ID = "Libraries"
@@ -11,7 +10,7 @@ private const val LIBRARIES_ID = "Libraries"
 class ModuleAnalyticReport @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val featureMapping: FeatureMapping,
-    private val projectInfoFactory: ProjectInfoFactory
+    private val projectInfoProvider: ProjectInfoProvider
 ) : AnalyticReport {
     override fun report(apks: Set<ApkFileInfo>, contributors: Set<Contributor>) {
         contributors.toModules().also { modules -> report(apks, modules) }
@@ -30,7 +29,7 @@ class ModuleAnalyticReport @Inject constructor(
                 Report(
                     id = METRICS_ID_MODULES,
                     name = METRICS_ID_MODULES,
-                    projectInfo = projectInfoFactory.create(apks.getVersionName()),
+                    projectInfo = projectInfoProvider.get(),
                     rows = toReportRows(reportItems)
                 )
             )

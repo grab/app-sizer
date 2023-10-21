@@ -76,13 +76,25 @@ class AgentReportWriter(
     }
 
 
-    private fun ProjectInfo.toCommonFields(): List<MetricsField> = listOf(
-        MetricsField(
-            name = "pipeline_id",
-            value = pipelineId,
-            valueType = "integer"
-        )
-    )
+    private fun ProjectInfo.toCommonFields(): List<MetricsField> {
+        return mutableListOf(
+            MetricsField(
+                name = "pipeline_id",
+                value = pipelineId ?: "NA",
+                valueType = "integer"
+            )
+        ).apply {
+            if (tag != null) {
+                add(
+                    MetricsField(
+                        name = "tag",
+                        value = tag,
+                        valueType = "string"
+                    )
+                )
+            }
+        }
+    }
 
     private fun ProjectInfo.toCommonTags(): List<MetricsTag> =
         listOf(

@@ -15,7 +15,6 @@ const val ATTR_VERSION_CODE = "android:$PROP_VERSION_CODE"
 const val ATTR_VERSION_NAME = "android:$PROP_VERSION_NAME"
 
 interface ManifestFileParser {
-
     fun parse(manifestStream: InputStream, rawFileInfo: RawFileInfo): ManifestFileInfo
 }
 

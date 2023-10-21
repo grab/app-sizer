@@ -15,28 +15,28 @@ typealias AnalyzerClass = Class<*>
 interface ApkComponentAnalyzerModule {
     @Binds
     @IntoMap
-    @ClassKey(ResourceApkComponentAnalyzer::class)
-    fun ResourceApkComponentAnalyzer.bindResourceAnalyzer(): ApkComponentAnalyzer
+    @ClassKey(ResourceComponentMapper::class)
+    fun ResourceComponentMapper.bindResourceAnalyzer(): ComponentMapper
 
     @Binds
     @IntoMap
-    @ClassKey(NativeLibApkComponentAnalyzer::class)
-    fun NativeLibApkComponentAnalyzer.bindNativeLibAnalyzer(): ApkComponentAnalyzer
+    @ClassKey(NativeLibComponentMapper::class)
+    fun NativeLibComponentMapper.bindNativeLibAnalyzer(): ComponentMapper
 
     @Binds
     @IntoMap
-    @ClassKey(AssetsApkComponentAnalyzer::class)
-    fun AssetsApkComponentAnalyzer.bindAssetsAnalyzer(): ApkComponentAnalyzer
+    @ClassKey(AssetsComponentMapper::class)
+    fun AssetsComponentMapper.bindAssetsAnalyzer(): ComponentMapper
 
     @Binds
     @IntoMap
-    @ClassKey(ClassesApkComponentAnalyzer::class)
-    fun ClassesApkComponentAnalyzer.bindClassesAnalyzer(): ApkComponentAnalyzer
+    @ClassKey(ClassesComponentMapper::class)
+    fun ClassesComponentMapper.bindClassesAnalyzer(): ComponentMapper
 
     @Binds
     @IntoMap
-    @ClassKey(OtherApkComponentAnalyzer::class)
-    fun OtherApkComponentAnalyzer.bindOtherAnalyzer(): ApkComponentAnalyzer
+    @ClassKey(OtherComponentMapper::class)
+    fun OtherComponentMapper.bindOtherAnalyzer(): ComponentMapper
 
 
     @Binds

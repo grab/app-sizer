@@ -7,18 +7,18 @@
  */
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.5.10'
+    id "org.jetbrains.kotlin.jvm"
 }
 
 dependencies {
-    implementation('com.google.code.gson:gson:2.8.8')
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.5.21")
+    implementation libs.gson
+//    testImplementation libs.kotlin.test
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = '1.8'
+    kotlinOptions.jvmTarget = '11'
 }
 
 compileTestKotlin {
-    kotlinOptions.jvmTarget = '1.8'
+    kotlinOptions.jvmTarget = '11'
 }

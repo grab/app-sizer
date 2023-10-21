@@ -1,5 +1,41 @@
+
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        google()
+        maven {
+            url "https://artifacts.gitlab.myteksi.net/artifactory/mobile--android"
+            credentials {
+                username = "svc.pax.adr.artifactory.local"
+                password = "cmVmdGtuOjAxOjE3MTQwOTk3MjQ6VWQzQWgybE1nNldDSUJ5RlZQcWYwRDV5NjRk"
+            }
+        }
+    }
+    plugins {
+        id 'com.jfrog.artifactory' version '4.24.5'
+        id 'com.android.application' version '7.3.1'
+        id 'org.jetbrains.kotlin.jvm' version '1.8.20'
+        id 'org.jetbrains.kotlin.kapt' version '1.8.20'
+        id 'com.github.johnrengelman.shadow' version '7.0.0'
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+enableFeaturePreview('VERSION_CATALOGS')
+
 include 'analyzer'
 include 'analyzer-repo'
 include 'agent-report'
+include 'gradle-plugin'
+include 'clt'
 include 'report-writer'
+
 

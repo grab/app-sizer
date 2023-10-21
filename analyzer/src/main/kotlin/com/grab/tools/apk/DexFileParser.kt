@@ -1,9 +1,10 @@
 package com.grab.tools.apk
 
 
-import com.grab.tools.model.ClassFileInfo
 import com.grab.tools.di.AppScope
-import com.grab.tools.log.log
+import com.grab.tools.model.ClassFileInfo
+import com.grab.tools.utils.Logger
+import com.grab.tools.utils.log
 import org.jf.dexlib2.dexbacked.DexBackedClassDef
 import org.jf.dexlib2.dexbacked.DexBackedDexFile
 import shadow.bundletool.com.android.tools.proguard.ProguardMap
@@ -22,7 +23,9 @@ interface DexFileParser {
 }
 
 @AppScope
-class DefaultDexFileParser @Inject constructor() : DexFileParser {
+class DefaultDexFileParser @Inject constructor(
+    private val logger: Logger
+) : DexFileParser {
     override fun parse(
         entry: ZipEntry,
         inputStream: InputStream,
@@ -46,7 +49,7 @@ class DefaultDexFileParser @Inject constructor() : DexFileParser {
     private fun fromDex(classDef: DexBackedClassDef, proguardMap: ProguardMap?): ClassFileInfo {
         val className = classDef.type.removePrefix("L").replace('/', '.').removeSuffix(";")
         if (proguardMap != null && proguardMap.getClassName(className) == null) {
-            log("Can not find $className in from proguard mapping file")
+            logger.log("Can not find $className in from proguard mapping file")
         }
         return ClassFileInfo(
             name = proguardMap?.getClassName(className) ?: className,

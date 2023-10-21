@@ -1,0 +1,32 @@
+apply plugin: 'com.jfrog.artifactory'
+artifactory {
+    contextUrl = "https://artifacts.gitlab.myteksi.net/artifactory"
+    publish {
+        repository {
+            repoKey = 'mobile--android--local'
+            username = System.getenv('ARTIFACTORY_USER')
+            password = System.getenv('ARTIFACTORY_PASSWORD')
+            maven = true
+        }
+    }
+}
+
+ext.configureArtifact = { libGroupId, libVersion, libArtifactId ->
+    apply plugin: 'maven-publish'
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                groupId libGroupId
+                version libVersion
+                artifactId libArtifactId
+                from components.java
+            }
+        }
+    }
+    artifactoryPublish {
+        publications('maven')
+        dependsOn "build"
+    }
+}
+

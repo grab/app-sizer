@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 class BasicApkAnalyticReport @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
-    private val projectInfoFactory: ProjectInfoFactory
+    private val projectInfoProvider: ProjectInfoProvider
 ) : AnalyticReport {
 
     override fun report(androidBinaryInfo: Set<ApkFileInfo>, contributors: Set<Contributor>) {
@@ -18,7 +18,7 @@ class BasicApkAnalyticReport @Inject constructor(
         reportWriters.forEach {
             it.write(
                 Report(
-                    projectInfo = projectInfoFactory.create(androidBinaryInfo.getVersionName()),
+                    projectInfo = projectInfoProvider.get(),
                     rows = androidBinaryInfo.createApkReportRows(dexCompressedRatio),
                     id = METRICS_ID_BASIC_APK,
                     name = METRICS_ID_BASIC_APK

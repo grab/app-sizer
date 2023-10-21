@@ -30,7 +30,7 @@ class DefaultJarStreamParser @Inject constructor() : JarStreamParser {
                 )
                 when (fileInfo.type) {
                     FileType.CLASS -> classes.add(entry.toClass())
-                    FileType.OTHERS -> others.add(fileInfo)
+                    else -> others.add(fileInfo)
                 }
                 entry = entries.nextEntry
             }

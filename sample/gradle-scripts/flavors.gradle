@@ -1,0 +1,29 @@
+/**
+ * To use flavor config for your module, add the following lines to your module's build.gradle
+ *
+ *      apply from: "${rootProject.projectDir}/gradle-scripts/flavors.gradle"
+ *
+ *      android {
+ *                 // other config...
+ *                 with flavorConfig
+ *      }
+ */
+ext.flavorConfig = {
+
+    flavorDimensions "service"
+    productFlavors {
+        // flavor for Huawei Mobile Service
+        hms {
+            dimension "service"
+        }
+        // flavor for Google Play Service
+        gps {
+            dimension "service"
+        }
+    }
+
+    variantFilter { variant ->
+        def names = variant.flavors*.name
+        if(!names.contains("gps")) setIgnore(true)
+    }
+}

@@ -1,23 +1,21 @@
 package com.grab.tools.jar
 
+import com.grab.tools.apk.getPath
+import com.grab.tools.di.AppScope
 import com.grab.tools.model.ClassFileInfo
 import com.grab.tools.model.FileType
 import com.grab.tools.model.RawFileInfo
-import com.grab.tools.apk.getPath
-import com.grab.tools.di.AppScope
-import com.grab.tools.utils.JarFileQuery
 import java.io.File
 import java.util.zip.ZipFile
 import javax.inject.Inject
 
 interface JarFileParser {
-    fun parse(file: File): JarFileInfo
-    fun parseJars(dir: File, jarFileQuery: JarFileQuery): Set<JarFileInfo>
+    fun parseJars(files: Sequence<File>): Set<JarFileInfo>
 }
 
 @AppScope
 class DefaultJarFileParser @Inject constructor() : JarFileParser {
-    override fun parse(file: File): JarFileInfo {
+    private fun parse(file: File): JarFileInfo {
         ZipFile(file).use { zipFile ->
             val entries = zipFile.entries()
             val nativeLibs = mutableSetOf<RawFileInfo>()
@@ -39,7 +37,7 @@ class DefaultJarFileParser @Inject constructor() : JarFileParser {
                         nativeLibs.add(fileInfoCorrectName)
                     }
                     FileType.CLASS -> classes.add(entry.toClass())
-                    FileType.OTHERS -> others.add(fileInfo)
+                    else -> others.add(fileInfo)
                 }
             }
             return JarFileInfo(
@@ -52,9 +50,8 @@ class DefaultJarFileParser @Inject constructor() : JarFileParser {
         }
     }
 
-    override fun parseJars(dir: File, jarFileQuery: JarFileQuery): Set<JarFileInfo> {
-        return jarFileQuery.query(dir)
-            .map { file -> parse(file) }
+    override fun parseJars(files: Sequence<File>): Set<JarFileInfo> {
+        return files.map { file -> parse(file) }
             .toSet()
     }
 }

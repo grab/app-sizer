@@ -11,7 +11,7 @@ private const val SIZE_THRESHOLD = 10 * 1024
 class LargeFileReport @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val featureMapping: FeatureMapping,
-    private val projectInfoFactory: ProjectInfoFactory,
+    private val projectInfoProvider: ProjectInfoProvider,
 ) : AnalyticReport {
 
     override fun report(apks: Set<ApkFileInfo>, contributors: Set<Contributor>) {
@@ -36,7 +36,7 @@ class LargeFileReport @Inject constructor(
         reportWriters.forEach {
             it.write(
                 Report(
-                    projectInfoFactory.create(apks.getVersionName()),
+                    projectInfoProvider.get(),
                     id = METRICS_ID_LARGE_FILES,
                     name = METRICS_ID_LARGE_FILES,
                     rows = reportRows

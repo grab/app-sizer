@@ -1,0 +1,89 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.grab.size-analysis'
+}
+
+apply from: "${rootProject.projectDir}/gradle-scripts/flavors.gradle"
+
+android {
+    namespace 'com.grab.android.sample'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.grab.android.sample"
+        minSdk 21
+        targetSdk 32
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        viewBinding true
+    }
+
+    signingConfigs {
+        release {
+            // You need to specify these in your local.properties file or
+            // as environment variables
+            storeFile file("$rootProject.projectDir/buildsystem/sample-release.keystore")
+            storePassword '12345678'
+            keyAlias 'key0'
+            keyPassword '12345678'
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            // Other release configs
+        }
+    }
+
+    with flavorConfig
+}
+
+appSizeAnalysis {
+    outputDirectory = project.buildDir
+    featureMappingFile = new File(project.rootDir, 'module-owner.yml')
+    bundleToolPath = new File(project.rootDir, '/binary/bundletool-all-1.15.4.jar').toString()
+    bundleFilePath = "${project.buildDir}/outputs/bundle/gpsRelease/app-gps-release.aab"
+    tag = "tag-anything"
+}
+
+dependencies {
+
+    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.6.0'
+
+    implementation project(":android-module-level1")
+    implementation project(":kotlin-module")
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
