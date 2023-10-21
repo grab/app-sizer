@@ -2,9 +2,7 @@ package com.grab.tools
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.*
-import com.grab.tools.log.log
-import com.grab.tools.utils.DefaultFileQuery
-import com.grab.tools.utils.ProjectInfoProviderImpl
+import com.grab.tools.utils.*
 import java.io.File
 
 
@@ -59,11 +57,12 @@ class AnalyzerCommand : CliktCommand() {
 
     override fun run() {
         val settings = SettingYmlLoader().load(settingFile)
-        log("Lib directory ${settings.libraryDirectoryPath}")
-        log("Project directory ${settings.projectDirectoryPath}")
-        log("Feature mapping file ${settings.featureMappingFilePath}")
-        log("Proguard mapping file ${settings.mappingFilePath}")
-        log("Apk directory ${settings.apkDirectoryPath}")
+        val logger: Logger = CltLogger()
+        logger.log("Lib directory ${settings.libraryDirectoryPath}")
+        logger.log("Project directory ${settings.projectDirectoryPath}")
+        logger.log("Feature mapping file ${settings.featureMappingFilePath}")
+        logger.log("Proguard mapping file ${settings.mappingFilePath}")
+        logger.log("Apk directory ${settings.apkDirectoryPath}")
         validateCommand()
 
         val projectInfoProvider = ProjectInfoProviderImpl(
@@ -89,7 +88,8 @@ class AnalyzerCommand : CliktCommand() {
                 inputFileProvider,
                 projectInfoProvider,
                 libName,
-                reportOption
+                reportOption,
+                logger
             ).process()
     }
 }

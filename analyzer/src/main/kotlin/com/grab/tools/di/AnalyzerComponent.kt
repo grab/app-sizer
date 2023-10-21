@@ -6,12 +6,10 @@ import com.grab.tools.apk.*
 import com.grab.tools.report.ProjectInfoProvider
 import com.grab.tools.report.ReportModule
 import com.grab.tools.utils.InputFileProvider
+import com.grab.tools.utils.Logger
 import dagger.*
 import javax.inject.Named
 
-internal const val NAMED_DEVICE_NAME = "device_name"
-internal const val NAMED_PROJECT_NAME = "project_name"
-internal const val NAMED_EXTRA_TAG = "tag"
 internal const val NAMED_LIB_NAME = "lib_name"
 
 @Component(
@@ -31,9 +29,9 @@ interface AnalyzerComponent {
     interface Factory {
         fun create(
             @BindsInstance inputFileProvider: InputFileProvider,
-//            @BindsInstance analyticsOption: AnalyticsOption,
             @BindsInstance projectInfoProvider: ProjectInfoProvider,
             @BindsInstance @Named(NAMED_LIB_NAME) libName: String?,
+            @BindsInstance logger: Logger,
         ): AnalyzerComponent
     }
 }

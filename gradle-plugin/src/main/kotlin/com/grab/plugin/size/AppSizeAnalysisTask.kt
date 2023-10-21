@@ -5,6 +5,7 @@ import com.android.build.gradle.api.BaseVariant
 import com.grab.plugin.size.dependencies.DependencyExtractorImpl
 import com.grab.plugin.size.dependencies.DependencyGraph
 import com.grab.plugin.size.utils.PluginInputFileProvider
+import com.grab.plugin.size.utils.PluginLogger
 import com.grab.tools.AnalyticsOption
 import com.grab.tools.AnalyzerFactory
 import com.grab.tools.analyzer.report.ProjectInfo
@@ -46,6 +47,7 @@ abstract class AppSizeAnalysisTask : DefaultTask() {
         val extractor = DependencyExtractorImpl(project, variant)
         val dependencyGraph = extractor.extract()
         val inputFileProvider = createInputFileProvider(dependencyGraph)
+        val logger = PluginLogger(project)
         AnalyzerFactory()
             .create(
                 inputFileProvider,
@@ -53,7 +55,8 @@ abstract class AppSizeAnalysisTask : DefaultTask() {
                     override fun get() = projectInfo.get()
                 },
                 libName = libName.orNull,
-                AnalyticsOption.fromString(option.orNull ?: "general")
+                AnalyticsOption.fromString(option.orNull ?: "general"),
+                logger,
             ).process()
 
     }
