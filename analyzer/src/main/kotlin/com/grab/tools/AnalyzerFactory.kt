@@ -11,13 +11,12 @@ class AnalyzerFactory {
         inputFileProvider: InputFileProvider,
         projectInfoProvider: ProjectInfoProvider,
         libName: String?,
-        analyticsOption: AnalyticsOption,
         logger: Logger
-    ): Analyzer = DaggerAnalyzerComponent.factory()
+    ): Map<AnalyticsOption, Analyzer> = DaggerAnalyzerComponent.factory()
         .create(
             inputFileProvider,
             projectInfoProvider,
             libName,
             logger
-        ).analyzerMap().getValue(analyticsOption)
+        ).analyzerMap()
 }

@@ -8,8 +8,9 @@ import com.grab.pax.plugins.report.Tag as MetricsTag
 class AgentReportWriter(
     private val metricsPublisher: MetricsPublisher
 ) : ReportWriter {
-    override fun write(report: Report) {
+    override fun write(reportId : String, report: Report) {
         metricsPublisher.publish(
+            reportId,
             report.rows.flatMap {
                 it.toMetrics(report.projectInfo, report.id)
             }

@@ -48,17 +48,22 @@ abstract class AppSizeAnalysisTask : DefaultTask() {
         val dependencyGraph = extractor.extract()
         val inputFileProvider = createInputFileProvider(dependencyGraph)
         val logger = PluginLogger(project)
-        AnalyzerFactory()
+        val analyzerMap = AnalyzerFactory()
             .create(
                 inputFileProvider,
                 object : ProjectInfoProvider {
                     override fun get() = projectInfo.get()
                 },
                 libName = libName.orNull,
-                AnalyticsOption.fromString(option.orNull ?: "general"),
                 logger,
-            ).process()
-
+            )
+        if(!option.isPresent){
+            analyzerMap
+                .filterKeys { it != AnalyticsOption.LIB_CONTENT && it != AnalyticsOption.LARGE_FILE }
+                .forEach { (_, analyzer) -> analyzer.process() }
+        }else{
+            analyzerMap[AnalyticsOption.fromString(option.orNull ?: "general")]?.process()
+        }
     }
 
     private fun createInputFileProvider(dependencyGraph: DependencyGraph) =

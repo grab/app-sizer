@@ -1,5 +1,6 @@
 package com.grab.tools.report
 
+import com.grab.tools.AnalyticsOption
 import com.grab.tools.analyzer.report.*
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.model.Contributor
@@ -26,6 +27,7 @@ class ModuleAnalyticReport @Inject constructor(
         val reportItems = listOf(apkReport, librariesReport) + sortedFeaturesReport
         reportWriters.forEach {
             it.write(
+                AnalyticsOption.MODULES.name.toLowerCase(),
                 Report(
                     id = METRICS_ID_MODULES,
                     name = METRICS_ID_MODULES,

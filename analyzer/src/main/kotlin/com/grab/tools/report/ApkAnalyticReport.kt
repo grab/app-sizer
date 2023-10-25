@@ -1,5 +1,6 @@
 package com.grab.tools.report
 
+import com.grab.tools.AnalyticsOption
 import com.grab.tools.analyzer.report.HybridField
 import com.grab.tools.analyzer.report.Report
 import com.grab.tools.analyzer.report.ReportWriter
@@ -27,6 +28,7 @@ class ApkAnalyticReport @Inject constructor(
 
         reportWriters.forEach {
             it.write(
+                AnalyticsOption.APK.name.toLowerCase(),
                 Report(
                     projectInfo = projectInfoProvider.get(),
                     rows = listOfReport,

@@ -1,12 +1,13 @@
 package com.grab.tools.report
 
+import com.grab.tools.AnalyticsOption
 import com.grab.tools.analyzer.report.*
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.model.Contributor
 import javax.inject.Inject
 
 
-class FeatureAnalyticReport @Inject constructor(
+class GeneralAnalyticReport @Inject constructor(
     private val featureMapping: FeatureMapping,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val projectInfoProvider: ProjectInfoProvider
@@ -22,6 +23,7 @@ class FeatureAnalyticReport @Inject constructor(
             .map { it.toReportRow(dexCompressedRatio) }
         reportWriters.forEach {
             it.write(
+                AnalyticsOption.GENERAL.name.toLowerCase(),
                 Report(
                     id = METRICS_ID_FEATURES,
                     name = METRICS_ID_FEATURES,

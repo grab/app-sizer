@@ -64,7 +64,7 @@ data class Report(
 )
 
 interface ReportWriter {
-    fun write(report: Report)
+    fun write(reportId : String, report: Report)
 }
 
 

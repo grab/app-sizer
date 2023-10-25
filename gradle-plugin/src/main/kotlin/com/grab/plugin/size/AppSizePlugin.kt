@@ -3,6 +3,7 @@ package com.grab.plugin.size
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
+import com.android.build.gradle.internal.scope.ProjectInfo.Companion.getBaseName
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import com.grab.plugin.size.dependencies.projectsDependenciesSet
 import com.grab.plugin.size.utils.*
@@ -73,7 +74,7 @@ class AppSizePlugin : Plugin<Project> {
         extension: AppSizePluginExtension
     ): ProjectInfo {
         return ProjectInfo(
-            projectName = project.rootProject.displayName,
+            projectName = project.rootProject.name,
             versionName = variant.mergedFlavor.versionName ?: "NA",
             deviceName = (project.findProperty(DEVICE_NAME_PARAM) as String?) ?: DEFAULT_DEVICE_NAME,
             pipelineId = project.findProperty(PIPELINE_ID_PARAM) as String?,

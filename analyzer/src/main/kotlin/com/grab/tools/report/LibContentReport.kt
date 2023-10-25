@@ -1,5 +1,6 @@
 package com.grab.tools.report
 
+import com.grab.tools.AnalyticsOption
 import com.grab.tools.analyzer.report.*
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.model.Contributor
@@ -30,6 +31,7 @@ class LibContentReport @Inject constructor(
 
         reportWriters.forEach {
             it.write(
+                AnalyticsOption.LIB_CONTENT.name.toLowerCase(),
                 Report(
                     projectInfo = projectInfoProvider.get(),
                     id = LIB_CONTENT_METRICS_ID,

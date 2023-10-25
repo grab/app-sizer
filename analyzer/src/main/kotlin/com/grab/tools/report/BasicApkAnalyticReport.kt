@@ -1,5 +1,6 @@
 package com.grab.tools.report
 
+import com.grab.tools.AnalyticsOption
 import com.grab.tools.analyzer.report.HybridField
 import com.grab.tools.analyzer.report.Report
 import com.grab.tools.analyzer.report.ReportWriter
@@ -17,6 +18,7 @@ class BasicApkAnalyticReport @Inject constructor(
         val dexCompressedRatio = androidBinaryInfo.dexDownloadRatio()
         reportWriters.forEach {
             it.write(
+                AnalyticsOption.BASIC_APK.name.toLowerCase(),
                 Report(
                     projectInfo = projectInfoProvider.get(),
                     rows = androidBinaryInfo.createApkReportRows(dexCompressedRatio),

@@ -41,13 +41,16 @@ object AnalyzerModule {
 @Module
 interface AnalyzerBinder {
     @Binds
+    fun DefaultDataParser.bindDataParser(): DataParser
+
+    @Binds
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.GENERAL)
     fun GeneralAnalyzer.bindGeneralAnalyzer(): Analyzer
 
     @Binds
     @IntoMap
-    @AnalyticsOptionKey(AnalyticsOption.LIBRARIES_ANALYTICS)
+    @AnalyticsOptionKey(AnalyticsOption.LIBRARIES)
     fun LibrariesAnalyzer.bindLibrariesAnalyzer(): Analyzer
 
     @Binds
@@ -57,17 +60,17 @@ interface AnalyzerBinder {
 
     @Binds
     @IntoMap
-    @AnalyticsOptionKey(AnalyticsOption.BASIC_APK_ANALYTICS)
+    @AnalyticsOptionKey(AnalyticsOption.BASIC_APK)
     fun BasicApkAnalyzer.bindBasicApkAnalyzer(): Analyzer
 
     @Binds
     @IntoMap
-    @AnalyticsOptionKey(AnalyticsOption.MODULE_ANALYTICS)
+    @AnalyticsOptionKey(AnalyticsOption.MODULES)
     fun ModuleAnalyzer.bindModuleAnalyzer(): Analyzer
 
     @Binds
     @IntoMap
-    @AnalyticsOptionKey(AnalyticsOption.APK_ANALYTICS)
+    @AnalyticsOptionKey(AnalyticsOption.APK)
     fun ApkAnalyzer.bindApkAnalyzer(): Analyzer
 
     @Binds

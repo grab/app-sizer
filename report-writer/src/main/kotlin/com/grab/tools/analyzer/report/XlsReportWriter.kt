@@ -8,15 +8,20 @@ private const val KILO_BYTE = 1024L
 private const val MEGA_BYTE = 1024L * 1024L
 
 class XlsReportWriter(
-    private val outputFile: File
+    private val outputDirectory: File
 ) : ReportWriter {
-    override fun write(report: Report) {
-        val workbook = WorkbookFactory.create(false)
-        val sheet = workbook.createSheet("Apk Analyzer Report")
-        createHeader(sheet, report.rows)
-        createRows(report.rows, sheet)
-        outputFile.initOutPutFile()
-        workbook.write(outputFile.outputStream())
+    override fun write(reportId: String, report: Report) {
+        val workbook = WorkbookFactory.create(false).apply {
+            createSheet("Apk Analyzer Report").apply {
+                createHeader(this, report.rows)
+                createRows(report.rows, this)
+            }
+        }
+
+        File(outputDirectory, "$reportId-report.xls").run {
+            initOutPutFile()
+            workbook.write(outputStream())
+        }
     }
 
     private fun createRows(

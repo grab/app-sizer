@@ -1,5 +1,6 @@
 package com.grab.tools.report
 
+import com.grab.tools.AnalyticsOption
 import com.grab.tools.analyzer.report.HybridField
 import com.grab.tools.analyzer.report.Report
 import com.grab.tools.analyzer.report.ReportWriter
@@ -27,6 +28,7 @@ class LibrariesAnalyticReport @Inject constructor(
             listOf(apkReport, codeBaseReport, totalLibsReport) + reportPerLibrary(dexCompressedRatio, contributorList)
         reportWriters.forEach {
             it.write(
+                AnalyticsOption.LIBRARIES.name.toLowerCase(),
                 Report(
                     projectInfo = projectInfoProvider.get(),
                     id = LIBRARY_METRICS_ID,
