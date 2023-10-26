@@ -41,40 +41,40 @@ object AnalyzerModule {
 @Module
 interface AnalyzerBinder {
     @Binds
-    fun DefaultDataParser.bindDataParser(): DataParser
+    internal fun DefaultDataParser.bindDataParser(): DataParser
 
     @Binds
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.GENERAL)
-    fun GeneralAnalyzer.bindGeneralAnalyzer(): Analyzer
+    internal fun GeneralAnalyzer.bindGeneralAnalyzer(): Analyzer
 
     @Binds
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.LIBRARIES)
-    fun LibrariesAnalyzer.bindLibrariesAnalyzer(): Analyzer
+    internal fun LibrariesAnalyzer.bindLibrariesAnalyzer(): Analyzer
 
     @Binds
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.LIB_CONTENT)
-    fun LibContentAnalyzer.bindAnalyzer(): Analyzer
+    internal fun LibContentAnalyzer.bindAnalyzer(): Analyzer
 
     @Binds
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.BASIC_APK)
-    fun BasicApkAnalyzer.bindBasicApkAnalyzer(): Analyzer
+    internal fun BasicApkAnalyzer.bindBasicApkAnalyzer(): Analyzer
 
     @Binds
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.MODULES)
-    fun ModuleAnalyzer.bindModuleAnalyzer(): Analyzer
+    internal fun ModuleAnalyzer.bindModuleAnalyzer(): Analyzer
 
     @Binds
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.APK)
-    fun ApkAnalyzer.bindApkAnalyzer(): Analyzer
+    internal fun ApkAnalyzer.bindApkAnalyzer(): Analyzer
 
     @Binds
     @IntoMap
     @AnalyticsOptionKey(AnalyticsOption.LARGE_FILE)
-    fun LargeFileAnalyzer.bindLargeFileAnalyzer(): Analyzer
+    internal fun LargeFileAnalyzer.bindLargeFileAnalyzer(): Analyzer
 }

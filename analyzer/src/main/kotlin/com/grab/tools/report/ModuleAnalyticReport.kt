@@ -1,12 +1,14 @@
 package com.grab.tools.report
 
 import com.grab.tools.AnalyticsOption
+import com.grab.tools.analyzer.METRICS_ID_MODULES
+import com.grab.tools.analyzer.ProjectInfoProvider
 import com.grab.tools.analyzer.report.*
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.model.Contributor
 import javax.inject.Inject
 
-private const val LIBRARIES_ID = "Libraries"
+internal const val LIBRARIES_ID = "Libraries"
 
 class ModuleAnalyticReport @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,

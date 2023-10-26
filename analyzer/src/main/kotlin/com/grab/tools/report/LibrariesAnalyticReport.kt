@@ -1,6 +1,8 @@
 package com.grab.tools.report
 
 import com.grab.tools.AnalyticsOption
+import com.grab.tools.analyzer.LIBRARY_METRICS_ID
+import com.grab.tools.analyzer.ProjectInfoProvider
 import com.grab.tools.analyzer.report.HybridField
 import com.grab.tools.analyzer.report.Report
 import com.grab.tools.analyzer.report.ReportWriter
@@ -8,10 +10,9 @@ import com.grab.tools.analyzer.report.Row
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.model.Contributor
 import java.io.File
-import java.util.*
 import javax.inject.Inject
 
-private const val CODE_BASE_ID = "Codebase"
+internal const val CODE_BASE_ID = "Codebase"
 
 class LibrariesAnalyticReport @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,

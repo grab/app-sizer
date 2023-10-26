@@ -9,7 +9,7 @@ import com.grab.plugin.size.utils.PluginLogger
 import com.grab.tools.AnalyticsOption
 import com.grab.tools.AnalyzerFactory
 import com.grab.tools.analyzer.report.ProjectInfo
-import com.grab.tools.report.ProjectInfoProvider
+import com.grab.tools.analyzer.ProjectInfoProvider
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property

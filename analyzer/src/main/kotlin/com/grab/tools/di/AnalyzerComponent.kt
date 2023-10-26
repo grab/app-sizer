@@ -2,8 +2,7 @@ package com.grab.tools.di
 
 import com.grab.tools.AnalyticsOption
 import com.grab.tools.analyzer.Analyzer
-import com.grab.tools.apk.*
-import com.grab.tools.report.ProjectInfoProvider
+import com.grab.tools.analyzer.ProjectInfoProvider
 import com.grab.tools.report.ReportModule
 import com.grab.tools.utils.InputFileProvider
 import com.grab.tools.utils.Logger

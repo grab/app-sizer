@@ -1,4 +1,4 @@
-package com.grab.tools.report
+package com.grab.tools.analyzer
 
 import com.grab.tools.analyzer.report.ProjectInfo
 

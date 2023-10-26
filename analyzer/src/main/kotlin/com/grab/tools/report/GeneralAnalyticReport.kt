@@ -1,6 +1,7 @@
 package com.grab.tools.report
 
 import com.grab.tools.AnalyticsOption
+import com.grab.tools.analyzer.ProjectInfoProvider
 import com.grab.tools.analyzer.report.*
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.model.Contributor
