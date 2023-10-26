@@ -9,7 +9,7 @@ import com.grab.plugin.size.utils.PluginLogger
 import com.grab.tools.AnalyticsOption
 import com.grab.tools.AnalyzerFactory
 import com.grab.tools.analyzer.report.ProjectInfo
-import com.grab.tools.report.ProjectInfoProvider
+import com.grab.tools.analyzer.ProjectInfoProvider
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
@@ -48,17 +48,22 @@ abstract class AppSizeAnalysisTask : DefaultTask() {
         val dependencyGraph = extractor.extract()
         val inputFileProvider = createInputFileProvider(dependencyGraph)
         val logger = PluginLogger(project)
-        AnalyzerFactory()
+        val analyzerMap = AnalyzerFactory()
             .create(
                 inputFileProvider,
                 object : ProjectInfoProvider {
                     override fun get() = projectInfo.get()
                 },
                 libName = libName.orNull,
-                AnalyticsOption.fromString(option.orNull ?: "general"),
                 logger,
-            ).process()
-
+            )
+        if(!option.isPresent){
+            analyzerMap
+                .filterKeys { it != AnalyticsOption.LIB_CONTENT && it != AnalyticsOption.LARGE_FILE }
+                .forEach { (_, analyzer) -> analyzer.process() }
+        }else{
+            analyzerMap[AnalyticsOption.fromString(option.orNull ?: "general")]?.process()
+        }
     }
 
     private fun createInputFileProvider(dependencyGraph: DependencyGraph) =

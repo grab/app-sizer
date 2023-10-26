@@ -1,24 +1,88 @@
 package com.grab.tools.analyzer
 
-import com.grab.tools.apk.ApkFileParser
-import com.grab.tools.apk.ProguardMappingProvider
-import com.grab.tools.di.AppScope
-import com.grab.tools.report.BasicApkAnalyticReport
-import com.grab.tools.utils.InputFileProvider
+import com.grab.tools.AnalyticsOption
+import com.grab.tools.analyzer.report.HybridField
+import com.grab.tools.analyzer.report.Report
+import com.grab.tools.analyzer.report.ReportWriter
+import com.grab.tools.analyzer.report.Row
+import com.grab.tools.apk.ApkFileInfo
+import com.grab.tools.model.Contributor
+import com.grab.tools.report.dexDownloadRatio
 import javax.inject.Inject
 
-@AppScope
-class BasicApkAnalyzer @Inject constructor(
-    private val proguardMappingProvider: ProguardMappingProvider,
-    private val apkFileParser: ApkFileParser,
-    private val analyticReport: BasicApkAnalyticReport,
-    private val inputFileProvider: InputFileProvider,
+internal const val METRICS_ID_BASIC_APK = "mobile.pax.app.size.components5"
+
+internal class BasicApkAnalyzer @Inject constructor(
+    private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
+    private val projectInfoProvider: ProjectInfoProvider,
+    private val dataParser: DataParser
 ) : Analyzer {
     override fun process() {
-        val apkFilesInfo = apkFileParser.parseApks(
-            inputFileProvider.provideApkFiles(),
-            proguardMappingProvider.provide()
-        )
-        analyticReport.report(apkFilesInfo, setOf())
+        report(dataParser.apks, setOf())
     }
+
+    private fun report(androidBinaryInfo: Set<ApkFileInfo>, contributors: Set<Contributor>) {
+        val dexCompressedRatio = androidBinaryInfo.dexDownloadRatio()
+        reportWriters.forEach {
+            it.write(
+                AnalyticsOption.BASIC_APK.name.toLowerCase(),
+                Report(
+                    projectInfo = projectInfoProvider.get(),
+                    rows = androidBinaryInfo.createApkReportRows(dexCompressedRatio),
+                    id = METRICS_ID_BASIC_APK,
+                    name = METRICS_ID_BASIC_APK
+                )
+            )
+        }
+    }
+
+    private fun Set<ApkFileInfo>.createApkReportRows(dexCompressedRatio: Double): List<Row> {
+        val resourceDownloadSize = flatMap { it.resources }.sumOf { it.downloadSize }
+        val nativeLibDownloadSize = flatMap { it.nativeLibs }.sumOf { it.downloadSize }
+        val assetDownloadSize = flatMap { it.assets }.sumOf { it.downloadSize }
+        val otherDownloadSize = flatMap { it.others }.sumOf { it.downloadSize }
+        val dexDownloadFile = flatMap { it.dexes }.sumOf { it.downloadSize }
+
+        val classesSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
+        val classDownloadSize = (classesSize * dexCompressedRatio).toLong()
+        val total =
+            resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + classDownloadSize
+
+        return listOf(
+            createRow(
+                name = "apk",
+                value = total
+            ),
+            createRow(
+                name = "resource",
+                value = resourceDownloadSize
+            ),
+            createRow(
+                name = "native_lib",
+                value = nativeLibDownloadSize
+            ),
+            createRow(
+                name = "asset",
+                value = assetDownloadSize
+            ),
+            createRow(
+                name = "other",
+                value = otherDownloadSize
+            ),
+            createRow(
+                name = "code",
+                value = dexDownloadFile
+            )
+        )
+    }
+
+    private fun createRow(name: String, value: Long): Row = Row(
+        fields = listOf(
+            HybridField(
+                name = name,
+                value = value
+            )
+        ),
+        name = name
+    )
 }

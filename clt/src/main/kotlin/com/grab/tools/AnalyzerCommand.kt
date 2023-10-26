@@ -40,14 +40,14 @@ class AnalyzerCommand : CliktCommand() {
 
     private val reportOption by option()
         .switch(
-            "--libraries" to AnalyticsOption.LIBRARIES_ANALYTICS,
-            "--modules" to AnalyticsOption.MODULE_ANALYTICS,
-            "--apk" to AnalyticsOption.APK_ANALYTICS,
-            "--basic" to AnalyticsOption.BASIC_APK_ANALYTICS,
+            "--libraries" to AnalyticsOption.LIBRARIES,
+            "--modules" to AnalyticsOption.MODULES,
+            "--apk" to AnalyticsOption.APK,
+            "--basic" to AnalyticsOption.BASIC_APK,
             "--general" to AnalyticsOption.GENERAL,
             "--large-files" to AnalyticsOption.LARGE_FILE,
             "--lib-content" to AnalyticsOption.LIB_CONTENT,
-        ).default(AnalyticsOption.LIBRARIES_ANALYTICS)
+        ).default(AnalyticsOption.GENERAL)
 
     private fun validateCommand() {
         if (reportOption == AnalyticsOption.LIB_CONTENT && libName == null) {
@@ -88,9 +88,8 @@ class AnalyzerCommand : CliktCommand() {
                 inputFileProvider,
                 projectInfoProvider,
                 libName,
-                reportOption,
                 logger
-            ).process()
+            )[reportOption]?.process()
     }
 }
 

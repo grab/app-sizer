@@ -1,7 +1,7 @@
 package com.grab.tools.utils
 
 import com.grab.tools.analyzer.report.ProjectInfo
-import com.grab.tools.report.ProjectInfoProvider
+import com.grab.tools.analyzer.ProjectInfoProvider
 
 class ProjectInfoProviderImpl(
     private val projectName: String,

@@ -10,7 +10,6 @@ import com.grab.tools.utils.InputFileProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import java.io.File
 
 const val NAMED_DEVICE_NAME = "device_name"
 const val NAMED_PROJECT_NAME = "project_name"
@@ -32,7 +31,7 @@ object ReportModule {
     @Provides
     @IntoSet
     fun provideXlsReportWriter(inputFileProvider: InputFileProvider): ReportWriter =
-        XlsReportWriter(inputFileProvider.provideOutPutDirectory().toExcelFile())
+        XlsReportWriter(inputFileProvider.provideOutPutDirectory())
 
     @Provides
     @IntoSet
@@ -40,8 +39,5 @@ object ReportModule {
 
     @Provides
     fun provideJsonFilePublisher(inputFileProvider: InputFileProvider, gson: Gson): MetricsPublisher =
-        JsonFilePublisher(inputFileProvider.provideOutPutDirectory().toJsonFile(), gson)
+        JsonFilePublisher(inputFileProvider.provideOutPutDirectory(), gson)
 }
-
-private fun File.toExcelFile(): File = File(this, "$nameWithoutExtension.xls")
-private fun File.toJsonFile(): File = File(this, "$nameWithoutExtension.json")

@@ -64,7 +64,7 @@ android {
 }
 
 appSizeAnalysis {
-    outputDirectory = project.buildDir
+    outputDirectory = new File(project.buildDir, "size-report")
     featureMappingFile = new File(project.rootDir, 'module-owner.yml')
     bundleToolPath = new File(project.rootDir, '/binary/bundletool-all-1.15.4.jar').toString()
     bundleFilePath = "${project.buildDir}/outputs/bundle/gpsRelease/app-gps-release.aab"

@@ -1,5 +1,6 @@
 package com.grab.tools.report
 
+import com.grab.tools.analyzer.toModules
 import com.grab.tools.model.Contributor
 
 data class Feature(
