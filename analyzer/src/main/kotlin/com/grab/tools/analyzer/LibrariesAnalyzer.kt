@@ -8,7 +8,6 @@ import com.grab.tools.analyzer.report.ReportWriter
 import com.grab.tools.analyzer.report.Row
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.model.Contributor
-import com.grab.tools.report.CODE_BASE_ID
 import com.grab.tools.report.ReportItem
 import com.grab.tools.report.apksSizeReport
 import com.grab.tools.report.dexDownloadRatio
@@ -17,7 +16,7 @@ import javax.inject.Inject
 
 internal const val LIBRARY_METRICS_ID = "mobile.pax.app.size.lib5"
 
-class LibrariesAnalyzer @Inject constructor(
+internal class LibrariesAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val projectInfoProvider: ProjectInfoProvider,

@@ -8,11 +8,12 @@ import com.grab.tools.model.Contributor
 import com.grab.tools.model.castToClass
 import com.grab.tools.model.castToRawFile
 import com.grab.tools.report.*
-import com.grab.tools.report.toModules
 import javax.inject.Inject
 
 internal const val METRICS_ID_MODULES = "mobile.pax.app.size.mds5"
-class ModuleAnalyzer @Inject constructor(
+internal const val LIBRARIES_ID = "Libraries"
+
+internal class ModuleAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,

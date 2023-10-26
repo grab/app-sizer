@@ -14,9 +14,10 @@ import com.grab.tools.report.*
 import javax.inject.Inject
 
 internal const val METRICS_ID_FEATURES = "mobile.pax.app.size.tfs5"
+internal const val CODE_BASE_ID = "Codebase"
 
 
-class GeneralAnalyzer @Inject constructor(
+internal class GeneralAnalyzer @Inject constructor(
     private val dataParser: DataParser,
     private val apkComponentProcessor: ApkComponentProcessor,
     private val featureMapping: FeatureMapping,

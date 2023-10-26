@@ -11,7 +11,7 @@ import com.grab.tools.jar.JarFileParser
 import com.grab.tools.utils.InputFileProvider
 import javax.inject.Inject
 
-interface DataParser {
+internal interface DataParser {
     val apks: Set<ApkFileInfo>
     val libAars: Set<AarFileInfo>
     val libJars: Set<JarFileInfo>
@@ -19,11 +19,11 @@ interface DataParser {
     val moduleJars: Set<JarFileInfo>
 }
 
-fun DataParser.getAars() = moduleAars + libAars
-fun DataParser.getJars() = libJars + moduleJars
+internal fun DataParser.getAars() = moduleAars + libAars
+internal fun DataParser.getJars() = libJars + moduleJars
 
 @AppScope
-class DefaultDataParser @Inject constructor(
+internal class DefaultDataParser @Inject constructor(
     private val apkFileParser: ApkFileParser,
     private val aarFileParser: AarFileParser,
     private val jarFileParser: JarFileParser,

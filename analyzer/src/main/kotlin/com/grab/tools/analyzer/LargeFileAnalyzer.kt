@@ -17,7 +17,7 @@ internal const val METRICS_ID_LARGE_FILES = "mobile.pax.app.size.files5"
 // Todo : move to a configurable value
 private const val SIZE_THRESHOLD = 10 * 1024
 
-class LargeFileAnalyzer @Inject constructor(
+internal class LargeFileAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,

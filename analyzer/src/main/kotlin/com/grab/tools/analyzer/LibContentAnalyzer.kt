@@ -14,7 +14,7 @@ import javax.inject.Named
 
 internal const val LIB_CONTENT_METRICS_ID = "mobile.pax.app.size.lib.content5"
 
-class LibContentAnalyzer @Inject constructor(
+internal class LibContentAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val projectInfoProvider: ProjectInfoProvider,
