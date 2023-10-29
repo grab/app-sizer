@@ -44,10 +44,10 @@ class AnalyzerCommand : CliktCommand() {
             "--modules" to AnalyticsOption.MODULES,
             "--apk" to AnalyticsOption.APK,
             "--basic" to AnalyticsOption.BASIC_APK,
-            "--general" to AnalyticsOption.GENERAL,
+            "--codebase" to AnalyticsOption.CODEBASE,
             "--large-files" to AnalyticsOption.LARGE_FILE,
             "--lib-content" to AnalyticsOption.LIB_CONTENT,
-        ).default(AnalyticsOption.GENERAL)
+        ).default(AnalyticsOption.CODEBASE)
 
     private fun validateCommand() {
         if (reportOption == AnalyticsOption.LIB_CONTENT && libName == null) {

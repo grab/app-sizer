@@ -1,4 +1,4 @@
-package com.grab.tools.report
+package com.grab.tools.analyzer.report
 
 
 @Deprecated("A new report API have built. Use com.grab.tools.analyzer.report.Field instead")

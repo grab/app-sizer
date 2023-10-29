@@ -1,15 +1,15 @@
 package com.grab.tools.analyzer
 
 import com.grab.tools.AnalyticsOption
-import com.grab.tools.analyzer.apk.ApkComponentProcessor
+import com.grab.tools.analyzer.mapper.ApkComponentProcessor
 import com.grab.tools.analyzer.report.*
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.model.Contributor
 import com.grab.tools.model.castToClass
 import com.grab.tools.model.castToRawFile
-import com.grab.tools.report.Feature
-import com.grab.tools.report.FeatureMapping
-import com.grab.tools.report.toFeatures
+import com.grab.tools.analyzer.report.Feature
+import com.grab.tools.analyzer.report.FeatureMapping
+import com.grab.tools.analyzer.report.toFeatures
 import javax.inject.Inject
 
 internal const val METRICS_ID_LARGE_FILES = "mobile.pax.app.size.files5"

@@ -7,7 +7,7 @@ import com.grab.tools.analyzer.report.ReportWriter
 import com.grab.tools.analyzer.report.Row
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.model.Contributor
-import com.grab.tools.report.dexDownloadRatio
+import com.grab.tools.analyzer.report.dexDownloadRatio
 import javax.inject.Inject
 
 internal const val METRICS_ID_BASIC_APK = "mobile.pax.app.size.components5"

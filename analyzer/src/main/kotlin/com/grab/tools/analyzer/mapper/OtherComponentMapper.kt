@@ -1,4 +1,4 @@
-package com.grab.tools.analyzer.apk
+package com.grab.tools.analyzer.mapper
 
 
 import com.grab.tools.aar.AarFileInfo

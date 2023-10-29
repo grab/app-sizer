@@ -1,4 +1,4 @@
-package com.grab.tools.report
+package com.grab.tools.analyzer.report
 
 import org.yaml.snakeyaml.Yaml
 import java.io.File

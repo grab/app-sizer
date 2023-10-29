@@ -1,11 +1,8 @@
 package com.grab.tools.analyzer
 
 import com.grab.tools.AnalyticsOption
-import com.grab.tools.analyzer.apk.ApkComponentProcessor
-import com.grab.tools.analyzer.report.HybridField
-import com.grab.tools.analyzer.report.Report
-import com.grab.tools.analyzer.report.ReportWriter
-import com.grab.tools.analyzer.report.Row
+import com.grab.tools.analyzer.mapper.ApkComponentProcessor
+import com.grab.tools.analyzer.report.*
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.model.Contributor
 import com.grab.tools.report.*

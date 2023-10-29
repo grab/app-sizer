@@ -1,4 +1,4 @@
-package com.grab.tools.report
+package com.grab.tools.analyzer.report
 
 import com.google.gson.Gson
 import com.grab.pax.plugins.report.JsonFilePublisher

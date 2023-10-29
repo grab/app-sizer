@@ -1,7 +1,7 @@
 package com.grab.tools.analyzer
 
 import com.grab.tools.AnalyticsOption
-import com.grab.tools.analyzer.apk.ApkComponentProcessor
+import com.grab.tools.analyzer.mapper.ApkComponentProcessor
 import com.grab.tools.analyzer.report.*
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.model.Contributor

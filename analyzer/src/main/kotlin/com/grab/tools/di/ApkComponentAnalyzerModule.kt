@@ -1,8 +1,7 @@
 package com.grab.tools.di
 
 import com.grab.tools.analyzer.apk.*
-import com.grab.tools.analyzer.apk.ApkComponentProcessor
-import com.grab.tools.analyzer.apk.DefaultApkComponentProcessor
+import com.grab.tools.analyzer.mapper.*
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.ClassKey

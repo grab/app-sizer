@@ -5,7 +5,7 @@ enum class AnalyticsOption {
     APK,
     BASIC_APK,
     MODULES,
-    GENERAL,
+    CODEBASE,
     LARGE_FILE,
     LIB_CONTENT;
 
@@ -15,7 +15,7 @@ enum class AnalyticsOption {
             "modules" -> AnalyticsOption.MODULES
             "apk" -> AnalyticsOption.APK
             "basic" -> AnalyticsOption.BASIC_APK
-            "general" -> AnalyticsOption.GENERAL
+            "codebase" -> AnalyticsOption.CODEBASE
             "large-files" -> AnalyticsOption.LARGE_FILE
             "lib-content" -> AnalyticsOption.LIB_CONTENT
             else -> null

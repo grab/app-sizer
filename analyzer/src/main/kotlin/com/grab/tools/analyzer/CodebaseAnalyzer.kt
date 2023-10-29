@@ -1,11 +1,8 @@
 package com.grab.tools.analyzer
 
 import com.grab.tools.AnalyticsOption
-import com.grab.tools.analyzer.apk.ApkComponentProcessor
-import com.grab.tools.analyzer.report.HybridField
-import com.grab.tools.analyzer.report.Report
-import com.grab.tools.analyzer.report.ReportWriter
-import com.grab.tools.analyzer.report.Row
+import com.grab.tools.analyzer.mapper.ApkComponentProcessor
+import com.grab.tools.analyzer.report.*
 import com.grab.tools.apk.ApkFileInfo
 import com.grab.tools.model.Contributor
 import com.grab.tools.model.castToClass
@@ -17,7 +14,7 @@ internal const val METRICS_ID_FEATURES = "mobile.pax.app.size.tfs5"
 internal const val CODE_BASE_ID = "Codebase"
 
 
-internal class GeneralAnalyzer @Inject constructor(
+internal class CodebaseAnalyzer @Inject constructor(
     private val dataParser: DataParser,
     private val apkComponentProcessor: ApkComponentProcessor,
     private val featureMapping: FeatureMapping,
@@ -63,7 +60,7 @@ internal class GeneralAnalyzer @Inject constructor(
             .map { it.toReportRow(dexCompressedRatio) }
         reportWriters.forEach {
             it.write(
-                AnalyticsOption.GENERAL.name.toLowerCase(),
+                AnalyticsOption.CODEBASE.name.toLowerCase(),
                 Report(
                     id = METRICS_ID_FEATURES,
                     name = METRICS_ID_FEATURES,

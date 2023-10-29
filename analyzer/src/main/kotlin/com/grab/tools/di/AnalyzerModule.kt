@@ -45,8 +45,8 @@ internal interface AnalyzerBinder {
 
     @Binds
     @IntoMap
-    @AnalyticsOptionKey(AnalyticsOption.GENERAL)
-    fun GeneralAnalyzer.bindGeneralAnalyzer(): Analyzer
+    @AnalyticsOptionKey(AnalyticsOption.CODEBASE)
+    fun CodebaseAnalyzer.bindGeneralAnalyzer(): Analyzer
 
     @Binds
     @IntoMap
