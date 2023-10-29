@@ -1,8 +1,6 @@
 package com.grab.tools.analyzer.report
 
-import com.grab.tools.analyzer.report.Field
-import com.grab.tools.analyzer.report.HybridField
-import com.grab.tools.apk.ApkFileInfo
+import com.grab.tools.parser.ApkFileInfo
 
 internal fun Set<ApkFileInfo>.apksSizeReport(dexCompressedRatio: Double): ReportItem {
     val resourceDownloadSize = flatMap { it.resources }.sumOf { it.downloadSize }

@@ -1,13 +1,13 @@
 package com.grab.tools.analyzer.mapper
 
-import com.grab.tools.model.RawFileInfo
-import com.grab.tools.aar.AarFileInfo
-import com.grab.tools.apk.ApkFileInfo
-import com.grab.tools.jar.JarFileInfo
+import com.grab.tools.analyzer.model.RawFileInfo
+import com.grab.tools.parser.AarFileInfo
+import com.grab.tools.parser.ApkFileInfo
+import com.grab.tools.parser.JarFileInfo
 import javax.inject.Inject
 
-class NativeLibComponentMapper @Inject constructor() : ComponentMapper {
-    override fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): ComponentAnalyzerResult {
+internal class NativeLibComponentMapper @Inject constructor() : ComponentMapper {
+    override fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): ComponentMapperResult {
         val apkLibs = apks.flatMap { apk -> apk.nativeLibs }
         val libraryMap = mutableMapOf<RawFileInfo, String>().apply {
             aars.forEach { aar ->
@@ -33,7 +33,7 @@ class NativeLibComponentMapper @Inject constructor() : ComponentMapper {
                 }
             }
         }
-        return ComponentAnalyzerResult(
+        return ComponentMapperResult(
             contributors = contributors,
             noOwnerData = noOwnerNativeLib
         )

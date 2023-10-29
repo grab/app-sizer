@@ -1,4 +1,4 @@
-package com.grab.tools.apk
+package com.grab.tools.parser
 
 import com.google.common.base.Charsets
 import com.grab.tools.utils.InputFileProvider

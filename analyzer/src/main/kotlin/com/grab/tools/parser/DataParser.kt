@@ -1,13 +1,6 @@
-package com.grab.tools.analyzer
+package com.grab.tools.parser
 
-import com.grab.tools.aar.AarFileInfo
-import com.grab.tools.aar.AarFileParser
-import com.grab.tools.apk.ApkFileInfo
-import com.grab.tools.apk.ApkFileParser
-import com.grab.tools.apk.ProguardMappingProvider
 import com.grab.tools.di.AppScope
-import com.grab.tools.jar.JarFileInfo
-import com.grab.tools.jar.JarFileParser
 import com.grab.tools.utils.InputFileProvider
 import javax.inject.Inject
 

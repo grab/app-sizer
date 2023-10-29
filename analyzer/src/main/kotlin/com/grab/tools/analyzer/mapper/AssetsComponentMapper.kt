@@ -1,14 +1,14 @@
 package com.grab.tools.analyzer.mapper
 
 
-import com.grab.tools.model.RawFileInfo
-import com.grab.tools.aar.AarFileInfo
-import com.grab.tools.apk.ApkFileInfo
-import com.grab.tools.jar.JarFileInfo
+import com.grab.tools.analyzer.model.RawFileInfo
+import com.grab.tools.parser.AarFileInfo
+import com.grab.tools.parser.ApkFileInfo
+import com.grab.tools.parser.JarFileInfo
 import javax.inject.Inject
 
-class AssetsComponentMapper @Inject constructor() : ComponentMapper {
-    override fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars : Set<JarFileInfo>): ComponentAnalyzerResult {
+internal class AssetsComponentMapper @Inject constructor() : ComponentMapper {
+    override fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars : Set<JarFileInfo>): ComponentMapperResult {
         val apkAssets = apks.flatMap { apk -> apk.assets }
 
         val aarsAssetMap = mutableMapOf<RawFileInfo, String>().apply {
@@ -30,7 +30,7 @@ class AssetsComponentMapper @Inject constructor() : ComponentMapper {
                 }
             }
         }
-        return ComponentAnalyzerResult(
+        return ComponentMapperResult(
             contributors = contributors,
             noOwnerData = noOwnerAssets
         )

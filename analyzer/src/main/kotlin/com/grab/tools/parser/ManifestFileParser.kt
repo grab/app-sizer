@@ -1,7 +1,7 @@
-package com.grab.tools.apk
+package com.grab.tools.parser
 
 import com.android.tools.apk.analyzer.BinaryXmlParser
-import com.grab.tools.model.RawFileInfo
+import com.grab.tools.analyzer.model.RawFileInfo
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.ByteArrayInputStream

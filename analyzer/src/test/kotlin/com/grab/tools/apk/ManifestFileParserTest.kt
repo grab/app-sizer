@@ -1,6 +1,7 @@
 package com.grab.tools.apk
 
-import com.grab.tools.model.RawFileInfo
+import com.grab.tools.analyzer.model.RawFileInfo
+import com.grab.tools.parser.ManifestFileParserImpl
 import org.xmlpull.v1.XmlPullParserFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals

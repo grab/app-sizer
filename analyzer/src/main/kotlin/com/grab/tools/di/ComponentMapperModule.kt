@@ -1,6 +1,5 @@
 package com.grab.tools.di
 
-import com.grab.tools.analyzer.apk.*
 import com.grab.tools.analyzer.mapper.*
 import dagger.Binds
 import dagger.Module
@@ -11,7 +10,7 @@ import dagger.multibindings.IntoMap
 typealias AnalyzerClass = Class<*>
 
 @Module
-interface ApkComponentAnalyzerModule {
+internal interface ComponentMapperModule {
     @Binds
     @IntoMap
     @ClassKey(ResourceComponentMapper::class)

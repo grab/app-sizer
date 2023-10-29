@@ -1,4 +1,4 @@
-package com.grab.tools.model
+package com.grab.tools.analyzer.model
 
 import java.io.File
 

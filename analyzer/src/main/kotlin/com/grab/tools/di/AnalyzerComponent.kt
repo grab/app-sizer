@@ -14,7 +14,7 @@ internal const val NAMED_LIB_NAME = "lib_name"
 @Component(
     modules = [
         AnalyzerModule::class,
-        ApkComponentAnalyzerModule::class,
+        ComponentMapperModule::class,
         ReportModule::class,
         AnalyzerBinder::class,
         ParserBinder::class

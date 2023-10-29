@@ -1,10 +1,10 @@
-package com.grab.tools.apk
+package com.grab.tools.parser
 
 import com.android.tools.apk.analyzer.ApkSizeCalculator
 import com.grab.tools.di.AppScope
-import com.grab.tools.model.FileInfo
-import com.grab.tools.model.FileType
-import com.grab.tools.model.RawFileInfo
+import com.grab.tools.analyzer.model.FileInfo
+import com.grab.tools.analyzer.model.FileType
+import com.grab.tools.analyzer.model.RawFileInfo
 import shadow.bundletool.com.android.tools.proguard.ProguardMap
 import java.io.File
 import java.nio.file.Path

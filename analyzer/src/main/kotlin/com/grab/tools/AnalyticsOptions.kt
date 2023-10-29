@@ -3,7 +3,7 @@ package com.grab.tools
 enum class AnalyticsOption {
     LIBRARIES,
     APK,
-    BASIC_APK,
+    BASIC,
     MODULES,
     CODEBASE,
     LARGE_FILE,
@@ -11,13 +11,13 @@ enum class AnalyticsOption {
 
     companion object {
         fun fromString(value: String): AnalyticsOption? = when (value) {
-            "libraries" -> AnalyticsOption.LIBRARIES
-            "modules" -> AnalyticsOption.MODULES
-            "apk" -> AnalyticsOption.APK
-            "basic" -> AnalyticsOption.BASIC_APK
-            "codebase" -> AnalyticsOption.CODEBASE
-            "large-files" -> AnalyticsOption.LARGE_FILE
-            "lib-content" -> AnalyticsOption.LIB_CONTENT
+            "libraries" -> LIBRARIES
+            "modules" -> MODULES
+            "apk" -> APK
+            "basic" -> BASIC
+            "codebase" -> CODEBASE
+            "large-files" -> LARGE_FILE
+            "lib-content" -> LIB_CONTENT
             else -> null
         }
     }

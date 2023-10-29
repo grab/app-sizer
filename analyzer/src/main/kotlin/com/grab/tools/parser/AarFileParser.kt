@@ -1,11 +1,8 @@
-package com.grab.tools.aar
+package com.grab.tools.parser
 
-import com.grab.tools.model.FileType
-import com.grab.tools.model.RawFileInfo
-import com.grab.tools.apk.getPath
+import com.grab.tools.analyzer.model.FileType
+import com.grab.tools.analyzer.model.RawFileInfo
 import com.grab.tools.di.AppScope
-import com.grab.tools.jar.JarFileInfo
-import com.grab.tools.jar.JarStreamParser
 import java.io.File
 import java.util.zip.ZipFile
 import javax.inject.Inject

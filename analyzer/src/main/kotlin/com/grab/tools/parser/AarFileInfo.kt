@@ -1,7 +1,6 @@
-package com.grab.tools.aar
+package com.grab.tools.parser
 
-import com.grab.tools.model.RawFileInfo
-import com.grab.tools.jar.JarFileInfo
+import com.grab.tools.analyzer.model.RawFileInfo
 
 
 class AarFileInfo(

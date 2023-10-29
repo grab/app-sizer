@@ -1,22 +1,22 @@
 package com.grab.tools.analyzer.mapper
 
-import com.grab.tools.model.FileInfo
-import com.grab.tools.aar.AarFileInfo
-import com.grab.tools.apk.ApkFileInfo
-import com.grab.tools.jar.JarFileInfo
+import com.grab.tools.analyzer.model.FileInfo
+import com.grab.tools.parser.AarFileInfo
+import com.grab.tools.parser.ApkFileInfo
+import com.grab.tools.parser.JarFileInfo
 
 /**
  * A map contain the input and the files belong to it
  */
-typealias RawContributors = Map<String, Set<FileInfo>>
+internal typealias RawContributors = Map<String, Set<FileInfo>>
 
-data class ComponentAnalyzerResult(
+internal data class ComponentMapperResult(
     val noOwnerData: Set<FileInfo>,
     val contributors: RawContributors
 )
 
-interface ComponentMapper {
-    fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): ComponentAnalyzerResult
+internal interface ComponentMapper {
+    fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): ComponentMapperResult
 }
 
 

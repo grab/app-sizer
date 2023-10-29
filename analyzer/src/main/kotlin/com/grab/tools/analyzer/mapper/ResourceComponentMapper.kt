@@ -1,20 +1,20 @@
 package com.grab.tools.analyzer.mapper
 
-import com.grab.tools.model.RawFileInfo
-import com.grab.tools.aar.AarFileInfo
-import com.grab.tools.apk.ApkFileInfo
-import com.grab.tools.jar.JarFileInfo
+import com.grab.tools.analyzer.model.RawFileInfo
+import com.grab.tools.parser.AarFileInfo
+import com.grab.tools.parser.ApkFileInfo
+import com.grab.tools.parser.JarFileInfo
 import java.io.File
 import javax.inject.Inject
 
 private const val RESOURCE_VERSION_EXTENSION = "-v\\d\\d"
 
-class ResourceComponentMapper @Inject constructor() : ComponentMapper {
+internal class ResourceComponentMapper @Inject constructor() : ComponentMapper {
     override fun analyze(
         apks: Set<ApkFileInfo>,
         aars: Set<AarFileInfo>,
         jars: Set<JarFileInfo>
-    ): ComponentAnalyzerResult {
+    ): ComponentMapperResult {
         val apkResource = apks.flatMap { it.resources }
         val aarsToResMap = mutableMapOf<RawFileInfo, String>().apply {
             aars.forEach { aar ->
@@ -33,7 +33,7 @@ class ResourceComponentMapper @Inject constructor() : ComponentMapper {
                 }
             }
         }
-        return ComponentAnalyzerResult(
+        return ComponentMapperResult(
             contributors = contributors,
             noOwnerData = noOwnerResources
         )

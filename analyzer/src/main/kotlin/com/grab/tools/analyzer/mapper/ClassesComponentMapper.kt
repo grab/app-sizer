@@ -1,20 +1,20 @@
 package com.grab.tools.analyzer.mapper
 
 
-import com.grab.tools.model.ClassFileInfo
-import com.grab.tools.aar.AarFileInfo
-import com.grab.tools.apk.ApkFileInfo
-import com.grab.tools.jar.JarFileInfo
+import com.grab.tools.analyzer.model.ClassFileInfo
+import com.grab.tools.parser.AarFileInfo
+import com.grab.tools.parser.ApkFileInfo
+import com.grab.tools.parser.JarFileInfo
 import javax.inject.Inject
 
 private const val AUTO_GENERATION_LAMBDA = "-\$\$Lambda\$"
 
-class ClassesComponentMapper @Inject constructor() : ComponentMapper {
+internal class ClassesComponentMapper @Inject constructor() : ComponentMapper {
     override fun analyze(
         apks: Set<ApkFileInfo>,
         aars: Set<AarFileInfo>,
         jars: Set<JarFileInfo>
-    ): ComponentAnalyzerResult {
+    ): ComponentMapperResult {
         val apkClasses = apks.flatMap { apk -> apk.dexes }.flatMap { dex -> dex.classes }
         val libClassMap = mutableMapOf<ClassFileInfo, String>().apply {
             aars.forEach { aar ->
@@ -42,7 +42,7 @@ class ClassesComponentMapper @Inject constructor() : ComponentMapper {
                 }
             }
         }
-        return ComponentAnalyzerResult(
+        return ComponentMapperResult(
             contributors = contributors,
             noOwnerData = noOwnerClasses
         )

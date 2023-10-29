@@ -3,9 +3,9 @@ package com.grab.tools.analyzer
 import com.grab.tools.AnalyticsOption
 import com.grab.tools.analyzer.mapper.ApkComponentProcessor
 import com.grab.tools.analyzer.report.*
-import com.grab.tools.apk.ApkFileInfo
-import com.grab.tools.model.Contributor
-import com.grab.tools.report.*
+import com.grab.tools.parser.ApkFileInfo
+import com.grab.tools.analyzer.model.Contributor
+import com.grab.tools.parser.DataParser
 import java.io.File
 import javax.inject.Inject
 

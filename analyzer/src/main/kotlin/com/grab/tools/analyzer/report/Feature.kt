@@ -1,7 +1,7 @@
 package com.grab.tools.analyzer.report
 
 import com.grab.tools.analyzer.toModules
-import com.grab.tools.model.Contributor
+import com.grab.tools.analyzer.model.Contributor
 
 data class Feature(
     val name: String,

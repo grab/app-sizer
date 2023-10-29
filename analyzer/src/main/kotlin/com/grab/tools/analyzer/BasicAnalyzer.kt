@@ -5,12 +5,13 @@ import com.grab.tools.analyzer.report.HybridField
 import com.grab.tools.analyzer.report.Report
 import com.grab.tools.analyzer.report.ReportWriter
 import com.grab.tools.analyzer.report.Row
-import com.grab.tools.apk.ApkFileInfo
-import com.grab.tools.model.Contributor
+import com.grab.tools.parser.ApkFileInfo
+import com.grab.tools.analyzer.model.Contributor
 import com.grab.tools.analyzer.report.dexDownloadRatio
+import com.grab.tools.parser.DataParser
 import javax.inject.Inject
 
-internal const val METRICS_ID_BASIC_APK = "mobile.pax.app.size.components5"
+internal const val METRICS_ID_BASIC = "mobile.pax.app.size.components5"
 
 internal class BasicApkAnalyzer @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
@@ -25,12 +26,12 @@ internal class BasicApkAnalyzer @Inject constructor(
         val dexCompressedRatio = androidBinaryInfo.dexDownloadRatio()
         reportWriters.forEach {
             it.write(
-                AnalyticsOption.BASIC_APK.name.toLowerCase(),
+                AnalyticsOption.BASIC.name.toLowerCase(),
                 Report(
                     projectInfo = projectInfoProvider.get(),
                     rows = androidBinaryInfo.createApkReportRows(dexCompressedRatio),
-                    id = METRICS_ID_BASIC_APK,
-                    name = METRICS_ID_BASIC_APK
+                    id = METRICS_ID_BASIC,
+                    name = METRICS_ID_BASIC
                 )
             )
         }

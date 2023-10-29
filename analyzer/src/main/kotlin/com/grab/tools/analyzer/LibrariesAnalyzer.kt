@@ -6,11 +6,12 @@ import com.grab.tools.analyzer.report.HybridField
 import com.grab.tools.analyzer.report.Report
 import com.grab.tools.analyzer.report.ReportWriter
 import com.grab.tools.analyzer.report.Row
-import com.grab.tools.apk.ApkFileInfo
-import com.grab.tools.model.Contributor
+import com.grab.tools.parser.ApkFileInfo
+import com.grab.tools.analyzer.model.Contributor
 import com.grab.tools.analyzer.report.ReportItem
 import com.grab.tools.analyzer.report.apksSizeReport
 import com.grab.tools.analyzer.report.dexDownloadRatio
+import com.grab.tools.parser.DataParser
 import java.io.File
 import javax.inject.Inject
 

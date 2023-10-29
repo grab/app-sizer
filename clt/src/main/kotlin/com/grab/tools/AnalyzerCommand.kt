@@ -43,7 +43,7 @@ class AnalyzerCommand : CliktCommand() {
             "--libraries" to AnalyticsOption.LIBRARIES,
             "--modules" to AnalyticsOption.MODULES,
             "--apk" to AnalyticsOption.APK,
-            "--basic" to AnalyticsOption.BASIC_APK,
+            "--basic" to AnalyticsOption.BASIC,
             "--codebase" to AnalyticsOption.CODEBASE,
             "--large-files" to AnalyticsOption.LARGE_FILE,
             "--lib-content" to AnalyticsOption.LIB_CONTENT,
