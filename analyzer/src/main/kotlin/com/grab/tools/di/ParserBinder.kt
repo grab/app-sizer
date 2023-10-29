@@ -1,15 +1,15 @@
 package com.grab.tools.di
 
-import com.grab.tools.aar.AarFileParser
-import com.grab.tools.aar.DefaultAarFileParser
-import com.grab.tools.apk.ApkFileParser
-import com.grab.tools.apk.DefaultApkFileParser
-import com.grab.tools.apk.DefaultDexFileParser
-import com.grab.tools.apk.DexFileParser
-import com.grab.tools.jar.DefaultJarFileParser
-import com.grab.tools.jar.DefaultJarStreamParser
-import com.grab.tools.jar.JarFileParser
-import com.grab.tools.jar.JarStreamParser
+import com.grab.tools.parser.AarFileParser
+import com.grab.tools.parser.DefaultAarFileParser
+import com.grab.tools.parser.ApkFileParser
+import com.grab.tools.parser.DefaultApkFileParser
+import com.grab.tools.parser.DefaultDexFileParser
+import com.grab.tools.parser.DexFileParser
+import com.grab.tools.parser.DefaultJarFileParser
+import com.grab.tools.parser.DefaultJarStreamParser
+import com.grab.tools.parser.JarFileParser
+import com.grab.tools.parser.JarStreamParser
 import dagger.Binds
 import dagger.Module
 

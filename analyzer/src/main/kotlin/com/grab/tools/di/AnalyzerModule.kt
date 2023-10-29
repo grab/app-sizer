@@ -4,8 +4,10 @@ import com.android.tools.apk.analyzer.ApkSizeCalculator
 import com.google.gson.Gson
 import com.grab.tools.AnalyticsOption
 import com.grab.tools.analyzer.*
-import com.grab.tools.apk.ManifestFileParser
-import com.grab.tools.apk.ManifestFileParserImpl
+import com.grab.tools.parser.DataParser
+import com.grab.tools.parser.DefaultDataParser
+import com.grab.tools.parser.ManifestFileParser
+import com.grab.tools.parser.ManifestFileParserImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -45,8 +47,8 @@ internal interface AnalyzerBinder {
 
     @Binds
     @IntoMap
-    @AnalyticsOptionKey(AnalyticsOption.GENERAL)
-    fun GeneralAnalyzer.bindGeneralAnalyzer(): Analyzer
+    @AnalyticsOptionKey(AnalyticsOption.CODEBASE)
+    fun CodebaseAnalyzer.bindGeneralAnalyzer(): Analyzer
 
     @Binds
     @IntoMap
@@ -60,7 +62,7 @@ internal interface AnalyzerBinder {
 
     @Binds
     @IntoMap
-    @AnalyticsOptionKey(AnalyticsOption.BASIC_APK)
+    @AnalyticsOptionKey(AnalyticsOption.BASIC)
     fun BasicApkAnalyzer.bindBasicApkAnalyzer(): Analyzer
 
     @Binds
