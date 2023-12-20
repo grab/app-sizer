@@ -57,7 +57,6 @@ internal class CodebaseAnalyzer @Inject constructor(
 
     private fun reportFeatures(apks: Set<ApkFileInfo>, features: List<Feature>) {
         val dexCompressedRatio = apks.dexDownloadRatio()
-        val apkReport = apks.toReportRow(dexCompressedRatio)
         val sortedFeaturesReport = features.sort(dexCompressedRatio)
             .map { it.toReportRow(dexCompressedRatio) }
         reportWriters.forEach {
@@ -66,17 +65,12 @@ internal class CodebaseAnalyzer @Inject constructor(
                 Report(
                     id = METRICS_ID_FEATURES,
                     name = METRICS_ID_FEATURES,
-                    rows = listOf(apkReport) + sortedFeaturesReport,
+                    rows = sortedFeaturesReport,
                     projectInfo = projectInfoProvider.get()
                 )
             )
         }
     }
-
-    private fun Set<ApkFileInfo>.toReportRow(dexCompressedRatio: Double): Row = Row(
-        fields = listOf(toReportField(dexCompressedRatio)),
-        name = "Apk"
-    )
 
     private fun Feature.toReportRow(dexCompressedRatio: Double): Row {
         return Row(
@@ -85,7 +79,7 @@ internal class CodebaseAnalyzer @Inject constructor(
                 HybridField(
                     name = name,
                     value = getDownloadSize(dexCompressedRatio),
-                    tag = "Sum up all codebase for $name"
+                    tag = "Feature"
                 ),
             )
         )

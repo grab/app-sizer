@@ -2,18 +2,17 @@ package com.grab.tools.analyzer
 
 import com.grab.tools.AnalyticsOption
 import com.grab.tools.analyzer.mapper.ApkComponentProcessor
-import com.grab.tools.analyzer.report.*
-import com.grab.tools.parser.ApkFileInfo
 import com.grab.tools.analyzer.model.Contributor
 import com.grab.tools.analyzer.model.castToClass
 import com.grab.tools.analyzer.model.castToRawFile
+import com.grab.tools.analyzer.report.*
+import com.grab.tools.parser.ApkFileInfo
 import com.grab.tools.parser.DataParser
 import com.grab.tools.parser.getAars
 import com.grab.tools.parser.getJars
 import javax.inject.Inject
 
 internal const val METRICS_ID_MODULES = "mobile.pax.app.size.mds5"
-internal const val LIBRARIES_ID = "Libraries"
 
 internal class ModuleAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
@@ -54,12 +53,8 @@ internal class ModuleAnalyzer @Inject constructor(
 
     private fun report(apks: Set<ApkFileInfo>, modules: List<Module>) {
         val dexCompressedRatio = apks.dexDownloadRatio()
-        val apkReport = apks.apksSizeReport(dexCompressedRatio)
         val sortedFeaturesReport = modules.sortedBy { it.getDownloadSize(dexCompressedRatio) }
             .map { it.toReportItem(dexCompressedRatio, featureMapping.moduleToFeatureMap) }
-        val totalModuleReport = totalModuleReport(sortedFeaturesReport)
-        val librariesReport = librariesReport(apkReport, totalModuleReport)
-        val reportItems = listOf(apkReport, librariesReport) + sortedFeaturesReport
         reportWriters.forEach {
             it.write(
                 AnalyticsOption.MODULES.name.toLowerCase(),
@@ -67,7 +62,7 @@ internal class ModuleAnalyzer @Inject constructor(
                     id = METRICS_ID_MODULES,
                     name = METRICS_ID_MODULES,
                     projectInfo = projectInfoProvider.get(),
-                    rows = toReportRows(reportItems)
+                    rows = toReportRows(sortedFeaturesReport)
                 )
             )
         }
@@ -90,35 +85,6 @@ internal class ModuleAnalyzer @Inject constructor(
                 )
             )
         }
-
-    private fun totalModuleReport(data: List<ReportItem>): ReportItem {
-        return data.reduce { pre, cur ->
-            pre.copy(
-                totalDownloadSize = pre.totalDownloadSize + cur.totalDownloadSize,
-                resourceDownloadSize = pre.resourceDownloadSize + cur.resourceDownloadSize,
-                nativeLibDownloadSize = pre.nativeLibDownloadSize + cur.nativeLibDownloadSize,
-                classesSize = pre.classesSize + cur.classesSize,
-                classesDownloadSize = pre.classesDownloadSize + cur.classesDownloadSize
-            )
-        }.copy(
-            name = "All modules",
-            id = "all_modules"
-        )
-    }
-
-    private fun librariesReport(
-        apkReport: ReportItem,
-        totalModuleReport: ReportItem
-    ): ReportItem = ReportItem(
-        id = LIBRARIES_ID,
-        name = LIBRARIES_ID,
-        totalDownloadSize = apkReport.totalDownloadSize - totalModuleReport.totalDownloadSize - apkReport.otherDownloadSize,
-        otherDownloadSize = apkReport.otherDownloadSize - totalModuleReport.otherDownloadSize,
-        resourceDownloadSize = apkReport.resourceDownloadSize - totalModuleReport.resourceDownloadSize,
-        nativeLibDownloadSize = apkReport.nativeLibDownloadSize - totalModuleReport.nativeLibDownloadSize,
-        classesDownloadSize = apkReport.classesDownloadSize - totalModuleReport.classesDownloadSize,
-        classesSize = apkReport.classesSize - totalModuleReport.classesSize
-    )
 }
 
 internal fun Set<Contributor>.toModules(): List<Module> = moduleToContributors().map { Module(it.key, it.value) }

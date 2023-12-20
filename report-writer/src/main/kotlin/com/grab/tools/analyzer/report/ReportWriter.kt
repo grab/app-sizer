@@ -38,7 +38,7 @@ data class DefaultField(
 
 
 /**
- * A hybrid class, which will pass the value as a field, but name as a tag to the a database
+ * A hybrid class, which will pass the value as a field, but name as a tag to the database
  */
 data class HybridField(
     override val name: String,
