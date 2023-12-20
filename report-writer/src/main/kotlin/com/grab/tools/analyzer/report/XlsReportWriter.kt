@@ -49,11 +49,11 @@ class XlsReportWriter(
     ) {
 
         sheet.createRow(0).also { sheetRow ->
-            sheetRow.createCell(0)
+//            sheetRow.createCell(0)
             rows.firstOrNull()?.apply {
                 this.fields.map { field -> field.name }
                     .forEachIndexed { i, text ->
-                        sheetRow.createCell(i + 1).apply { setCellValue(text) }
+                        sheetRow.createCell(i).apply { setCellValue(text) }
                     }
             }
         }

@@ -2,27 +2,25 @@ package com.grab.plugin.size
 
 
 import com.android.build.gradle.api.BaseVariant
-import com.grab.plugin.size.dependencies.DependencyExtractorImpl
 import com.grab.plugin.size.dependencies.DependencyGraph
 import com.grab.plugin.size.utils.PluginInputFileProvider
 import com.grab.plugin.size.utils.PluginLogger
 import com.grab.tools.AnalyticsOption
 import com.grab.tools.AnalyzerFactory
-import com.grab.tools.analyzer.report.ProjectInfo
 import com.grab.tools.analyzer.ProjectInfoProvider
+import com.grab.tools.analyzer.report.ProjectInfo
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
+import java.io.File
 
 
-abstract class AppSizeAnalysisTask : DefaultTask() {
+internal abstract class AppSizeAnalysisTask : DefaultTask() {
 
     @Internal
-    lateinit var variant: BaseVariant
+    lateinit var appSizeTaskComponent: AppSizeTaskComponent
 
     @Internal
     lateinit var extension: AppSizePluginExtension
@@ -31,12 +29,11 @@ abstract class AppSizeAnalysisTask : DefaultTask() {
     abstract val apksDirectory: RegularFileProperty
 
     @get:Input
-    @get:Optional
-    abstract val libName: Property<String?>
+    abstract val option: Property<AnalyticsOption>
 
     @get:Input
     @get:Optional
-    abstract val option: Property<String?>
+    abstract val libName: Property<String?>
 
     @get:Input
     abstract val projectInfo: Property<ProjectInfo>
@@ -44,7 +41,7 @@ abstract class AppSizeAnalysisTask : DefaultTask() {
 
     @TaskAction
     fun run() {
-        val extractor = DependencyExtractorImpl(project, variant)
+        val extractor = appSizeTaskComponent.dependencyExtractor()
         val dependencyGraph = extractor.extract()
         val inputFileProvider = createInputFileProvider(dependencyGraph)
         val logger = PluginLogger(project)
@@ -57,12 +54,12 @@ abstract class AppSizeAnalysisTask : DefaultTask() {
                 libName = libName.orNull,
                 logger,
             )
-        if(!option.isPresent){
+        if (option.get() == AnalyticsOption.DEFAULT) {
             analyzerMap
                 .filterKeys { it != AnalyticsOption.LIB_CONTENT && it != AnalyticsOption.LARGE_FILE }
                 .forEach { (_, analyzer) -> analyzer.process() }
-        }else{
-            analyzerMap[AnalyticsOption.fromString(option.orNull ?: "general")]?.process()
+        } else {
+            analyzerMap[option.get()]?.process()
         }
     }
 
@@ -71,7 +68,44 @@ abstract class AppSizeAnalysisTask : DefaultTask() {
             dependencyGraph = dependencyGraph,
             extension = extension,
             project = project,
-            variant = variant,
+            variant = appSizeTaskComponent.buildVariant(),
             apksDirectory
         )
+
+    companion object {
+        fun registerTask(
+            project: Project,
+            pluginExtension: AppSizePluginExtension,
+            apkDirectory: File,
+            rootComponent: AppSizeTaskComponent
+        ): TaskProvider<AppSizeAnalysisTask> {
+            val variant = rootComponent.buildVariant()
+            return project.tasks.register(
+                "appSizeAnalysis${variant.name.capitalize()}", AppSizeAnalysisTask::class.java
+            ) {
+                extension = pluginExtension
+                apksDirectory.set(apkDirectory)
+                libName.set(project.params().libraryName() as String?)
+                option.set(project.params().option())
+                projectInfo.set(extractProjectInfo(project, variant, pluginExtension))
+                appSizeTaskComponent = rootComponent
+            }
+        }
+
+        private fun extractProjectInfo(
+            project: Project,
+            variant: BaseVariant,
+            extension: AppSizePluginExtension
+        ): ProjectInfo {
+            val params = project.params()
+            return ProjectInfo(
+                projectName = project.rootProject.name,
+                versionName = variant.mergedFlavor.versionName ?: "NA",
+                deviceName = params.deviceName() ?: DEFAULT_DEVICE_NAME,
+                pipelineId = params.pipelineId(),
+                buildType = variant.name,
+                tag = extension.tag.get()
+            )
+        }
+    }
 }

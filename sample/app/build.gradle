@@ -1,7 +1,6 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'com.grab.size-analysis'
 }
 
 apply from: "${rootProject.projectDir}/gradle-scripts/flavors.gradle"
@@ -63,15 +62,9 @@ android {
     with flavorConfig
 }
 
-appSizeAnalysis {
-    outputDirectory = new File(project.buildDir, "size-report")
-    featureMappingFile = new File(project.rootDir, 'module-owner.yml')
-    bundleToolPath = new File(project.rootDir, '/binary/bundletool-all-1.15.4.jar').toString()
-    bundleFilePath = "${project.buildDir}/outputs/bundle/gpsRelease/app-gps-release.aab"
-    tag = "tag-anything"
-}
-
 dependencies {
+    implementation project(":android-module-level1")
+    implementation project(":kotlin-module")
 
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -79,9 +72,6 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
     implementation 'androidx.navigation:navigation-ui-ktx:2.6.0'
-
-    implementation project(":android-module-level1")
-    implementation project(":kotlin-module")
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

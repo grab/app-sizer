@@ -1,59 +1,77 @@
 package com.grab.plugin.size.dependencies
 
-import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.api.BaseVariant
-import com.grab.plugin.size.utils.isAndroidApplication
-import com.grab.plugin.size.utils.isAndroidLibrary
-import com.grab.plugin.size.utils.isKotlinJvm
+import com.grab.plugin.size.AppSizeTaskScope
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.internal.artifacts.DefaultResolvedDependency
 import org.gradle.api.internal.artifacts.DependencyGraphNodeResult
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency
-import org.gradle.api.plugins.JavaPlugin
-import org.gradle.jvm.tasks.Jar
-import org.gradle.kotlin.dsl.the
 import java.util.*
-
+import javax.inject.Inject
 
 interface DependencyExtractor {
     fun extract(): DependencyGraph
 }
 
-class DependencyExtractorImpl(
+
+private const val INTERNAL_DEP_VERSION = "unspecified"
+@AppSizeTaskScope
+class DefaultDependencyExtractor @Inject constructor(
     private val appProject: Project,
-    private val variant: BaseVariant,
+    private val configurationExtractor: ConfigurationExtractor,
+    private val archiveExtractor: ArchiveExtractor
 ) : DependencyExtractor {
     override fun extract(): DependencyGraph {
-        val dependencyGraph = DependencyGraph()
-        val queue: Queue<Project> = LinkedList()
-        queue.add(appProject)
+        val dependencyGraph = MutableDependencyGraph()
+        val dependenciesCache = mutableMapOf<String, ArchiveDependency>()
+        val externalHaveChecked = mutableListOf<String>()
+        val queue: Queue<Project> = LinkedList<Project>().apply { add(appProject) }
         while (queue.isNotEmpty()) {
             val project = queue.poll()
-            val projectArchiveDependency = project.toArchiveDependency(variant)
-            project.filteredConfigurations(variant)
-                .flatMap { it.dependencies }
-                .filterIsInstance<DefaultProjectDependency>()
-                .map { it.dependencyProject }
-                .forEach { dependencyProject ->
-                    val archive = dependencyProject.toArchiveDependency(variant)
-                    dependencyGraph.addDependency(projectArchiveDependency, archive)
-                    queue.add(dependencyProject)
-                }
-            fetchExternalDependency(project, variant, dependencyGraph, projectArchiveDependency)
+            val projectArchive = archiveExtractor.extract(project)
+            dependenciesCache[projectArchive.id] = projectArchive
+            fetchInternalDependency(project, dependenciesCache, dependencyGraph, projectArchive, queue)
+            if (!externalHaveChecked.contains(projectArchive.id)) {
+                fetchExternalDependency(project, projectArchive, dependencyGraph, dependenciesCache)
+                externalHaveChecked.add(projectArchive.id)
+            }
+
         }
         return dependencyGraph
     }
 
+    private fun fetchInternalDependency(
+        project: Project,
+        dependenciesCache: MutableMap<String, ArchiveDependency>,
+        dependencyGraph: MutableDependencyGraph,
+        projectArchive: ArchiveDependency,
+        queue: Queue<Project>
+    ) {
+        configurationExtractor.runtimeConfigurations(project)
+            .flatMap { it.dependencies }
+            .filterIsInstance<DefaultProjectDependency>()
+            .map { it.dependencyProject }
+            .forEach { dependencyProject ->
+                val archive = archiveExtractor.extract(dependencyProject)
+                if (!dependenciesCache.contains(archive.id)) {
+                    dependenciesCache[archive.id] = archive
+                }
+                dependencyGraph.addDependency(
+                    projectArchive,
+                    dependenciesCache.getValue(archive.id)
+                )
+                queue.add(dependencyProject)
+            }
+    }
+
     private fun fetchExternalDependency(
         project: Project,
-        variant: BaseVariant,
-        dependencyGraph: DependencyGraph,
-        root: ArchiveDependency
+        root: ArchiveDependency,
+        dependencyGraph: MutableDependencyGraph,
+        dependenciesCache: MutableMap<String, ArchiveDependency>
     ) {
-        project.filteredConfigurations(variant)
+        configurationExtractor.runtimeConfigurations(project)
             .filter { it.isCanBeResolved }
             .map { it.resolvedConfiguration }
             .flatMap {
@@ -65,70 +83,45 @@ class DependencyExtractorImpl(
             }
             .filterIsInstance<DefaultResolvedDependency>()
             .forEach { resolvedDep ->
-                val directDep = resolvedDep.toArchiveDependency()
-                dependencyGraph.addDependency(root, directDep)
-                val transitiveQueue = LinkedList<DependencyGraphNodeResult>()
-                transitiveQueue.add(resolvedDep)
-                while (transitiveQueue.isNotEmpty()) {
-                    val item = transitiveQueue.poll()
-                    item.outgoingEdges.forEach {
-                        val transitiveDep = it.toArchiveDependency()
-                        dependencyGraph.addDependency(directDep, transitiveDep)
+                if (resolvedDep.moduleVersion != INTERNAL_DEP_VERSION) {
+                    val directDep = resolvedDep.toArchiveDependency()
+
+                    if (!dependenciesCache.contains(directDep.id)) {
+                        dependenciesCache[directDep.id] = directDep
+                    }
+
+                    dependencyGraph.addDependency(root, dependenciesCache.getValue(directDep.id))
+                    val transitiveQueue = LinkedList<DependencyGraphNodeResult>()
+                    transitiveQueue.add(resolvedDep)
+                    while (transitiveQueue.isNotEmpty()) {
+                        val item = transitiveQueue.poll()
+
+                        item.outgoingEdges.forEach {
+                            val transitiveDep = it.toArchiveDependency()
+                            if (!dependenciesCache.contains(transitiveDep.id)) {
+                                dependenciesCache[transitiveDep.id] = transitiveDep
+                            }
+
+                            dependencyGraph.addDependency(directDep, dependenciesCache.getValue(transitiveDep.id))
+                        }
                     }
                 }
+
             }
     }
 }
 
-internal fun DependencyGraphNodeResult.toArchiveDependency(): ArchiveDependency = ExternalDependency(
+private fun DependencyGraphNodeResult.toArchiveDependency(): ArchiveDependency = ExternalDependency(
     name = publicView.name,
     group = publicView.moduleGroup,
     version = publicView.moduleVersion,
     pathToArtifact = publicView.allModuleArtifacts.first().file.path
 )
 
-internal fun DefaultResolvedDependency.toArchiveDependency(): ArchiveDependency = ExternalDependency(
+private fun DefaultResolvedDependency.toArchiveDependency(): ArchiveDependency = ExternalDependency(
     name = name,
     group = moduleGroup,
     version = moduleVersion,
     pathToArtifact = allModuleArtifacts.first().file.path
 )
-
-internal fun Project.toArchiveDependency(variant: BaseVariant): ArchiveDependency {
-    return when {
-        isAndroidApplication -> {
-            return AppDependency(
-                name = name,
-                pathToArtifact = variant.outputs.first().outputFile.absolutePath
-            )
-        }
-        isAndroidLibrary -> {
-            val extension = the<LibraryExtension>()
-            val libraryVariant = extension.libraryVariants.find { libraryVariant ->
-                libraryVariant.name == variant.name
-            } ?: extension.libraryVariants.find { libraryVariant ->
-                libraryVariant.buildType.name == variant.buildType.name
-            }
-
-            if (libraryVariant != null) {
-                return ModuleDependency(
-                    name = name,
-                    pathToArtifact = libraryVariant.outputs.first().outputFile.path
-                )
-            } else throw IllegalArgumentException("Can not fetch the output for $name")
-        }
-        isKotlinJvm -> {
-            val jarTask = tasks.findByName(JavaPlugin.JAR_TASK_NAME) as Jar
-            return JavaModuleDependency(
-                name = name,
-                pathToArtifact = jarTask.archiveFile.get().asFile.absolutePath
-            )
-        }
-        else -> {
-            throw IllegalArgumentException("The $name is not an Android/Kotlin module")
-        }
-    }
-}
-
-internal fun Configuration.isNotTest() = !name.contains("test", true)
 

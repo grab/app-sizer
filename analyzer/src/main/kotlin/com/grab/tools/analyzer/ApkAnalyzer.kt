@@ -7,6 +7,7 @@ import com.grab.tools.parser.ApkFileInfo
 import com.grab.tools.analyzer.model.Contributor
 import com.grab.tools.parser.DataParser
 import java.io.File
+import java.util.*
 import javax.inject.Inject
 
 internal const val METRICS_ID_APK = "mobile.pax.app.size.app5"
@@ -38,7 +39,7 @@ internal class ApkAnalyzer @Inject constructor(
 
         reportWriters.forEach {
             it.write(
-                AnalyticsOption.APK.name.toLowerCase(),
+                AnalyticsOption.APK.name.lowercase(Locale.getDefault()),
                 Report(
                     projectInfo = projectInfoProvider.get(),
                     rows = listOfReport,
@@ -95,7 +96,7 @@ internal class ApkAnalyzer @Inject constructor(
         ),
         createRow(
             name = "native-libraries",
-            value = allLibReport.totalDownloadSize - allLibReport.nativeLibDownloadSize
+            value = allLibReport.nativeLibDownloadSize
         )
     )
 

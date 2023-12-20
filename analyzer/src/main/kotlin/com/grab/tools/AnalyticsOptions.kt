@@ -1,7 +1,10 @@
 package com.grab.tools
 
-enum class AnalyticsOption {
+import java.io.Serializable
+
+enum class AnalyticsOption : Serializable{
     LIBRARIES,
+    DEFAULT,
     APK,
     BASIC,
     MODULES,
@@ -10,7 +13,7 @@ enum class AnalyticsOption {
     LIB_CONTENT;
 
     companion object {
-        fun fromString(value: String): AnalyticsOption? = when (value) {
+        fun fromString(value: String?): AnalyticsOption = when (value) {
             "libraries" -> LIBRARIES
             "modules" -> MODULES
             "apk" -> APK
@@ -18,7 +21,7 @@ enum class AnalyticsOption {
             "codebase" -> CODEBASE
             "large-files" -> LARGE_FILE
             "lib-content" -> LIB_CONTENT
-            else -> null
+            else -> DEFAULT
         }
     }
 }

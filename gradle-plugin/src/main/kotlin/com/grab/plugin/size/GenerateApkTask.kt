@@ -1,16 +1,13 @@
 package com.grab.plugin.size
 
+import com.android.build.gradle.api.ApplicationVariant
 import com.android.builder.model.SigningConfig
-import com.grab.tools.analyzer.report.ProjectInfo
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import java.io.File
 
 private const val DEFAULT_DEVICE_SPEC = """
@@ -24,7 +21,8 @@ private const val DEFAULT_DEVICE_SPEC = """
 
 internal const val DEFAULT_DEVICE_NAME = "default_device"
 
-abstract class GenerateApkTask : DefaultTask() {
+internal abstract class GenerateApkTask : DefaultTask() {
+
 
     @get:Input
     abstract val bundleToolPath: Property<String>
@@ -112,15 +110,33 @@ abstract class GenerateApkTask : DefaultTask() {
                 apk.delete()
             }
     }
+
+    companion object {
+        fun registerTask(
+            project: Project,
+            extension: AppSizePluginExtension,
+            variant: ApplicationVariant,
+            apkDirectory: File
+        ): TaskProvider<GenerateApkTask> {
+            return project.tasks.register("generateApkFor${variant.name.capitalize()}", GenerateApkTask::class.java) {
+                dependsOn("bundle${variant.name.capitalize()}")
+                deviceSpecFilePath.set(project.params().deviceSpec())
+                bundleToolPath.set(extension.bundleToolPath.get())
+                outputDirectory.set(apkDirectory)
+                bundleFile.set(project.file(extension.bundleFilePath))
+                signingConfig.set(variant.signingConfig.toInternalSigningConfig())
+            }
+        }
+    }
 }
 
-fun SigningConfig.toInternalSigningConfig(): InternalSigningConfig = InternalSigningConfig(
+private fun SigningConfig.toInternalSigningConfig(): InternalSigningConfig = InternalSigningConfig(
     storeFile = storeFile?.path ?: "",
     storePassword = storePassword ?: "",
     keyAlias = keyAlias ?: ""
 )
 
-data class InternalSigningConfig(
+internal data class InternalSigningConfig(
     val storeFile: String,
     val storePassword: String,
     val keyAlias: String

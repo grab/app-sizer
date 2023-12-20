@@ -17,3 +17,12 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.20' apply false
 }
 
+apply plugin: "com.grab.size-analysis"
+
+appSizeAnalysis {
+    outputDirectory = new File(project.buildDir, "size-report")
+    featureMappingFile = new File(project.rootDir, 'module-owner.yml')
+    bundleToolPath = new File(project.rootDir, '/binary/bundletool-all-1.15.4.jar').toString()
+    bundleFilePath = "${project.rootDir}/app/build/outputs/bundle/gpsRelease/app-gps-release.aab"
+    tag = "tag-anything"
+}

@@ -10,6 +10,7 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'java-gradle-plugin'
+    id "org.jetbrains.kotlin.kapt"
     alias(libs.plugins.kotlin.dsl)
 }
 
@@ -30,6 +31,8 @@ dependencies {
     implementation project(":report-writer")
     implementation libs.android.gradle.plugin
     implementation libs.gradle.api
+    implementation libs.google.dagger
+    kapt libs.dagger.compiler
 }
 
 gradlePlugin {
