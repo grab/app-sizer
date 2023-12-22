@@ -34,10 +34,11 @@ internal class LibrariesAnalyzer @Inject constructor(
             it.write(
                 AnalyticsOption.LIBRARIES.name.toLowerCase(),
                 Report(
-                    projectInfo = projectInfoProvider.get(),
                     id = LIBRARY_METRICS_ID,
                     name = LIBRARY_METRICS_ID,
-                    rows = listOfReport.toReportRows()
+                    rows = listOfReport.toReportRows(),
+                    projectInfo = projectInfoProvider.getProjectInfo(),
+                    customProperties = projectInfoProvider.getCustomProperties()
                 )
             )
         }

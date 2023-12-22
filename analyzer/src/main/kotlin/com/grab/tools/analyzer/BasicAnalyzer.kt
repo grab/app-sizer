@@ -28,10 +28,11 @@ internal class BasicApkAnalyzer @Inject constructor(
             it.write(
                 AnalyticsOption.BASIC.name.toLowerCase(),
                 Report(
-                    projectInfo = projectInfoProvider.get(),
                     rows = androidBinaryInfo.createApkReportRows(dexCompressedRatio),
                     id = METRICS_ID_BASIC,
-                    name = METRICS_ID_BASIC
+                    name = METRICS_ID_BASIC,
+                    projectInfo = projectInfoProvider.getProjectInfo(),
+                    customProperties = projectInfoProvider.getCustomProperties()
                 )
             )
         }

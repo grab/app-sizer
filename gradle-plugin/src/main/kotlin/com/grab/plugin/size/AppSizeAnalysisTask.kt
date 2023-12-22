@@ -8,6 +8,7 @@ import com.grab.plugin.size.utils.PluginLogger
 import com.grab.tools.AnalyticsOption
 import com.grab.tools.AnalyzerFactory
 import com.grab.tools.analyzer.ProjectInfoProvider
+import com.grab.tools.analyzer.report.CustomProperties
 import com.grab.tools.analyzer.report.ProjectInfo
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -49,7 +50,8 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
             .create(
                 inputFileProvider,
                 object : ProjectInfoProvider {
-                    override fun get() = projectInfo.get()
+                    override fun getProjectInfo() = projectInfo.get()
+                    override fun getCustomProperties(): CustomProperties = extension.metrics.customAttributes.get()
                 },
                 libName = libName.orNull,
                 logger,
@@ -87,24 +89,21 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
                 apksDirectory.set(apkDirectory)
                 libName.set(project.params().libraryName() as String?)
                 option.set(project.params().option())
-                projectInfo.set(extractProjectInfo(project, variant, pluginExtension))
+                projectInfo.set(extractProjectInfo(project, variant))
                 appSizeTaskComponent = rootComponent
             }
         }
 
         private fun extractProjectInfo(
             project: Project,
-            variant: BaseVariant,
-            extension: AppSizePluginExtension
+            variant: BaseVariant
         ): ProjectInfo {
             val params = project.params()
             return ProjectInfo(
                 projectName = project.rootProject.name,
                 versionName = variant.mergedFlavor.versionName ?: "NA",
                 deviceName = params.deviceName() ?: DEFAULT_DEVICE_NAME,
-                pipelineId = params.pipelineId(),
-                buildType = variant.name,
-                tag = extension.tag.get()
+                buildType = variant.name
             )
         }
     }

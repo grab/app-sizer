@@ -11,7 +11,7 @@ class ProjectInfoProviderImpl(
     private val buildType: String = "production",
     private val tag: String = ""
 ) : ProjectInfoProvider {
-    override fun get(): ProjectInfo {
+    override fun getProjectInfo(): ProjectInfo {
         return ProjectInfo(
             projectName = projectName,
             versionName = versionName,

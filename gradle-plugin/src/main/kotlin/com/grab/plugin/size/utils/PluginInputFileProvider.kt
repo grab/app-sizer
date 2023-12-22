@@ -38,7 +38,7 @@ class PluginInputFileProvider(
             ?.asSequence() ?: emptySequence()
     }
 
-    override fun provideOutPutDirectory(): File = extension.outputDirectory.asFile.get()
+    override fun provideOutPutDirectory(): File = extension.metrics.local.outputDirectory.asFile.get()
 
     override fun provideR8MappingFile(): File? {
         return if (variant.mappingFileProvider.isPresent) {

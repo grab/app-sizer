@@ -1,13 +1,12 @@
 package com.grab.tools.analyzer.report
 
+typealias CustomProperties = Map<String, String>
 
 data class ProjectInfo(
     val versionName: String,
     val projectName: String,
     val deviceName: String,
-    val pipelineId: String?,
-    val buildType: String = "production",
-    val tag: String?
+    val buildType: String = "production"
 )
 
 
@@ -57,14 +56,15 @@ data class TagField(
 
 
 data class Report(
+    val id: String,
+    val name: String,
     val projectInfo: ProjectInfo,
     val rows: List<Row>,
-    val id: String,
-    val name: String
+    val customProperties: CustomProperties
 )
 
 interface ReportWriter {
-    fun write(reportId : String, report: Report)
+    fun write(reportId: String, report: Report)
 }
 
 

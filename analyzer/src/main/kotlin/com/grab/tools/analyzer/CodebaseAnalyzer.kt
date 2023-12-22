@@ -66,7 +66,8 @@ internal class CodebaseAnalyzer @Inject constructor(
                     id = METRICS_ID_FEATURES,
                     name = METRICS_ID_FEATURES,
                     rows = sortedFeaturesReport,
-                    projectInfo = projectInfoProvider.get()
+                    projectInfo = projectInfoProvider.getProjectInfo(),
+                    customProperties = projectInfoProvider.getCustomProperties()
                 )
             )
         }

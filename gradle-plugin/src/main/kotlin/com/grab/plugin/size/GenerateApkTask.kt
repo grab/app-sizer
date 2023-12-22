@@ -121,9 +121,9 @@ internal abstract class GenerateApkTask : DefaultTask() {
             return project.tasks.register("generateApkFor${variant.name.capitalize()}", GenerateApkTask::class.java) {
                 dependsOn("bundle${variant.name.capitalize()}")
                 deviceSpecFilePath.set(project.params().deviceSpec())
-                bundleToolPath.set(extension.bundleToolPath.get())
+                bundleToolPath.set(extension.apk.bundleToolPath.get())
                 outputDirectory.set(apkDirectory)
-                bundleFile.set(project.file(extension.bundleFilePath))
+                bundleFile.set(project.file(extension.apk.bundleFilePath))
                 signingConfig.set(variant.signingConfig.toInternalSigningConfig())
             }
         }
