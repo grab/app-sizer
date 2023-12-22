@@ -2,9 +2,9 @@ package com.grab.tools.analyzer
 
 import com.grab.tools.AnalyticsOption
 import com.grab.tools.analyzer.mapper.ApkComponentProcessor
+import com.grab.tools.analyzer.model.Contributor
 import com.grab.tools.analyzer.report.*
 import com.grab.tools.parser.ApkFileInfo
-import com.grab.tools.analyzer.model.Contributor
 import com.grab.tools.parser.DataParser
 import java.io.File
 import java.util.*
@@ -41,10 +41,11 @@ internal class ApkAnalyzer @Inject constructor(
             it.write(
                 AnalyticsOption.APK.name.lowercase(Locale.getDefault()),
                 Report(
-                    projectInfo = projectInfoProvider.get(),
                     rows = listOfReport,
                     id = METRICS_ID_APK,
-                    name = METRICS_ID_APK
+                    name = METRICS_ID_APK,
+                    projectInfo = projectInfoProvider.getProjectInfo(),
+                    customProperties = projectInfoProvider.getCustomProperties()
                 )
             )
         }

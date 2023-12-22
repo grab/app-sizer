@@ -1,13 +1,32 @@
 package com.grab.plugin.size
 
+import com.grab.plugin.size.configuration.ApkGeneratorConfig
+import com.grab.plugin.size.configuration.MetricConfig
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.Property
 
-open class AppSizePluginExtension(project: Project) {
-    val bundleToolPath: Property<String> = project.objects.property(String::class.java)
-    val bundleFilePath: Property<String> = project.objects.property(String::class.java)
-    val outputDirectory: RegularFileProperty = project.objects.fileProperty()
-    val featureMappingFile: RegularFileProperty = project.objects.fileProperty()
-    val tag: Property<String?> = project.objects.property(String::class.java)
+
+open class AppSizePluginExtension(val project: Project) {
+    var apk: ApkGeneratorConfig = project.objects.newInstance(ApkGeneratorConfig::class.java, project.objects)
+    var metrics = project.objects.newInstance(MetricConfig::class.java, project.objects)
+    var featureMappingFile: RegularFileProperty = project.objects.fileProperty()
+
+    fun metrics(block: MetricConfig.() -> Unit) {
+        block(metrics)
+    }
+
+    fun metrics(action: Action<in MetricConfig>) {
+        action.execute(metrics)
+    }
+
+    fun apk(action: Action<in ApkGeneratorConfig>) {
+        action.execute(apk)
+    }
+
+    fun apk(block: ApkGeneratorConfig.() -> Unit) {
+        block(apk)
+    }
 }
+
+

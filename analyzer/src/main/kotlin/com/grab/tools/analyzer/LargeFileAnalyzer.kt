@@ -2,12 +2,11 @@ package com.grab.tools.analyzer
 
 import com.grab.tools.AnalyticsOption
 import com.grab.tools.analyzer.mapper.ApkComponentProcessor
-import com.grab.tools.analyzer.report.*
-import com.grab.tools.analyzer.report.toFeatures
-import com.grab.tools.parser.ApkFileInfo
 import com.grab.tools.analyzer.model.Contributor
 import com.grab.tools.analyzer.model.castToClass
 import com.grab.tools.analyzer.model.castToRawFile
+import com.grab.tools.analyzer.report.*
+import com.grab.tools.parser.ApkFileInfo
 import com.grab.tools.parser.DataParser
 import com.grab.tools.parser.getAars
 import com.grab.tools.parser.getJars
@@ -76,10 +75,11 @@ internal class LargeFileAnalyzer @Inject constructor(
             it.write(
                 AnalyticsOption.LARGE_FILE.name.toLowerCase(),
                 Report(
-                    projectInfoProvider.get(),
                     id = METRICS_ID_LARGE_FILES,
                     name = METRICS_ID_LARGE_FILES,
-                    rows = reportRows
+                    rows = reportRows,
+                    projectInfo = projectInfoProvider.getProjectInfo(),
+                    customProperties = projectInfoProvider.getCustomProperties()
                 )
             )
         }

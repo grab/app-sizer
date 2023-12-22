@@ -8,18 +8,22 @@ import com.grab.pax.plugins.report.Tag as MetricsTag
 class AgentReportWriter(
     private val metricsPublisher: MetricsPublisher
 ) : ReportWriter {
-    override fun write(reportId : String, report: Report) {
+    override fun write(reportId: String, report: Report) {
         metricsPublisher.publish(
             reportId,
             report.rows.flatMap {
-                it.toMetrics(report.projectInfo, report.id)
+                it.toMetrics(report.projectInfo, report.customProperties, report.id)
             }
         )
     }
 
-    private fun Row.toMetrics(projectInfo: ProjectInfo, metricsId: String): List<Metrics> = listOf(
+    private fun Row.toMetrics(
+        projectInfo: ProjectInfo,
+        customProperties: CustomProperties,
+        metricsId: String
+    ): List<Metrics> = listOf(
         Metrics(
-            fields = fields.toMetricsFields() + projectInfo.toCommonFields(),
+            fields = fields.toMetricsFields() + customProperties.toCommonFields(),
             tags = fields.toMetricsTags() + projectInfo.toCommonTags(),
             timestamp = System.currentTimeMillis(),
             name = metricsId,
@@ -62,6 +66,7 @@ class AgentReportWriter(
                         )
                     )
                 }
+
                 is TagField -> {
                     add(
                         MetricsTag(
@@ -76,26 +81,14 @@ class AgentReportWriter(
         }
     }
 
-
-    private fun ProjectInfo.toCommonFields(): List<MetricsField> {
-        return mutableListOf(
-            MetricsField(
-                name = "pipeline_id",
-                value = pipelineId ?: "NA",
-                valueType = "integer"
-            )
-        ).apply {
-            if (tag != null) {
-                add(
-                    MetricsField(
-                        name = "tag",
-                        value = tag,
-                        valueType = "string"
-                    )
-                )
-            }
-        }
+    private fun CustomProperties.toCommonFields(): List<MetricsField> = map {
+        MetricsField(
+            name = it.key,
+            value = it.value,
+            valueType = "string"
+        )
     }
+
 
     private fun ProjectInfo.toCommonTags(): List<MetricsTag> =
         listOf(

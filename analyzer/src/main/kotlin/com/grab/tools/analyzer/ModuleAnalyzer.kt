@@ -61,8 +61,9 @@ internal class ModuleAnalyzer @Inject constructor(
                 Report(
                     id = METRICS_ID_MODULES,
                     name = METRICS_ID_MODULES,
-                    projectInfo = projectInfoProvider.get(),
-                    rows = toReportRows(sortedFeaturesReport)
+                    projectInfo = projectInfoProvider.getProjectInfo(),
+                    rows = toReportRows(sortedFeaturesReport),
+                    customProperties = projectInfoProvider.getCustomProperties()
                 )
             )
         }

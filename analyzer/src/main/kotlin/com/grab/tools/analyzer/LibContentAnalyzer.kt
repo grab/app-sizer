@@ -2,12 +2,10 @@ package com.grab.tools.analyzer
 
 import com.grab.tools.AnalyticsOption
 import com.grab.tools.analyzer.mapper.ApkComponentProcessor
-import com.grab.tools.analyzer.report.*
-import com.grab.tools.parser.ApkFileInfo
 import com.grab.tools.analyzer.model.Contributor
 import com.grab.tools.analyzer.model.FileInfo
-import com.grab.tools.analyzer.report.NAMED_LIB_NAME
-import com.grab.tools.analyzer.report.dexDownloadRatio
+import com.grab.tools.analyzer.report.*
+import com.grab.tools.parser.ApkFileInfo
 import com.grab.tools.parser.DataParser
 import java.io.File
 import javax.inject.Inject
@@ -49,10 +47,11 @@ internal class LibContentAnalyzer @Inject constructor(
             it.write(
                 AnalyticsOption.LIB_CONTENT.name.toLowerCase(),
                 Report(
-                    projectInfo = projectInfoProvider.get(),
                     id = LIB_CONTENT_METRICS_ID,
                     name = LIB_CONTENT_METRICS_ID,
-                    rows = resourceRows + assetRows + nativeLibRows + otherRows + classRows
+                    rows = resourceRows + assetRows + nativeLibRows + otherRows + classRows,
+                    projectInfo = projectInfoProvider.getProjectInfo(),
+                    customProperties = projectInfoProvider.getCustomProperties()
                 )
             )
         }
