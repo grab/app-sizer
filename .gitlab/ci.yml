@@ -1,0 +1,23 @@
+image: openjdk:11-jdk
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  script: ./gradlew assemble
+  artifacts:
+    paths:
+      - gradle-plugin/build/libs/*.jar
+      - clt/build/libs/*.jar
+    expire_in: 1 week
+
+test:
+  stage: test
+  script:
+    - cd ./sample
+    - ./gradlew app:appSizeAnalysisGpsRelease --stacktrace -Dorg.gradle.debug=false --no-daemon --info
