@@ -31,11 +31,10 @@ dependencyResolutionManagement {
 
 enableFeaturePreview('VERSION_CATALOGS')
 
-include 'analyzer'
+include 'app-sizer'
 include 'analyzer-repo'
 include 'agent-report'
 include 'gradle-plugin'
 include 'clt'
-include 'report-writer'
 
 

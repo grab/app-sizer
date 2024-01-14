@@ -27,8 +27,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
 }
 
 dependencies {
-    implementation project(":analyzer")
-    implementation project(":report-writer")
+    implementation project(':app-sizer')
     implementation libs.android.gradle.plugin
     implementation libs.gradle.api
     implementation libs.google.dagger
@@ -39,15 +38,15 @@ gradlePlugin {
     // Define the plugin
     plugins {
         sizeAnalysis {
-            id = 'com.grab.size-analysis'
-            implementationClass = 'com.grab.plugin.size.AppSizePlugin'
+            id = 'com.grab.sizer-analysis'
+            implementationClass = 'com.grab.plugin.sizer.AppSizePlugin'
             displayName = "SizeAnalysis"
         }
     }
 }
 
 
-def libArtifactId = 'size-analysis'
+def libArtifactId = 'sizer-analysis'
 
 apply from: '../publish.gradle'
 configureArtifact(group, version, libArtifactId)

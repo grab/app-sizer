@@ -1,7 +1,7 @@
 apkDirectoryPath: "./app/build/outputs/apk/gps/debug"
 libraryDirectoryPath: "./build/gradle-cache/caches/modules-2/files-2.1"
 projectDirectoryPath: "./"
-outputFilePath: "./build/app-size"
+outputFilePath: "./build/app-sizer"
 mappingFilePath: "./app/build/outputs/mapping/gpsDebug/mapping.txt"
 featureMappingFilePath: "./module-owner.yml"
 projectName: "sample"

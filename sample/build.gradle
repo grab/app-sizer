@@ -6,7 +6,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath "com.grab:size-analysis:SNAPSHOT"
+        classpath "com.grab:sizer-analysis:SNAPSHOT"
     }
 }
 
@@ -17,7 +17,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.20' apply false
 }
 
-apply plugin: "com.grab.size-analysis"
+apply plugin: "com.grab.sizer-analysis"
 
 appSizeAnalysis {
     apk {
@@ -27,13 +27,13 @@ appSizeAnalysis {
 
     metrics {
         influxDbPublisher {
-            dbName = "mp_metrics"
+            dbName = "sizer"
             url = "http://10.197.86.135:8086"
             username = "talaiot"
             password = "UrMpvi3uC6Wc1owj"
         }
         local {
-            outputDirectory = new File(project.buildDir, "size-report")
+            outputDirectory = new File(project.buildDir, "sizer-report")
         }
 
         customAttributes.putAll(
