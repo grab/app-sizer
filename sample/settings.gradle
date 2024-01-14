@@ -9,7 +9,7 @@ pluginManagement {
 
 includeBuild("../") {
     dependencySubstitution {
-        substitute module("com.grab:size-analysis") with project(":gradle-plugin")
+        substitute module("com.grab:sizer-analysis") with project(":gradle-plugin")
     }
 }
 

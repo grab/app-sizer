@@ -1,0 +1,37 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.kapt"
+}
+
+dependencies {
+    implementation project(":agent-report")
+    implementation('org.apache.poi:poi-ooxml:5.2.2')
+    implementation('org.jxls:jxls-jexcel:1.0.9')
+    implementation libs.influxdbClient
+
+    implementation libs.dexlib2
+    implementation libs.clikt
+    implementation libs.bundletool
+    implementation libs.apkanalyzer
+    implementation libs.common
+    implementation libs.jackson.module.kotlin
+    implementation libs.jackson.dataformat.yaml
+    implementation libs.kxml2
+    implementation libs.guava
+    implementation libs.poi.ooxml
+    implementation libs.jxls.jexcel
+    implementation libs.google.dagger
+    implementation libs.gson
+
+    kapt libs.dagger.compiler
+
+    testImplementation libs.kotlin.test
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '11'
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = '11'
+}

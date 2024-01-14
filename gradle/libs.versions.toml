@@ -16,6 +16,7 @@ kotlin-test = "1.8.20"
 kotlin-dsl = "2.1.7"
 gradle-plugin-publish = "0.14.0"
 android-gradle-plugin = "7.2.2"
+influxdbClient = "2.21"
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android-gradle-plugin" }
@@ -35,6 +36,7 @@ google-dagger = { module = "com.google.dagger:dagger", version.ref = "dagger"  }
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger"  }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson"  }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-test"  }
+influxdbClient = { module = "org.influxdb:influxdb-java", version.ref = "influxdbClient"  }
 
 [plugins]
 kotlin-dsl = { id = "org.gradle.kotlin.kotlin-dsl", version.ref = "kotlin-dsl" }
