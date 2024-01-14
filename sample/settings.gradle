@@ -9,7 +9,7 @@ pluginManagement {
 
 includeBuild("../") {
     dependencySubstitution {
-        substitute module("com.grab:sizer-analysis") with project(":gradle-plugin")
+        substitute module("com.grab:app-sizer") with project(":gradle-plugin")
     }
 }
 
@@ -22,8 +22,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "sample"
 include ':app'
-
-
 include ':android-module-level1'
 include ':android-module-level2'
 include ':kotlin-module'
