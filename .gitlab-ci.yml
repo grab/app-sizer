@@ -1,31 +1,28 @@
 default:
   image: gitlab.myteksi.net:4567/mobile/pax-android/basic-docker:1.0.1
 
-#variables:
-#  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
-simple:
-  script: echo pipeline
+stages:
+  - build
+  - test
 
-#stages:
-#  - build
-#  - test
-#
-#build:
-#  stage: build
-#  script: ./gradlew assemble
-#  tags:
-#    - xlarge
-#  artifacts:
-#    paths:
-#      - gradle-plugin/build/libs/*.jar
-#      - clt/build/libs/*.jar
-#    expire_in: 1 week
-#
-#test:
-#  stage: test
-#  tags:
-#    - xlarge
-#  script:
-#    - cd ./sample
-#    - ./gradlew app:appSizeAnalysisGpsRelease --stacktrace -Dorg.gradle.debug=false --no-daemon --info
+build:
+  stage: build
+  script: ./gradlew assemble
+  tags:
+    - xlarge
+  artifacts:
+    paths:
+      - gradle-plugin/build/libs/*.jar
+      - clt/build/libs/*.jar
+    expire_in: 1 week
+
+test:
+  stage: test
+  tags:
+    - xlarge
+  script:
+    - cd ./sample
+    - ./gradlew app:appSizeAnalysisGpsRelease --stacktrace -Dorg.gradle.debug=false --no-daemon --info
