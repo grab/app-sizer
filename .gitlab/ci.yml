@@ -1,4 +1,4 @@
-image: openjdk:11-jdk
+image: gitlab.myteksi.net:4567/mobile/pax-android/basic-docker:1.0.1
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -10,6 +10,8 @@ stages:
 build:
   stage: build
   script: ./gradlew assemble
+  tags:
+    - xlarge
   artifacts:
     paths:
       - gradle-plugin/build/libs/*.jar
@@ -18,6 +20,8 @@ build:
 
 test:
   stage: test
+  tags:
+    - xlarge
   script:
     - cd ./sample
     - ./gradlew app:appSizeAnalysisGpsRelease --stacktrace -Dorg.gradle.debug=false --no-daemon --info
