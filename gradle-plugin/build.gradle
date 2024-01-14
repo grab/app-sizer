@@ -38,7 +38,7 @@ gradlePlugin {
     // Define the plugin
     plugins {
         sizeAnalysis {
-            id = 'com.grab.sizer-analysis'
+            id = 'com.grab.app-sizer'
             implementationClass = 'com.grab.plugin.sizer.AppSizePlugin'
             displayName = "SizeAnalysis"
         }
@@ -46,7 +46,7 @@ gradlePlugin {
 }
 
 
-def libArtifactId = 'sizer-analysis'
+def libArtifactId = 'app-sizer'
 
 apply from: '../publish.gradle'
 configureArtifact(group, version, libArtifactId)

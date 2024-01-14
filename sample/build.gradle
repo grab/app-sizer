@@ -6,7 +6,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath "com.grab:sizer-analysis:SNAPSHOT"
+        classpath "com.grab:app-sizer:SNAPSHOT"
     }
 }
 
@@ -17,7 +17,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.20' apply false
 }
 
-apply plugin: "com.grab.sizer-analysis"
+apply plugin: "com.grab.app-sizer"
 
 appSizeAnalysis {
     apk {
