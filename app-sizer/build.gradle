@@ -35,3 +35,14 @@ compileKotlin {
 compileTestKotlin {
     kotlinOptions.jvmTarget = '11'
 }
+
+group = 'com.grab'
+version = "SNAPSHOT"
+def libArtifactId = 'app-sizer'
+
+apply from: '../publish.gradle'
+configureArtifact(group, version, libArtifactId)
+
+repositories {
+    mavenCentral()
+}

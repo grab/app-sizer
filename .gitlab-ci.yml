@@ -7,6 +7,7 @@ variables:
 stages:
   - build
   - test
+  - publish
 
 build:
   stage: build
@@ -26,3 +27,12 @@ test:
   script:
     - cd ./sample
     - ./gradlew app:appSizeAnalysisGpsRelease --stacktrace -Dorg.gradle.debug=false --no-daemon --info
+
+publish_artifact:
+  stage: publish
+  rules:
+    - if: $RELEASE == "publish"
+  tags:
+    - xlarge
+  script:
+    - ./gradlew artifactoryPublish

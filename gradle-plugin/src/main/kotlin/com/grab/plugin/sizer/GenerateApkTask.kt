@@ -9,6 +9,7 @@ import org.gradle.api.logging.LogLevel
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import java.io.File
+import java.io.IOException
 
 private const val DEFAULT_DEVICE_SPEC = """
     {
@@ -18,6 +19,8 @@ private const val DEFAULT_DEVICE_SPEC = """
   "sdkVersion": 30
 }
 """
+
+private const val BUNDLE_EXTENSION = ".aab"
 
 internal const val DEFAULT_DEVICE_NAME = "default_device"
 
@@ -68,12 +71,26 @@ internal abstract class GenerateApkTask : DefaultTask() {
         }
     }
 
+    private fun fetchBundlePath(): String {
+        val file = File(bundleToolPath.get())
+        if (file.isFile) return file.path
+        if (file.isDirectory) {
+            val files = file.listFiles { _, name -> name.endsWith(BUNDLE_EXTENSION) }
+            return when {
+                files == null || files.isEmpty() -> throw IOException("No app bundles found in the directory.")
+                files.size > 1 -> throw IOException("More than one app bundle found in the directory.")
+                else -> files[0].path
+            }
+        }
+        throw IOException("Can not find the bundle file")
+    }
+
     private fun extractApksToDirectory(apksTempFile: File, deviceSpec: String?) {
         project.exec {
             commandLine(
                 "java",
                 "-jar",
-                bundleToolPath.get(),
+                fetchBundlePath(),
                 "extract-apks",
                 "--apks=${apksTempFile.path}",
                 "--output-dir=${outputDirectory.asFile.get().path}",
@@ -121,9 +138,9 @@ internal abstract class GenerateApkTask : DefaultTask() {
             return project.tasks.register("generateApkFor${variant.name.capitalize()}", GenerateApkTask::class.java) {
                 dependsOn("bundle${variant.name.capitalize()}")
                 deviceSpecFilePath.set(project.params().deviceSpec())
-                bundleToolPath.set(extension.apk.bundleToolPath.get())
+                bundleToolPath.set(extension.android.apk.bundleToolPath.get())
                 outputDirectory.set(apkDirectory)
-                bundleFile.set(project.file(extension.apk.bundleFilePath))
+                bundleFile.set(project.file(extension.android.apk.bundleFilePath))
                 signingConfig.set(variant.signingConfig.toInternalSigningConfig())
             }
         }

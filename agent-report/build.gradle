@@ -8,11 +8,12 @@
 
 plugins {
     id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.kapt"
 }
 
 dependencies {
     implementation libs.gson
-//    testImplementation libs.kotlin.test
+    testImplementation libs.kotlin.test
 }
 
 compileKotlin {
@@ -21,4 +22,15 @@ compileKotlin {
 
 compileTestKotlin {
     kotlinOptions.jvmTarget = '11'
+}
+
+group = 'com.grab'
+version = "SNAPSHOT"
+def libArtifactId = 'agent-report'
+
+apply from: '../publish.gradle'
+configureArtifact(group, version, libArtifactId)
+
+repositories {
+    mavenCentral()
 }

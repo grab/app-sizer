@@ -2,6 +2,7 @@ package com.grab.plugin.sizer.dependencies
 
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
+import com.android.build.gradle.internal.dsl.BuildType
 import com.grab.plugin.sizer.AppSizeTaskScope
 import com.grab.plugin.sizer.utils.isAndroidApplication
 import com.grab.plugin.sizer.utils.isAndroidLibrary
@@ -19,6 +20,7 @@ import javax.inject.Named
 
 internal const val BUILD_TYPE = "BUILD_TYPE"
 internal const val BUILD_FLAVOR = "BUILD_FLAVOR"
+internal const val BUILD_TYPE_DEBUG = "debug"
 
 internal interface VariantExtractor {
     fun findMatchVariant(project: Project): AppSizeVariant
@@ -82,6 +84,20 @@ internal class DefaultVariantExtractor @Inject constructor(
             if (matchBuildType.size == 1) return matchBuildType.first()
             flavorMatchingFallbacks.forEach { fallback ->
                 matchBuildType.forEach { variant ->
+                    if (fallback == variant.flavorName) return variant
+                }
+            }
+        }
+
+        // no flavor or build type match - return debug by default
+        val matchDefaultBuildType = extension.libraryVariants.filter { variant ->
+            variant.buildType.name == BUILD_TYPE_DEBUG
+        }
+
+        if(matchDefaultBuildType.isNotEmpty()){
+            if (matchDefaultBuildType.size == 1) return matchDefaultBuildType.first()
+            flavorMatchingFallbacks.forEach { fallback ->
+                matchDefaultBuildType.forEach { variant ->
                     if (fallback == variant.flavorName) return variant
                 }
             }
