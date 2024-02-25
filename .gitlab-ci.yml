@@ -11,7 +11,7 @@ stages:
 
 build:
   stage: build
-  script: ./gradlew assemble
+  script: ./gradlew gradle-plugin:assemble --rerun-tasks
   tags:
     - xlarge
   artifacts:

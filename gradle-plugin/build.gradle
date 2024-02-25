@@ -11,22 +11,14 @@ plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'java-gradle-plugin'
     id "org.jetbrains.kotlin.kapt"
+    id "com.grab.sizer.kotlin.buildplugin"
     alias(libs.plugins.kotlin.dsl)
-}
-
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-
-    kotlinOptions {
-        jvmTarget = '11'
-    }
 }
 
 dependencies {
     implementation project(':app-sizer')
     implementation libs.android.gradle.plugin
-    implementation libs.gradle.api
+    implementation libs.android.gradle.api
     implementation libs.google.dagger
     kapt libs.dagger.compiler
 }
