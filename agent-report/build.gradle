@@ -16,11 +16,6 @@ dependencies {
     testImplementation libs.kotlin.test
 }
 
-compileJava {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
 
 group = 'com.grab'
 version = "0.0.1"

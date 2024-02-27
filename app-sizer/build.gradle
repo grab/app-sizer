@@ -29,18 +29,6 @@ dependencies {
     testImplementation libs.kotlin.test
 }
 
-//compileKotlin {
-//    kotlinOptions.jvmTarget = '11'
-//}
-//
-//compileTestKotlin {
-//    kotlinOptions.jvmTarget = '11'
-//}
-//
-//compileJava {
-//    sourceCompatibility = JavaVersion.VERSION_11
-//    targetCompatibility = JavaVersion.VERSION_11
-//}
 
 group = 'com.grab'
 version = "SNAPSHOT"
