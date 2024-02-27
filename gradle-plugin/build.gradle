@@ -11,25 +11,14 @@ plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'java-gradle-plugin'
     id "org.jetbrains.kotlin.kapt"
+    id "com.grab.sizer.kotlin.buildplugin"
     alias(libs.plugins.kotlin.dsl)
-}
-
-group = 'com.grab'
-version = "SNAPSHOT"
-
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-
-    kotlinOptions {
-        jvmTarget = '11'
-    }
 }
 
 dependencies {
     implementation project(':app-sizer')
     implementation libs.android.gradle.plugin
-    implementation libs.gradle.api
+    implementation libs.android.gradle.api
     implementation libs.google.dagger
     kapt libs.dagger.compiler
 }
@@ -40,13 +29,14 @@ gradlePlugin {
         sizeAnalysis {
             id = 'com.grab.app-sizer'
             implementationClass = 'com.grab.plugin.sizer.AppSizePlugin'
-            displayName = "SizeAnalysis"
+            displayName = "app-sizer-plugin"
         }
     }
 }
 
-
-def libArtifactId = 'app-sizer'
+group = 'com.grab'
+version = "SNAPSHOT"
+def libArtifactId = 'app-sizer-plugin'
 
 apply from: '../publish.gradle'
 configureArtifact(group, version, libArtifactId)

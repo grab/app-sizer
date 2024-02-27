@@ -1,5 +1,5 @@
 default:
-  image: gitlab.myteksi.net:4567/mobile/pax-android/basic-docker:1.0.1
+  image: gitlab.myteksi.net:4567/mobile/platform/mobile-tooling/base-android:33.1.2
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -7,10 +7,11 @@ variables:
 stages:
   - build
   - test
+  - publish
 
 build:
   stage: build
-  script: ./gradlew assemble
+  script: ./gradlew gradle-plugin:assemble --rerun-tasks
   tags:
     - xlarge
   artifacts:
@@ -26,3 +27,12 @@ test:
   script:
     - cd ./sample
     - ./gradlew app:appSizeAnalysisGpsRelease --stacktrace -Dorg.gradle.debug=false --no-daemon --info
+
+publish_artifact:
+  stage: publish
+  rules:
+    - if: $RELEASE == "publish"
+  tags:
+    - xlarge
+  script:
+    - ./gradlew artifactoryPublish

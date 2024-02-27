@@ -22,21 +22,3 @@ allprojects {
         google()
     }
 }
-
-/*
-subprojects {
-
-    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-        kotlinOptions {
-            jvmTarget = "11"
-        }
-    }
-
-
-    tasks.withType(JavaCompile).configureEach { task ->
-        task.sourceCompatibility = JavaVersion.VERSION_11
-        task.targetCompatibility = JavaVersion.VERSION_11
-    }
-}
-
- */

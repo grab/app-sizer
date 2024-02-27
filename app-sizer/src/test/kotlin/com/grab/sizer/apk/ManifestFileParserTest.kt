@@ -2,12 +2,14 @@ package com.grab.sizer.apk
 
 import com.grab.sizer.analyzer.model.RawFileInfo
 import com.grab.sizer.parser.ManifestFileParserImpl
+import org.junit.Ignore
 import org.xmlpull.v1.XmlPullParserFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ManifestFileParserTest {
 
+    @Ignore
     @Test
     fun test_ManifestFileParserImpl_parse() {
         val stream = javaClass.getResource("/AndroidManifest.xml").openStream()

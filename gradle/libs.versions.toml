@@ -13,14 +13,14 @@ jxls-jexcel = "1.0.9"
 dagger = "2.45"
 gson = "2.10.1"
 kotlin-test = "1.8.20"
-kotlin-dsl = "2.1.7"
+kotlin-dsl = "2.3.3"
 gradle-plugin-publish = "0.14.0"
 android-gradle-plugin = "7.2.2"
 influxdbClient = "2.21"
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android-gradle-plugin" }
-gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "android-gradle-plugin" }
+android-gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "android-gradle-plugin" }
 dexlib2 = { module = "org.smali:dexlib2", version.ref = "dexlib2"  }
 clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt"  }
 bundletool = { module = "com.android.tools.build:bundletool", version.ref = "bundletool"  }
@@ -37,6 +37,7 @@ dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = 
 gson = { module = "com.google.code.gson:gson", version.ref = "gson"  }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-test"  }
 influxdbClient = { module = "org.influxdb:influxdb-java", version.ref = "influxdbClient"  }
+
 
 [plugins]
 kotlin-dsl = { id = "org.gradle.kotlin.kotlin-dsl", version.ref = "kotlin-dsl" }

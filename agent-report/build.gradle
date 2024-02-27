@@ -8,17 +8,22 @@
 
 plugins {
     id "org.jetbrains.kotlin.jvm"
+    id "com.grab.sizer.kotlin.buildplugin"
 }
 
 dependencies {
     implementation libs.gson
-//    testImplementation libs.kotlin.test
+    testImplementation libs.kotlin.test
 }
 
-compileKotlin {
-    kotlinOptions.jvmTarget = '11'
-}
 
-compileTestKotlin {
-    kotlinOptions.jvmTarget = '11'
+group = 'com.grab'
+version = "0.0.1"
+def libArtifactId = 'agent-report'
+
+apply from: '../publish.gradle'
+configureArtifact(group, version, libArtifactId)
+
+repositories {
+    mavenCentral()
 }

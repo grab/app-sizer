@@ -1,11 +1,41 @@
+apply plugin: 'maven-publish'
+
+//ext.configureArtifact = { libGroupId, libVersion, libArtifactId ->
+//
+//    publishing {
+//        repositories {
+//            maven {
+////                url 'http://localhost:8081/artifactory/libs-release-local' //your Artifactory url
+//                url 'https://artifacts.gitlab.myteksi.net/artifactory/'
+//                repoKey = 'mobile--android--local'
+//                credentials {
+//                    username 'admin' //your Artifactory username
+//                    password 'password' //your Artifactory password
+//                }
+//            }
+//        }
+//        publications {
+//            mavenJava(MavenPublication) { publication ->
+//                from components.java
+//                groupId = libGroupId
+//                artifactId = libArtifactId
+//                version = libVersion
+//            }
+//        }
+//    }
+//}
+
+
+
+
 apply plugin: 'com.jfrog.artifactory'
 artifactory {
     contextUrl = "https://artifacts.gitlab.myteksi.net/artifactory"
     publish {
         repository {
             repoKey = 'mobile--android--local'
-            username = System.getenv('ARTIFACTORY_USER')
-            password = System.getenv('ARTIFACTORY_PASSWORD')
+            username = System.getenv('PAX_ARTIFACTORY_USER')
+            password = System.getenv('PAX_ARTIFACTORY_PASSWORD')
             maven = true
         }
     }
