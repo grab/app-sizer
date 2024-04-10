@@ -10,6 +10,7 @@ import java.io.File
 
 class PluginOutputProvider(
     private val extension: AppSizePluginExtension,
+    private val outputFolder : File
 ) : OutputProvider {
     override fun provideInfluxDbConfig(): InfluxDBConfig? {
         val influxDBExtension = extension.metrics.influxDBExtension
@@ -19,7 +20,7 @@ class PluginOutputProvider(
         return null
     }
 
-    override fun provideOutPutDirectory(): File = extension.metrics.localExtension.outputDirectory.asFile.get()
+    override fun provideOutPutDirectory(): File = outputFolder
 }
 
 private fun InfluxDBExtension.toInfluxDBConfig(): InfluxDBConfig = InfluxDBConfig(

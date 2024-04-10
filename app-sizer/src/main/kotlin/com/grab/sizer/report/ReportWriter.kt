@@ -1,5 +1,7 @@
 package com.grab.sizer.report
 
+import java.io.File
+
 
 const val KEY_CONTRIBUTOR = "contributor"
 const val KEY_SIZE = "size"

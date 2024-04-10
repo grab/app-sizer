@@ -19,9 +19,10 @@ class XlsReportWriter(
             }
         }
 
-        File(outputDirectory, "$reportId-report.xls").run {
+        File(File(outputDirectory, report.projectInfo.deviceName), "$reportId-report.xls").apply {
             initOutPutFile()
             workbook.write(outputStream())
+            workbook.close()
         }
     }
 

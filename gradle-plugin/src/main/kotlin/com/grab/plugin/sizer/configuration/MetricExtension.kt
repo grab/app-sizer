@@ -1,18 +1,21 @@
 package com.grab.plugin.sizer.configuration
 
 import groovy.lang.Closure
+import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import javax.inject.Inject
 
-open class MetricExtension @Inject constructor(objects: ObjectFactory) {
-    var influxDBExtension: InfluxDBExtension = objects.newInstance(InfluxDBExtension::class.java, objects)
+open class MetricExtension @Inject constructor(project: Project) {
+    var influxDBExtension: InfluxDBExtension =
+        project.objects.newInstance(InfluxDBExtension::class.java, project.objects)
 
-    val localExtension: LocalExtension = objects.newInstance(LocalExtension::class.java, objects)
+    val localExtension: LocalExtension = project.objects.newInstance(LocalExtension::class.java, project)
 
-    val customAttributes: MapProperty<String, String> = objects.mapProperty(String::class.java, String::class.java)
+    val customAttributes: MapProperty<String, String> =
+        project.objects.mapProperty(String::class.java, String::class.java)
 
     fun influxDB(closure: Closure<*>) {
         closure.delegate = influxDBExtension
@@ -59,6 +62,8 @@ open class InfluxDBExtension @Inject constructor(objects: ObjectFactory) {
 }
 
 
-open class LocalExtension @Inject constructor(objects: ObjectFactory) {
-    var outputDirectory: DirectoryProperty = objects.directoryProperty()
+open class LocalExtension @Inject constructor(project: Project) {
+    var outputDirectory: DirectoryProperty = project.objects.directoryProperty().convention(
+        project.layout.buildDirectory.dir("sizer/reports")
+    )
 }

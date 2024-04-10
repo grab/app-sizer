@@ -78,3 +78,35 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
+
+apply plugin: "com.grab.app-sizer"
+
+appSizeAnalysis {
+    forGrabTeamOnly = false
+    enabled = true
+    android {
+        apk {
+            bundleToolPath = new File(rootProject.rootDir, '/binary/bundletool-all-1.15.4.jar').toString()
+            deviceSpecs = [
+                    file("${rootProject.rootDir}/app-size-config/device-1.json"),
+                    file("${rootProject.rootDir}/app-size-config/device-2.json")
+            ]
+        }
+        variantFilter { variant ->
+            variant.setIgnore(variant.flavors.contains("gea"))
+        }
+    }
+    metrics {
+        influxDB {
+            dbName = "sizer"
+            url = "http://localhost:8086"
+            username = "root"
+            password = "root"
+        }
+
+        customAttributes.putAll(
+                ["pipelineId": "100"]
+        )
+    }
+    featureMappingFile = new File(rootProject.rootDir, 'module-owner.yml')
+}

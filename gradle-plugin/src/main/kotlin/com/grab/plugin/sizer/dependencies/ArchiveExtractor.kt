@@ -1,6 +1,5 @@
 package com.grab.plugin.sizer.dependencies
 
-import com.grab.plugin.sizer.AppSizeTaskScope
 import com.grab.plugin.sizer.utils.isAndroidApplication
 import com.grab.plugin.sizer.utils.isAndroidLibrary
 import com.grab.plugin.sizer.utils.isKotlinJvm
@@ -11,7 +10,7 @@ interface ArchiveExtractor {
     fun extract(project: Project): ArchiveDependency
 }
 
-@AppSizeTaskScope
+@DependenciesScope
 internal class DefaultArchiveExtractor @Inject constructor(
     private val variantExtractor: VariantExtractor
 ) : ArchiveExtractor {
@@ -25,7 +24,7 @@ internal class DefaultArchiveExtractor @Inject constructor(
                 )
             }
 
-            project.isAndroidLibrary -> {
+            project.isAndroidLibrary || project.isKotlinJvm -> {
                 return ModuleDependency(
                     name = project.path,
                     pathToArtifact = matchVariant.binaryOutPut.path

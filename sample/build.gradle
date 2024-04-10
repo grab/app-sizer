@@ -16,36 +16,3 @@ plugins {
     id 'org.jetbrains.kotlin.android' version '1.8.20' apply false
     id 'org.jetbrains.kotlin.jvm' version '1.8.20' apply false
 }
-
-apply plugin: "com.grab.app-sizer"
-
-appSizeAnalysis {
-    enabled = true
-    android {
-        apk {
-            bundleToolPath = new File(project.rootDir, '/binary/bundletool-all-1.15.4.jar').toString()
-            deviceSpecs = [
-                    file("${rootProject.rootDir}/app-size-config/device-1.json")
-            ]
-        }
-        variantFilter { variant ->
-            variant.setIgnore(variant.flavors.contains("gea"))
-        }
-    }
-    metrics {
-        influxDB {
-            dbName = "sizer"
-            url = "http://localhost:8086"
-            username = "root"
-            password = "root"
-        }
-        local {
-            outputDirectory = new File(project.buildDir, "sizer-report")
-        }
-
-        customAttributes.putAll(
-                ["pipelineId": "100"]
-        )
-    }
-    featureMappingFile = new File(project.rootDir, 'module-owner.yml')
-}

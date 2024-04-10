@@ -7,7 +7,12 @@ import com.android.build.gradle.internal.dsl.ProductFlavor
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import com.grab.plugin.sizer.configuration.DefaultVariantFilter
 import com.grab.plugin.sizer.dependencies.AndroidAppSizeVariant
+import com.grab.plugin.sizer.dependencies.DaggerDependenciesComponent
+import com.grab.plugin.sizer.dependencies.DependenciesComponent
 import com.grab.plugin.sizer.dependencies.VariantExtractor
+import com.grab.plugin.sizer.tasks.AppSizeAnalysisTask
+import com.grab.plugin.sizer.tasks.GenerateApkTask
+import com.grab.plugin.sizer.tasks.GenerateArchiveDependencyTask
 import com.grab.plugin.sizer.utils.isAndroidApplication
 import com.grab.plugin.sizer.utils.isAndroidLibrary
 import com.grab.plugin.sizer.utils.isJava
@@ -23,16 +28,13 @@ internal class TaskManager(
 ) {
     fun configTasks() {
         if (pluginExtension.enabled) {
-            project.gradle.projectsEvaluated {
-                project.subprojects.forEach { subProject ->
-                    if (subProject.isAndroidApplication) {
-                        configAppSizeTask(subProject)
-                    }
+            project.rootProject.gradle.projectsEvaluated {
+                if (project.isAndroidApplication) {
+                    configAppSizeTask(project)
                 }
             }
         }
     }
-
 
     private fun configAppSizeTask(project: Project) {
         with(project.the<AppExtension>()) {
@@ -40,64 +42,64 @@ internal class TaskManager(
                 val variantFilter = DefaultVariantFilter(variant)
                 pluginExtension.android.variantFilter?.execute(variantFilter)
                 if (!variantFilter.ignored) {
-                    val appSizeTaskComponent = DaggerAppSizeTaskComponent.factory().create(
-                        project = project,
-                        variant = variant,
-                        flavorMatchingFallbacks = getProductFlavor(variant)?.matchingFallbacks ?: emptyList(),
-                        buildTypeMatchingFallbacks = getOriginalBuildType(variant).matchingFallbacks
-                    )
-
                     val generateApkTask = GenerateApkTask.registerTask(
                         project,
                         pluginExtension,
                         variant
                     )
 
+                    val generateArchiveDependencyTask = GenerateArchiveDependencyTask.registerTask(
+                        project,
+                        variant = variant,
+                        flavorMatchingFallbacks = getProductFlavor(variant)?.matchingFallbacks ?: emptyList(),
+                        buildTypeMatchingFallbacks = getOriginalBuildType(variant).matchingFallbacks
+                    )
+
+
                     val appSizeAnalysisTask = AppSizeAnalysisTask.registerTask(
                         project,
+                        variant,
                         pluginExtension,
-                        appSizeTaskComponent,
-                        generateApkTask
+                        generateApkTask,
+                        generateArchiveDependencyTask,
                     )
-                    appSizeAnalysisTask.dependsOn(generateApkTask)
-                    registerAppSizeTaskDep(project, appSizeTaskComponent, appSizeAnalysisTask)
+                    registerAppSizeTaskDep(project, variant, this, appSizeAnalysisTask)
                 }
             }
         }
     }
 
-    private fun AppExtension.getProductFlavor(variant: BaseVariant): ProductFlavor? = productFlavors.find {
-        it.name == variant.flavorName
-    }
-
-    private fun AppExtension.getOriginalBuildType(variant: BaseVariant): BuildType = buildTypes.first {
-        it.name == variant.buildType.name
-    }
-
     private fun registerAppSizeTaskDep(
         project: Project,
-        appSizeTaskComponent: AppSizeTaskComponent,
+        variant: BaseVariant,
+        appExtension: AppExtension,
         appSizeTask: TaskProvider<AppSizeAnalysisTask>
     ) {
+        val dependenciesComponent = DaggerDependenciesComponent.factory().create(
+            project = project,
+            variant = variant,
+            flavorMatchingFallbacks = appExtension.getProductFlavor(variant)?.matchingFallbacks ?: emptyList(),
+            buildTypeMatchingFallbacks = appExtension.getOriginalBuildType(variant).matchingFallbacks
+        )
         val markAsChecked = mutableSetOf<String>()
-        dfs(project, markAsChecked, appSizeTaskComponent, appSizeTask)
+        dfs(project, markAsChecked, dependenciesComponent, appSizeTask)
     }
 
     private fun dfs(
         project: Project,
         markAsChecked: MutableSet<String>,
-        appSizeTaskComponent: AppSizeTaskComponent,
+        dependenciesComponent: DependenciesComponent,
         appSizeTask: TaskProvider<AppSizeAnalysisTask>
     ) {
         if (markAsChecked.contains(project.path)) return
         markAsChecked.add(project.path)
-        handleSubProject(project, appSizeTask, appSizeTaskComponent.variantExtractor())
-        appSizeTaskComponent.configurationExtractor()
+        handleSubProject(project, appSizeTask, dependenciesComponent.variantExtractor())
+        dependenciesComponent.configurationExtractor()
             .runtimeConfigurations(project)
             .flatMap { configuration ->
                 configuration.dependencies.withType(DefaultProjectDependency::class.java)
             }.forEach {
-                dfs(it.dependencyProject, markAsChecked, appSizeTaskComponent, appSizeTask)
+                dfs(it.dependencyProject, markAsChecked, dependenciesComponent, appSizeTask)
             }
     }
 
@@ -124,4 +126,12 @@ internal class TaskManager(
         }
 
     }
+}
+
+internal fun AppExtension.getProductFlavor(variant: BaseVariant): ProductFlavor? = productFlavors.find {
+    it.name == variant.flavorName
+}
+
+internal fun AppExtension.getOriginalBuildType(variant: BaseVariant): BuildType = buildTypes.first {
+    it.name == variant.buildType.name
 }

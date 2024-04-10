@@ -1,50 +1,51 @@
 package com.grab.plugin.sizer.dependencies
 
-import com.grab.plugin.sizer.AppSizeTaskScope
 import com.grab.sizer.utils.Logger
 import com.grab.sizer.utils.log
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ResolveException
+import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.internal.artifacts.DefaultResolvedDependency
-import org.gradle.api.internal.artifacts.DependencyGraphNodeResult
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency
 import java.util.*
 import javax.inject.Inject
 
+typealias ArchiveDependencyStore = HashSet<ArchiveDependency>
+
 interface DependencyExtractor {
-    fun extract(): DependencyGraph
+    fun extract(): ArchiveDependencyStore
 }
 
 
 private const val INTERNAL_DEP_VERSION = "unspecified"
 
-@AppSizeTaskScope
+@DependenciesScope
 class DefaultDependencyExtractor @Inject constructor(
     private val appProject: Project,
     private val configurationExtractor: ConfigurationExtractor,
     private val archiveExtractor: ArchiveExtractor,
     private val logger: Logger
 ) : DependencyExtractor {
-    override fun extract(): DependencyGraph {
-        val dependencyGraph = MutableDependencyGraph()
-        val checkedProjects = mutableSetOf<String>()
-        val queue: Queue<Project> = LinkedList<Project>().apply { add(appProject) }
+    override fun extract(): ArchiveDependencyStore {
+        return ArchiveDependencyStore().apply {
+            val checkedProjects = mutableSetOf<String>()
+            val queue: Queue<Project> = LinkedList<Project>().apply { add(appProject) }
 
-        while (queue.isNotEmpty()) {
-            val project = queue.poll()
-            val projectArchive = archiveExtractor.extract(project)
-            fetchInternalDependency(project, dependencyGraph, projectArchive, checkedProjects, queue)
-            fetchExternalDependency(project, projectArchive, dependencyGraph, checkedProjects)
+            while (queue.isNotEmpty()) {
+                val project = queue.poll()
+                val projectArchive = archiveExtractor.extract(project)
+                add(projectArchive)
+                fetchInternalDependency(project, this, checkedProjects, queue)
+                fetchExternalDependency(project, this)
+            }
         }
-        return dependencyGraph
     }
 
     private fun fetchInternalDependency(
         project: Project,
-        dependencyGraph: MutableDependencyGraph,
-        projectArchive: ArchiveDependency,
-        checkedProjects : MutableSet<String>,
+        archiveDependencyStore: ArchiveDependencyStore,
+        checkedProjects: MutableSet<String>,
         queue: Queue<Project>
     ) {
         configurationExtractor.runtimeConfigurations(project)
@@ -52,11 +53,10 @@ class DefaultDependencyExtractor @Inject constructor(
             .filterIsInstance<DefaultProjectDependency>()
             .map { it.dependencyProject }
             .forEach { dependencyProject ->
-                dependencyGraph.addDependency(
-                    projectArchive,
+                archiveDependencyStore.add(
                     archiveExtractor.extract(dependencyProject)
                 )
-                if(!checkedProjects.contains(dependencyProject.path)){
+                if (!checkedProjects.contains(dependencyProject.path)) {
                     queue.add(dependencyProject)
                     checkedProjects.add(dependencyProject.path)
                 }
@@ -65,9 +65,7 @@ class DefaultDependencyExtractor @Inject constructor(
 
     private fun fetchExternalDependency(
         project: Project,
-        projectArchive: ArchiveDependency,
-        dependencyGraph: MutableDependencyGraph,
-        checkedProjects : MutableSet<String>,
+        archiveDependencyStore: ArchiveDependencyStore
     ) {
         configurationExtractor.runtimeConfigurations(project)
             .filter { it.isCanBeResolved }
@@ -83,43 +81,16 @@ class DefaultDependencyExtractor @Inject constructor(
             .filterIsInstance<DefaultResolvedDependency>()
             .forEach { resolvedDep ->
                 if (resolvedDep.moduleVersion != INTERNAL_DEP_VERSION) {
-                    val archiveResolvedDep = resolvedDep.toArchiveDependency()
-                    dependencyGraph.addDependency(projectArchive, archiveResolvedDep)
-
-                    //if the lib haven't fetched the transitive dep
-                    if(!checkedProjects.contains(resolvedDep.name)){
-                        checkedProjects.add(resolvedDep.name)
-                        val transitiveQueue = LinkedList<DependencyGraphNodeResult>()
-                        transitiveQueue.add(resolvedDep)
-                        while (transitiveQueue.isNotEmpty()) {
-                            val item = transitiveQueue.poll()
-
-                            item.outgoingEdges.forEach {
-                                logger.log("Fetch dependency ${it.publicView.name}")
-                                // Todo - check bom file dependencies "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.7.3"
-                                if (it.publicView.allModuleArtifacts.isNotEmpty()) {
-                                    dependencyGraph.addDependency(archiveResolvedDep, it.toArchiveDependency())
-                                }
-                            }
-                        }
+                    resolvedDep.allModuleArtifacts.forEach { artifact ->
+                        archiveDependencyStore.add(artifact.toArchiveDependency())
                     }
                 }
-
             }
     }
 }
 
-private fun DependencyGraphNodeResult.toArchiveDependency(): ArchiveDependency = ExternalDependency(
-    name = publicView.name,
-    group = publicView.moduleGroup,
-    version = publicView.moduleVersion,
-    pathToArtifact = publicView.allModuleArtifacts.first().file.path
-)
-
-private fun DefaultResolvedDependency.toArchiveDependency(): ArchiveDependency = ExternalDependency(
-    name = name,
-    group = moduleGroup,
-    version = moduleVersion,
-    pathToArtifact = allModuleArtifacts.first().file.path
+private fun ResolvedArtifact.toArchiveDependency(): ArchiveDependency = ExternalDependency(
+    name = id.displayName,
+    pathToArtifact = file.path
 )
 

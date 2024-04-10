@@ -2,8 +2,6 @@ package com.grab.plugin.sizer.dependencies
 
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
-import com.android.build.gradle.internal.dsl.BuildType
-import com.grab.plugin.sizer.AppSizeTaskScope
 import com.grab.plugin.sizer.utils.isAndroidApplication
 import com.grab.plugin.sizer.utils.isAndroidLibrary
 import com.grab.plugin.sizer.utils.isJava
@@ -29,9 +27,11 @@ internal interface VariantExtractor {
 internal interface AppSizeVariant {
     val binaryOutPut: File
     val runtimeConfiguration: Configuration
+    val buildType: String
+    val buildFlavor: String
 }
 
-@AppSizeTaskScope
+@DependenciesScope
 internal class DefaultVariantExtractor @Inject constructor(
     private val baseVariant: BaseVariant,
     @Named(BUILD_FLAVOR)
@@ -94,7 +94,7 @@ internal class DefaultVariantExtractor @Inject constructor(
             variant.buildType.name == BUILD_TYPE_DEBUG
         }
 
-        if(matchDefaultBuildType.isNotEmpty()){
+        if (matchDefaultBuildType.isNotEmpty()) {
             if (matchDefaultBuildType.size == 1) return matchDefaultBuildType.first()
             flavorMatchingFallbacks.forEach { fallback ->
                 matchDefaultBuildType.forEach { variant ->
@@ -120,6 +120,11 @@ internal class JarAppSizeVariant(
             it.name.contains("RuntimeClasspath", true)
         }
     }
+
+    override val buildType: String
+        get() = ""
+    override val buildFlavor: String
+        get() = ""
 }
 
 internal class AndroidAppSizeVariant(
@@ -129,4 +134,8 @@ internal class AndroidAppSizeVariant(
         get() = baseVariant.outputs.first().outputFile
     override val runtimeConfiguration: Configuration
         get() = baseVariant.runtimeConfiguration
+    override val buildType: String
+        get() = baseVariant.buildType.name
+    override val buildFlavor: String
+        get() = baseVariant.flavorName
 }

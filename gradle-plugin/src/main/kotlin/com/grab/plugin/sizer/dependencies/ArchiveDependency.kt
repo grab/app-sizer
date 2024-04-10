@@ -9,9 +9,7 @@ interface ArchiveDependency {
 
 data class ExternalDependency(
     override val name: String,
-    override val pathToArtifact: String,
-    val group: String,
-    val version: String
+    override val pathToArtifact: String
 ) : ArchiveDependency {
     override val id: String
         get() = name
