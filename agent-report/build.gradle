@@ -16,9 +16,6 @@ dependencies {
     testImplementation libs.kotlin.test
 }
 
-
-group = 'com.grab'
-version = "0.0.1"
 def libArtifactId = 'agent-report'
 
 apply from: '../publish.gradle'

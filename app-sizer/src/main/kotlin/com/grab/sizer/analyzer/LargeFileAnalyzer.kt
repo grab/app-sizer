@@ -55,7 +55,7 @@ internal class LargeFileAnalyzer @Inject constructor(
     private fun report(apks: Set<ApkFileInfo>, contributors: Set<Contributor>) {
         contributors.filterLargeFileContributors()
             .toFeatures(featureMapping).also { features ->
-                reportLargeFiles(apks, features)
+                reportLargeFiles(features)
             }
 
     }
@@ -67,7 +67,7 @@ internal class LargeFileAnalyzer @Inject constructor(
     }.filter { it.resources.isNotEmpty() || it.assets.isNotEmpty() }
         .toSet()
 
-    private fun reportLargeFiles(apks: Set<ApkFileInfo>, features: List<Feature>) {
+    private fun reportLargeFiles(features: List<Feature>) {
         val sortedFeaturesReport = features.sorByResources()
         val reportRows = sortedFeaturesReport.toReportRows()
 

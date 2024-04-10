@@ -11,6 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.grab.android.sample"
+        archivesBaseName = "sample-bundle-file"
         minSdk 21
         targetSdk 32
         versionCode 1

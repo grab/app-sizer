@@ -1,13 +1,13 @@
 package com.grab.sizer
 
-import com.grab.sizer.report.db.InfluxDbConfig
+import com.grab.sizer.report.db.InfluxDBConfig
 import com.grab.sizer.utils.OutputProvider
 import java.io.File
 
 class CltOutputProvider(
     private val outputDirectory: File,
 ) : OutputProvider {
-    override fun provideInfluxDbConfig(): InfluxDbConfig? {
+    override fun provideInfluxDbConfig(): InfluxDBConfig? {
         TODO("Not yet implemented")
     }
 

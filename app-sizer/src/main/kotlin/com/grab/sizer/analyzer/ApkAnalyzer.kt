@@ -10,7 +10,7 @@ import java.io.File
 import java.util.*
 import javax.inject.Inject
 
-internal const val METRICS_ID_APK = "mobile.pax.app.sizer.app5"
+internal const val METRICS_ID_APK = "mobile.pax.app.size.app5"
 
 internal class ApkAnalyzer @Inject constructor(
     private val apkComponentAnalytic: ApkComponentProcessor,

@@ -12,18 +12,18 @@ ext.flavorConfig = {
 
     flavorDimensions "service"
     productFlavors {
-        // flavor for Huawei Mobile Service
-        hms {
+        // flavor for production
+        pro {
             dimension "service"
         }
-        // flavor for Google Play Service
-        gps {
+        // flavor for early access
+        gea {
             dimension "service"
         }
     }
 
     variantFilter { variant ->
         def names = variant.flavors*.name
-        if(!names.contains("gps")) setIgnore(true)
+        if(!names.contains("pro")) setIgnore(true)
     }
 }

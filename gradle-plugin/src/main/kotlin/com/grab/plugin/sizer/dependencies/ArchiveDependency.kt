@@ -14,7 +14,7 @@ data class ExternalDependency(
     val version: String
 ) : ArchiveDependency {
     override val id: String
-        get() = "$name:$group:$version"
+        get() = name
 
     override fun hashCode(): Int = id.hashCode()
     override fun equals(other: Any?): Boolean {
@@ -51,7 +51,7 @@ data class JavaModuleDependency(override val name: String, override val pathToAr
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as ModuleDependency
+        other as JavaModuleDependency
 
         return id == other.id
     }
@@ -67,7 +67,7 @@ data class AppDependency(override val name: String, override val pathToArtifact:
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as ModuleDependency
+        other as AppDependency
 
         return id == other.id
     }

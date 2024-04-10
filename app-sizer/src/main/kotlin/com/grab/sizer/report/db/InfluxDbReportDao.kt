@@ -16,12 +16,24 @@ import javax.inject.Inject
 
 private const val SHOW_DATABASE_COMMAND = "SHOW DATABASES"
 
-data class InfluxDbConfig(
-    var dbName: String, var url: String, var username: String?, var password: String?
+data class InfluxDBConfig(
+    val dbName: String,
+    val url: String,
+    val username: String?,
+    val password: String?,
+    val databaseRetentionPolicy: DatabaseRetentionPolicy
+)
+
+data class DatabaseRetentionPolicy(
+    val name: String,
+    val duration: String,
+    val shardDuration: String,
+    val replicationFactor: Int,
+    val isDefault: Boolean,
 )
 
 class InfluxDBFactory {
-    fun create(config: InfluxDbConfig): InfluxDB {
+    fun create(config: InfluxDBConfig): InfluxDB {
         return org.influxdb.InfluxDBFactory.connect(config.url, config.username, config.password).apply {
             setLogLevel(InfluxDB.LogLevel.FULL)
             enableBatch(
@@ -39,22 +51,39 @@ class InfluxDBFactory {
 
 class InfluxDbReportDao @Inject constructor(
     private val influxDB: InfluxDB,
-    private val config: InfluxDbConfig
+    private val config: InfluxDBConfig
 ) : ReportDao {
     init {
 
         if (databaseExists(config.dbName)) {
             influxDB.setDatabase(config.dbName)
         } else {
-            createDatabase(config.dbName)
+            createDatabase(config)
             influxDB.setDatabase(config.dbName)
         }
     }
 
-    private fun createDatabase(name: String) {
-        Preconditions.checkNonEmptyString(name, "name")
-        val createDatabaseQueryString = String.format("CREATE DATABASE \"%s\"", name)
-        influxDB.query(Query(createDatabaseQueryString))
+    private fun createDatabase(influxDBConfig: InfluxDBConfig) {
+        Preconditions.checkNonEmptyString(influxDBConfig.dbName, "name")
+        influxDB.query(
+            Query(
+                "CREATE DATABASE ${influxDBConfig.dbName}"
+            )
+        )
+
+        val retentionPolicy = influxDBConfig.databaseRetentionPolicy
+
+        influxDB.query(
+            Query(
+                """CREATE RETENTION POLICY ${retentionPolicy.name} 
+                    |ON ${influxDBConfig.dbName} 
+                    |DURATION ${retentionPolicy.duration} 
+                    |REPLICATION ${retentionPolicy.replicationFactor} 
+                    |SHARD DURATION ${retentionPolicy.shardDuration} 
+                    |${if (retentionPolicy.isDefault) "DEFAULT" else ""}
+                    |""".trimMargin()
+            )
+        )
     }
 
     private fun describeDatabases(): List<String> {

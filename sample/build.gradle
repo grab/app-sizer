@@ -20,21 +20,24 @@ plugins {
 apply plugin: "com.grab.app-sizer"
 
 appSizeAnalysis {
+    enabled = true
     android {
         apk {
             bundleToolPath = new File(project.rootDir, '/binary/bundletool-all-1.15.4.jar').toString()
-            bundleFilePath = "${project.rootDir}/app/build/outputs/bundle/gpsRelease/app-gps-release.aab"
+            deviceSpecs = [
+                    file("${rootProject.rootDir}/app-size-config/device-1.json")
+            ]
         }
         variantFilter { variant ->
-            variant.setIgnore(isIgnoredVariant(variant))
+            variant.setIgnore(variant.flavors.contains("gea"))
         }
     }
     metrics {
-        influxDbPublisher {
+        influxDB {
             dbName = "sizer"
-            url = "http://10.197.86.135:8086"
-            username = "talaiot"
-            password = "UrMpvi3uC6Wc1owj"
+            url = "http://localhost:8086"
+            username = "root"
+            password = "root"
         }
         local {
             outputDirectory = new File(project.buildDir, "sizer-report")

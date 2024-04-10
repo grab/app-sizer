@@ -1,6 +1,6 @@
 package com.grab.sizer.utils
 
-import com.grab.sizer.report.db.InfluxDbConfig
+import com.grab.sizer.report.db.InfluxDBConfig
 import java.io.File
 
 interface InputProvider {
@@ -14,6 +14,6 @@ interface InputProvider {
 }
 
 interface OutputProvider {
-    fun provideInfluxDbConfig(): InfluxDbConfig?
+    fun provideInfluxDbConfig(): InfluxDBConfig?
     fun provideOutPutDirectory(): File
 }
