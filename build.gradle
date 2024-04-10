@@ -16,9 +16,14 @@ buildscript {
     }
 }
 
-allprojects {
+subprojects {
     repositories {
         mavenCentral()
         google()
     }
+
+    group = 'com.grab'
+    version = System.getenv("CI")?.toBoolean() ?  "SNAPSHOT8" : "SNAPSHOT8"
 }
+
+

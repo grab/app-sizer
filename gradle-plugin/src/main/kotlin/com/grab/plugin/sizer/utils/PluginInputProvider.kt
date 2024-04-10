@@ -5,7 +5,6 @@ import com.grab.plugin.sizer.AppSizePluginExtension
 import com.grab.plugin.sizer.dependencies.*
 import com.grab.sizer.utils.InputProvider
 import org.gradle.api.Project
-import org.gradle.api.file.RegularFileProperty
 import java.io.File
 
 private const val EXT_AAR = "aar"
@@ -16,7 +15,7 @@ class PluginInputProvider(
     private val extension: AppSizePluginExtension,
     private val project: Project,
     private val variant: BaseVariant,
-    private val apksDirectory: RegularFileProperty
+    private val apksDirectory: File,
 ) : InputProvider {
     override fun provideModuleAar(): Sequence<File> =
         dependencyGraph.getModuleDependency().map { File(it.pathToArtifact) }
@@ -33,9 +32,7 @@ class PluginInputProvider(
         .filter { it.extension.equals(EXT_AAR, true) }
 
     override fun provideApkFiles(): Sequence<File> {
-        return apksDirectory.asFile.get()
-            .listFiles()
-            ?.asSequence() ?: emptySequence()
+        return apksDirectory.listFiles()?.asSequence() ?: emptySequence()
     }
 
     override fun provideR8MappingFile(): File? {

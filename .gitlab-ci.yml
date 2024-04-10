@@ -26,10 +26,10 @@ test:
     - xlarge
   script:
     - cd ./sample
-    - ./gradlew app:appSizeAnalysisGpsRelease --stacktrace -Dorg.gradle.debug=false --no-daemon --info
+    - ./gradlew app:appSizeAnalysisProRelease --stacktrace -Dorg.gradle.debug=false --no-daemon --info
 
 publish_artifact:
-  stage: publish
+  stage: build
   rules:
     - if: $RELEASE == "publish"
   tags:

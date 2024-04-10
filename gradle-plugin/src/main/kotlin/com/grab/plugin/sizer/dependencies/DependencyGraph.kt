@@ -5,25 +5,26 @@ interface DependencyGraph {
     fun getDependenciesOf(module: ArchiveDependency): Set<ArchiveDependency>
 }
 
+/**
+ * This class is a adjacency list of a graph.
+ */
 class MutableDependencyGraph : DependencyGraph {
     private val adjacencyList = mutableMapOf<ArchiveDependency, MutableList<ArchiveDependency>>()
-
-    fun setDependencies(from: ArchiveDependency, to: List<ArchiveDependency>) {
-        adjacencyList[from] = to.toMutableList()
-    }
+    private val nodeCache = mutableMapOf<String, ArchiveDependency>()
 
     fun addDependency(from: ArchiveDependency, to: ArchiveDependency) {
-        adjacencyList.getOrPut(from) { mutableListOf() }.add(to)
+        val noDuplicateFrom = nodeCache[from.id] ?: from
+        val noDuplicateTo = nodeCache[to.id] ?: to
+        adjacencyList.getOrPut(noDuplicateFrom) { mutableListOf() }.add(noDuplicateTo)
+        nodeCache[from.id] = noDuplicateFrom
+        nodeCache[to.id] = noDuplicateTo
     }
 
     override fun getDependenciesOf(module: ArchiveDependency): Set<ArchiveDependency> {
         return adjacencyList[module]?.toSet() ?: emptySet()
     }
 
-    override fun getAll(): Sequence<ArchiveDependency> = adjacencyList.values
-        .asSequence()
-        .flatMap { it }
-        .distinct()
+    override fun getAll(): Sequence<ArchiveDependency> = nodeCache.values.asSequence()
 
     override fun toString(): String {
         return StringBuilder().apply {

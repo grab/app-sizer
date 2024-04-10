@@ -7,7 +7,7 @@ import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.*
 import javax.inject.Inject
 
-internal const val METRICS_ID_BASIC = "mobile.pax.app.sizer.components5"
+internal const val METRICS_ID_BASIC = "mobile.pax.app.size.components5"
 
 internal class BasicApkAnalyzer @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
@@ -22,7 +22,7 @@ internal class BasicApkAnalyzer @Inject constructor(
         val dexCompressedRatio = androidBinaryInfo.dexDownloadRatio()
         reportWriters.forEach {
             it.write(
-                AnalyticsOption.BASIC.name.toLowerCase(),
+                AnalyticsOption.BASIC.name.lowercase(),
                 Report(
                     rows = androidBinaryInfo.createApkReportRows(dexCompressedRatio),
                     id = METRICS_ID_BASIC,

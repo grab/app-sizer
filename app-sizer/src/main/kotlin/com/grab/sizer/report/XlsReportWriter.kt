@@ -3,6 +3,7 @@ package com.grab.sizer.report
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import java.io.File
+import java.util.*
 
 private const val KILO_BYTE = 1024L
 private const val MEGA_BYTE = 1024L * 1024L
@@ -12,7 +13,7 @@ class XlsReportWriter(
 ) : ReportWriter {
     override fun write(reportId: String, report: Report) {
         val workbook = WorkbookFactory.create(false).apply {
-            createSheet("Apk Analyzer Report").apply {
+            createSheet("App Sizer Report").apply {
                 createHeader(this, report.rows)
                 createRows(report.rows, this)
             }
@@ -30,9 +31,8 @@ class XlsReportWriter(
     ) {
         rows.forEachIndexed { i, row ->
             sheet.createRow(i + 1).apply {
-                createCell(0).apply { setCellValue(row.name) }
                 row.fields.forEachIndexed { index, field ->
-                    createCell(index + 1).apply {
+                    createCell(index).apply {
                         when (field.value) {
                             is Long -> setCellValue((field.value as Long).reportSize())
                             else -> setCellValue(field.value.toString())
@@ -49,10 +49,13 @@ class XlsReportWriter(
     ) {
         sheet.createRow(0).also { sheetRow ->
             rows.firstOrNull()?.apply {
-                this.fields.map { field -> field.name }
-                    .forEachIndexed { i, text ->
-                        sheetRow.createCell(i).apply { setCellValue(text) }
+                this.fields.map { field ->
+                    field.name.replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
                     }
+                }.forEachIndexed { i, text ->
+                    sheetRow.createCell(i).apply { setCellValue(text) }
+                }
             }
         }
     }

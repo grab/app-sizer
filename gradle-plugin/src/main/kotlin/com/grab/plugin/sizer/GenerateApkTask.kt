@@ -1,15 +1,17 @@
 package com.grab.plugin.sizer
 
 import com.android.build.gradle.api.ApplicationVariant
+import com.android.build.gradle.internal.tasks.FinalizeBundleTask
 import com.android.builder.model.SigningConfig
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import java.io.File
-import java.io.IOException
 
 private const val DEFAULT_DEVICE_SPEC = """
     {
@@ -20,19 +22,15 @@ private const val DEFAULT_DEVICE_SPEC = """
 }
 """
 
-private const val BUNDLE_EXTENSION = ".aab"
-
 internal const val DEFAULT_DEVICE_NAME = "default_device"
 
 internal abstract class GenerateApkTask : DefaultTask() {
-
-
     @get:Input
     abstract val bundleToolPath: Property<String>
 
-    @get:Input
-    @get:Optional
-    abstract val deviceSpecFilePath: Property<String?>
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val deviceSpecFiles: ConfigurableFileCollection
 
     @get:InputFile
     abstract val bundleFile: RegularFileProperty
@@ -40,68 +38,75 @@ internal abstract class GenerateApkTask : DefaultTask() {
     @get:Input
     abstract val signingConfig: Property<InternalSigningConfig>
 
-    @get:OutputDirectory
-    abstract val outputDirectory: RegularFileProperty
+    @get:Input
+    abstract val outputDirectoryPath: Property<String>
+
+    /**
+     * The task will generate a set of APKs for each device specification.
+     * Each of these sets will then be stored in its own distinct folder. And they all listed in outputDirectories
+     */
+    @get:OutputDirectories
+    val outputDirectories: FileCollection
+        get() {
+            return project.files(apkDirectories)
+        }
+
+    private val apkDirectories = mutableListOf<File>()
 
     @TaskAction
     fun generateApk() {
-        val apksTempFile = File.createTempFile("app", ".apks")
-        var tempDeviceConfigFile: File? = null
-
-        val deviceSpec = if (deviceSpecFilePath.orNull != null) {
-            deviceSpecFilePath.get()
+        val deviceSpecs = if (deviceSpecFiles.isEmpty) {
+            setOf(
+                File.createTempFile("device_config", ".json")
+                    .apply {
+                        writeBytes(
+                            DEFAULT_DEVICE_SPEC.toByteArray()
+                        )
+                    }
+            )
         } else {
-            tempDeviceConfigFile = File.createTempFile("device_config", ".json")
-                .apply {
-                    writeBytes(
-                        DEFAULT_DEVICE_SPEC.toByteArray()
-                    )
+            deviceSpecFiles
+        }
+
+        deviceSpecs.forEach { deviceSpecFile ->
+            File.createTempFile(deviceSpecFile.name, ".apks").run {
+                try {
+                    generateApksFile(this, deviceSpecFile.path)
+                    val outputDir = File(outputDirectoryPath.get(), deviceSpecFile.name).apply {
+                        if (!exists()) {
+                            mkdirs()
+                        } else {
+                            clearDirectory()
+                        }
+                    }
+                    extractApksToDirectory(this, deviceSpecFile.path, outputDir)
+                    apkDirectories.add(outputDir)
+                } finally {
+                    delete()
+                    project.logger.log(LogLevel.INFO, "Temp files were deleted")
                 }
-            tempDeviceConfigFile.path
-        }
-
-        try {
-            generateApksFile(apksTempFile, deviceSpec)
-            emptyOutPutDirectory()
-            extractApksToDirectory(apksTempFile, deviceSpec)
-        } finally {
-            apksTempFile.delete()
-            tempDeviceConfigFile?.delete()
-            project.logger.log(LogLevel.INFO, "Temp files were deleted")
-        }
-    }
-
-    private fun fetchBundlePath(): String {
-        val file = File(bundleToolPath.get())
-        if (file.isFile) return file.path
-        if (file.isDirectory) {
-            val files = file.listFiles { _, name -> name.endsWith(BUNDLE_EXTENSION) }
-            return when {
-                files == null || files.isEmpty() -> throw IOException("No app bundles found in the directory.")
-                files.size > 1 -> throw IOException("More than one app bundle found in the directory.")
-                else -> files[0].path
             }
         }
-        throw IOException("Can not find the bundle file")
     }
 
-    private fun extractApksToDirectory(apksTempFile: File, deviceSpec: String?) {
+    private fun extractApksToDirectory(apksTempFile: File, deviceSpec: String, outputDirectory: File) {
         project.exec {
             commandLine(
                 "java",
                 "-jar",
-                fetchBundlePath(),
+                bundleToolPath.get(),
                 "extract-apks",
                 "--apks=${apksTempFile.path}",
-                "--output-dir=${outputDirectory.asFile.get().path}",
+                "--output-dir=${outputDirectory.path}",
                 "--device-spec=${deviceSpec}",
             )
         }
-        project.logger.log(LogLevel.QUIET, "The Apks were extracted successfully")
+        project.logger.log(LogLevel.QUIET, "The Apks for $deviceSpec were extracted successfully")
     }
 
-    private fun generateApksFile(apksTempFile: File, deviceSpec: String?) {
+    private fun generateApksFile(apksTempFile: File, deviceSpec: String) {
         val realSigningConfig = signingConfig.get()
+
         project.exec {
             commandLine(
                 "java",
@@ -112,6 +117,7 @@ internal abstract class GenerateApkTask : DefaultTask() {
                 "--output=${apksTempFile.path}",
                 "--ks=${realSigningConfig.storeFile}",
                 "--ks-pass=pass:${realSigningConfig.storePassword}",
+                "--key-pass=pass:${realSigningConfig.keyPassword}",
                 "--ks-key-alias=${realSigningConfig.keyAlias}",
                 "--device-spec=${deviceSpec}",
                 "--overwrite"
@@ -120,29 +126,33 @@ internal abstract class GenerateApkTask : DefaultTask() {
         project.logger.log(LogLevel.QUIET, "The app.apks generated successfully")
     }
 
-    private fun emptyOutPutDirectory() {
-        outputDirectory.asFile.get()
-            .listFiles()
-            ?.forEach { apk ->
-                apk.delete()
-            }
+    private fun File.clearDirectory() {
+        if (!exists()) return
+        if (!isDirectory) throw RuntimeException("The ${this.path} file is not a directory")
+        walk().forEach { apk ->
+            apk.delete()
+        }
     }
 
     companion object {
         fun registerTask(
             project: Project,
             extension: AppSizePluginExtension,
-            variant: ApplicationVariant,
-            apkDirectory: File
+            variant: ApplicationVariant
         ): TaskProvider<GenerateApkTask> {
-            return project.tasks.register("generateApkFor${variant.name.capitalize()}", GenerateApkTask::class.java) {
-                dependsOn("bundle${variant.name.capitalize()}")
-                deviceSpecFilePath.set(project.params().deviceSpec())
-                bundleToolPath.set(extension.android.apk.bundleToolPath.get())
-                outputDirectory.set(apkDirectory)
-                bundleFile.set(project.file(extension.android.apk.bundleFilePath))
+            val apkDirectory = File("${variant.outputs.first().outputFile.parent}/apks")
+            val bundleTask = project.tasks.named("sign${variant.name.capitalize()}Bundle")
+            val task = project.tasks.register("generateApk${variant.name.capitalize()}", GenerateApkTask::class.java) {
+
+                deviceSpecFiles.setFrom(extension.android.apk.deviceSpecs)
+                bundleToolPath.set(extension.android.apk.bundleToolPath)
+                outputDirectoryPath.set(apkDirectory.path)
+                bundleFile.set(
+                    bundleTask.map { (it as FinalizeBundleTask).finalBundleFile.get() }
+                )
                 signingConfig.set(variant.signingConfig.toInternalSigningConfig())
             }
+            return task
         }
     }
 }
@@ -150,11 +160,13 @@ internal abstract class GenerateApkTask : DefaultTask() {
 private fun SigningConfig.toInternalSigningConfig(): InternalSigningConfig = InternalSigningConfig(
     storeFile = storeFile?.path ?: "",
     storePassword = storePassword ?: "",
-    keyAlias = keyAlias ?: ""
+    keyAlias = keyAlias ?: "",
+    keyPassword = keyPassword ?: ""
 )
 
 internal data class InternalSigningConfig(
     val storeFile: String,
     val storePassword: String,
-    val keyAlias: String
+    val keyAlias: String,
+    val keyPassword: String
 ) : java.io.Serializable

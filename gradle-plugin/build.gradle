@@ -34,10 +34,7 @@ gradlePlugin {
     }
 }
 
-group = 'com.grab'
-version = "SNAPSHOT"
 def libArtifactId = 'app-sizer-plugin'
-
 apply from: '../publish.gradle'
 configureArtifact(group, version, libArtifactId)
 

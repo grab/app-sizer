@@ -1,4 +1,4 @@
-apkDirectoryPath: "./app/build/outputs/apk/gps/debug"
+apkDirectoryPath: "./app/build/outputs/apk/pro/debug"
 libraryDirectoryPath: "./build/gradle-cache/caches/modules-2/files-2.1"
 projectDirectoryPath: "./"
 outputFilePath: "./build/app-sizer"

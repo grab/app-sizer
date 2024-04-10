@@ -6,10 +6,7 @@ plugins {
 
 dependencies {
     implementation project(":agent-report")
-    implementation('org.apache.poi:poi-ooxml:5.2.2')
-    implementation('org.jxls:jxls-jexcel:1.0.9')
     implementation libs.influxdbClient
-
     implementation libs.dexlib2
     implementation libs.clikt
     implementation libs.bundletool
@@ -20,7 +17,6 @@ dependencies {
     implementation libs.kxml2
     implementation libs.guava
     implementation libs.poi.ooxml
-    implementation libs.jxls.jexcel
     implementation libs.google.dagger
     implementation libs.gson
 
@@ -29,9 +25,6 @@ dependencies {
     testImplementation libs.kotlin.test
 }
 
-
-group = 'com.grab'
-version = "SNAPSHOT"
 def libArtifactId = 'app-sizer'
 
 apply from: '../publish.gradle'

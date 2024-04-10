@@ -3,9 +3,6 @@ package com.grab.sizer.analyzer
 import com.grab.sizer.AnalyticsOption
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.*
-import com.grab.sizer.analyzer.model.castToClass
-import com.grab.sizer.analyzer.model.castToRawFile
-import com.grab.sizer.analyzer.model.moduleToContributors
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.parser.getAars
@@ -13,7 +10,7 @@ import com.grab.sizer.parser.getJars
 import com.grab.sizer.report.*
 import javax.inject.Inject
 
-internal const val METRICS_ID_MODULES = "mobile.pax.app.sizer.mds5"
+internal const val METRICS_ID_MODULES = "mobile.pax.app.size.mds5"
 
 internal class ModuleAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
@@ -37,7 +34,7 @@ internal class ModuleAnalyzer @Inject constructor(
             resources = wholeProject.noOwnerResources.castToRawFile(),
             nativeLibs = wholeProject.noOwnerNativeLibs.castToRawFile(),
             classes = wholeProject.noOwnerClasses.castToClass(),
-            //others = wholeProject.noOwnerOthers.castToRawFile()
+            others = wholeProject.noOwnerOthers.castToRawFile()
         )
 
         val processedData = apkComponentProcessor.process(
@@ -52,7 +49,7 @@ internal class ModuleAnalyzer @Inject constructor(
         contributors.toModules().also { modules -> report(apks, modules) }
     }
 
-    private fun report(apks: Set<ApkFileInfo>, modules: List<com.grab.sizer.analyzer.model.Module>) {
+    private fun report(apks: Set<ApkFileInfo>, modules: List<Module>) {
         val dexCompressedRatio = apks.dexDownloadRatio()
         val sortedFeaturesReport = modules.sortedBy { it.getDownloadSize(dexCompressedRatio) }
             .map { it.toReportItem(dexCompressedRatio, featureMapping.moduleToFeatureMap) }
@@ -84,8 +81,8 @@ internal class ModuleAnalyzer @Inject constructor(
         }
 }
 
-internal fun Set<Contributor>.toModules(): List<com.grab.sizer.analyzer.model.Module> = moduleToContributors().map {
-    com.grab.sizer.analyzer.model.Module(
+internal fun Set<Contributor>.toModules(): List<Module> = moduleToContributors().map {
+    Module(
         it.key,
         it.value
     )

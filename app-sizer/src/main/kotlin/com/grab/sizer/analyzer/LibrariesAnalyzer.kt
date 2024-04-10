@@ -12,7 +12,7 @@ import com.grab.sizer.report.dexDownloadRatio
 import java.io.File
 import javax.inject.Inject
 
-internal const val LIBRARY_METRICS_ID = "mobile.pax.app.sizer.lib5"
+internal const val LIBRARY_METRICS_ID = "mobile.pax.app.size.lib5"
 
 internal class LibrariesAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
