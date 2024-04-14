@@ -5,6 +5,7 @@ pluginManagement {
         google()
         mavenCentral()
     }
+
 }
 
 includeBuild("../") {

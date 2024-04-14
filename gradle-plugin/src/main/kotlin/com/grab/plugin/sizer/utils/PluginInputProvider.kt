@@ -11,23 +11,23 @@ private const val EXT_AAR = "aar"
 private const val EXT_JAR = "jar"
 
 class PluginInputProvider(
-    private val dependencyGraph: DependencyGraph,
+    private val archiveDependencyStore: ArchiveDependencyStore,
     private val extension: AppSizePluginExtension,
     private val project: Project,
     private val variant: BaseVariant,
     private val apksDirectory: File,
 ) : InputProvider {
     override fun provideModuleAar(): Sequence<File> =
-        dependencyGraph.getModuleDependency().map { File(it.pathToArtifact) }
+        archiveDependencyStore.getModuleDependency().map { File(it.pathToArtifact) }
 
     override fun provideModuleJar(): Sequence<File> =
-        dependencyGraph.getJavaModuleDependencies().map { File(it.pathToArtifact) }
+        archiveDependencyStore.getJavaModuleDependencies().map { File(it.pathToArtifact) }
 
-    override fun provideLibraryJar(): Sequence<File> = dependencyGraph.getExternalDependencies()
+    override fun provideLibraryJar(): Sequence<File> = archiveDependencyStore.getExternalDependencies()
         .map { File(it.pathToArtifact) }
         .filter { it.extension.equals(EXT_JAR, true) }
 
-    override fun provideLibraryAar(): Sequence<File> = dependencyGraph.getExternalDependencies()
+    override fun provideLibraryAar(): Sequence<File> = archiveDependencyStore.getExternalDependencies()
         .map { File(it.pathToArtifact) }
         .filter { it.extension.equals(EXT_AAR, true) }
 
@@ -44,13 +44,13 @@ class PluginInputProvider(
     override fun provideFeatureMappingFile(): File? = extension.featureMappingFile.asFile.get()
 }
 
-fun DependencyGraph.getExternalDependencies(): Sequence<ExternalDependency> =
-    getAll().filterIsInstance(ExternalDependency::class.java)
+fun ArchiveDependencyStore.getExternalDependencies(): Sequence<ExternalDependency> =
+    asSequence().filterIsInstance(ExternalDependency::class.java)
 
-fun DependencyGraph.getJavaModuleDependencies(): Sequence<JavaModuleDependency> =
-    getAll().filterIsInstance(JavaModuleDependency::class.java)
+fun ArchiveDependencyStore.getJavaModuleDependencies(): Sequence<JavaModuleDependency> =
+    asSequence().filterIsInstance(JavaModuleDependency::class.java)
 
-fun DependencyGraph.getModuleDependency(): Sequence<ModuleDependency> =
-    getAll().filterIsInstance(ModuleDependency::class.java)
+fun ArchiveDependencyStore.getModuleDependency(): Sequence<ModuleDependency> =
+    asSequence().filterIsInstance(ModuleDependency::class.java)
 
-fun DependencyGraph.getApp(): AppDependency = getAll().filterIsInstance<AppDependency>().first()
+fun ArchiveDependencyStore.getApp(): AppDependency = asSequence().filterIsInstance<AppDependency>().first()

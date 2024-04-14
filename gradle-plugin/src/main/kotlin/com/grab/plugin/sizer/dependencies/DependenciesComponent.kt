@@ -1,7 +1,6 @@
-package com.grab.plugin.sizer
+package com.grab.plugin.sizer.dependencies
 
 import com.android.build.gradle.api.BaseVariant
-import com.grab.plugin.sizer.dependencies.*
 import com.grab.plugin.sizer.utils.PluginLogger
 import com.grab.sizer.utils.Logger
 import dagger.Binds
@@ -14,19 +13,19 @@ import javax.inject.Scope
 
 @Scope
 @Retention(AnnotationRetention.RUNTIME)
-internal annotation class AppSizeTaskScope
+internal annotation class DependenciesScope
 
 @Component(
-    modules = [AppSizeTaskModule::class]
+    modules = [DependenciesModule::class]
 )
-@AppSizeTaskScope
-internal interface AppSizeTaskComponent {
-    fun dependencyExtractor() : DependencyExtractor
-    fun buildVariant() : BaseVariant
-    fun configurationExtractor() : ConfigurationExtractor
-    fun variantExtractor() : VariantExtractor
+@DependenciesScope
+internal interface DependenciesComponent {
+    fun dependencyExtractor(): DependencyExtractor
+    fun buildVariant(): BaseVariant
+    fun configurationExtractor(): ConfigurationExtractor
+    fun variantExtractor(): VariantExtractor
 
-    fun logger() : Logger
+    fun logger(): Logger
 
     @Component.Factory
     interface Factory {
@@ -35,12 +34,12 @@ internal interface AppSizeTaskComponent {
             @BindsInstance variant: BaseVariant,
             @BindsInstance @Named(BUILD_FLAVOR) flavorMatchingFallbacks: List<String>,
             @BindsInstance @Named(BUILD_TYPE) buildTypeMatchingFallbacks: List<String>
-        ) : AppSizeTaskComponent
+        ): DependenciesComponent
     }
 }
 
 @Module
-internal interface AppSizeTaskModule {
+internal interface DependenciesModule {
     @Binds
     fun DefaultArchiveExtractor.bindArchiveExtractor(): ArchiveExtractor
 
@@ -55,5 +54,4 @@ internal interface AppSizeTaskModule {
 
     @Binds
     fun PluginLogger.bindLogger(): Logger
-
 }

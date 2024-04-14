@@ -20,7 +20,6 @@ shadowJar {
 
 dependencies {
     implementation project(':app-sizer')
-    implementation project(":agent-report")
     implementation libs.google.dagger
     kapt libs.dagger.compiler
     implementation libs.clikt

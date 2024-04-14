@@ -9,8 +9,9 @@ import org.gradle.api.file.RegularFileProperty
 
 open class AppSizePluginExtension(val project: Project) {
     var enabled = true
+    var forGrabTeamOnly = false
     var android = project.objects.newInstance(AndroidExtension::class.java, project.objects)
-    var metrics = project.objects.newInstance(MetricExtension::class.java, project.objects)
+    var metrics = project.objects.newInstance(MetricExtension::class.java, project)
     var featureMappingFile: RegularFileProperty = project.objects.fileProperty()
 
     fun android(action: Action<in AndroidExtension>) {

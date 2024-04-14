@@ -1,20 +1,37 @@
-package com.grab.sizer.report
+package com.grab.sizer.report.json
 
-import com.grab.pax.plugins.Metrics
-import com.grab.pax.plugins.MetricsPublisher
-import com.grab.pax.plugins.Field as MetricsField
-import com.grab.pax.plugins.Tag as MetricsTag
+import com.google.gson.Gson
+import com.grab.sizer.report.*
+import java.io.File
+import java.io.FileWriter
 
-class AgentReportWriter(
-    private val metricsPublisher: MetricsPublisher
+typealias ReportField = com.grab.sizer.report.Field
+
+class JsonReportWriter(
+    private val outputDirectory: File,
+    private val gson: Gson = Gson()
 ) : ReportWriter {
     override fun write(reportId: String, report: Report) {
-        metricsPublisher.publish(
-            reportId,
-            report.rows.flatMap {
-                it.toMetrics(report.projectInfo, report.customProperties, report.id)
+        File(File(outputDirectory, report.projectInfo.deviceName), "$reportId-metrics.json").apply {
+            initOutPutFile()
+            FileWriter(this).use { fileWriter ->
+                gson.toJson(
+                    report.rows.flatMap { row ->
+                        row.toMetrics(report.projectInfo, report.customProperties, report.id)
+                    },
+                    fileWriter
+                )
             }
-        )
+        }
+    }
+
+
+    private fun File.initOutPutFile() {
+        if (!exists()) {
+            if (!parentFile.exists())
+                parentFile.mkdirs()
+            createNewFile()
+        }
     }
 
     private fun Row.toMetrics(
@@ -31,25 +48,25 @@ class AgentReportWriter(
         )
     )
 
-    private fun List<Field>.toMetricsFields() = this.filterIsInstance<DefaultField>()
+    private fun List<ReportField>.toMetricsFields() = this.filterIsInstance<DefaultField>()
         .map { field ->
-            MetricsField(
+            Field(
                 name = field.name,
                 value = field.value.toString(),
                 valueType = field.toMetricsType()
             )
         }
 
-    private fun List<Field>.toMetricsTags() = this.filterIsInstance<TagField>().map { field ->
-        MetricsTag(
+    private fun List<ReportField>.toMetricsTags() = this.filterIsInstance<TagField>().map { field ->
+        Tag(
             name = field.name,
             value = field.value.toString(),
             valueType = field.toMetricsType()
         )
     }
 
-    private fun CustomProperties.toCommonFields(): List<MetricsField> = map {
-        MetricsField(
+    private fun CustomProperties.toCommonFields(): List<Field> = map {
+        Field(
             name = it.key,
             value = it.value,
             valueType = "string"
@@ -57,24 +74,24 @@ class AgentReportWriter(
     }
 
 
-    private fun ProjectInfo.toCommonTags(): List<MetricsTag> =
+    private fun ProjectInfo.toCommonTags(): List<Tag> =
         listOf(
-            MetricsTag(
+            Tag(
                 name = "project",
                 value = projectName,
                 valueType = "string"
             ),
-            MetricsTag(
+            Tag(
                 name = "app_version",
                 value = versionName,
                 valueType = "string"
             ),
-            MetricsTag(
+            Tag(
                 name = "build_type",
                 value = buildType,
                 valueType = "string"
             ),
-            MetricsTag(
+            Tag(
                 name = "device_name",
                 value = deviceName,
                 valueType = "string"
@@ -82,7 +99,7 @@ class AgentReportWriter(
         )
 }
 
-private fun Field.toMetricsType(): String = when (value) {
+private fun ReportField.toMetricsType(): String = when (value) {
     is Int -> "integer"
     is Long -> "integer"
     else -> "string"

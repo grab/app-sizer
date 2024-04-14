@@ -5,7 +5,6 @@ plugins {
 }
 
 dependencies {
-    implementation project(":agent-report")
     implementation libs.influxdbClient
     implementation libs.dexlib2
     implementation libs.clikt

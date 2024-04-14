@@ -33,7 +33,6 @@ dependencyResolutionManagement {
 enableFeaturePreview('VERSION_CATALOGS')
 
 include 'app-sizer'
-include 'agent-report'
 include 'gradle-plugin'
 include 'clt'
 

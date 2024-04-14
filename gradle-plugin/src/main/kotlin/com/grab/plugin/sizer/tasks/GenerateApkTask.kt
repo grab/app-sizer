@@ -1,14 +1,16 @@
-package com.grab.plugin.sizer
+package com.grab.plugin.sizer.tasks
 
 import com.android.build.gradle.api.ApplicationVariant
 import com.android.build.gradle.internal.tasks.FinalizeBundleTask
 import com.android.builder.model.SigningConfig
+import com.grab.plugin.sizer.AppSizePluginExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.FileCollection
+import org.gradle.api.file.Directory
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.LogLevel
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import java.io.File
@@ -38,26 +40,48 @@ internal abstract class GenerateApkTask : DefaultTask() {
     @get:Input
     abstract val signingConfig: Property<InternalSigningConfig>
 
-    @get:Input
-    abstract val outputDirectoryPath: Property<String>
-
-    /**
-     * The task will generate a set of APKs for each device specification.
-     * Each of these sets will then be stored in its own distinct folder. And they all listed in outputDirectories
-     */
     @get:OutputDirectories
-    val outputDirectories: FileCollection
-        get() {
-            return project.files(apkDirectories)
-        }
+    abstract val outputDirectories: ListProperty<Directory>
 
-    private val apkDirectories = mutableListOf<File>()
+    init {
+        outputDirectories.set(
+            project.provider {
+                deviceSpecFiles.map { specFile ->
+                    project.layout.buildDirectory.dir("sizer/apk/${specFile.nameWithoutExtension}").get()
+                }
+            }
+        )
+    }
 
     @TaskAction
     fun generateApk() {
-        val deviceSpecs = if (deviceSpecFiles.isEmpty) {
+        deviceSpecs.forEach { deviceSpecFile ->
+            File.createTempFile(deviceSpecFile.name, ".apks").also { tempFile ->
+                try {
+                    generateApksFile(tempFile, deviceSpecFile.path)
+                    val outputDir = outputDirectories.get()
+                        .find {
+                            it.asFile.nameWithoutExtension == deviceSpecFile.nameWithoutExtension
+                        }?.asFile
+                        ?: throw IllegalArgumentException("output folders are not match for ${deviceSpecFile.nameWithoutExtension}")
+                    if (!outputDir.exists()) {
+                        outputDir.mkdirs()
+                    } else {
+                        outputDir.clearDirectory()
+                    }
+                    extractApksToDirectory(tempFile, deviceSpecFile.path, outputDir)
+                } finally {
+                    tempFile.delete()
+                    project.logger.log(LogLevel.INFO, "Temp files were deleted")
+                }
+            }
+        }
+    }
+
+    private val deviceSpecs: Iterable<File>
+        get() = if (deviceSpecFiles.isEmpty) {
             setOf(
-                File.createTempFile("device_config", ".json")
+                File.createTempFile("default_device", ".json")
                     .apply {
                         writeBytes(
                             DEFAULT_DEVICE_SPEC.toByteArray()
@@ -67,27 +91,6 @@ internal abstract class GenerateApkTask : DefaultTask() {
         } else {
             deviceSpecFiles
         }
-
-        deviceSpecs.forEach { deviceSpecFile ->
-            File.createTempFile(deviceSpecFile.name, ".apks").run {
-                try {
-                    generateApksFile(this, deviceSpecFile.path)
-                    val outputDir = File(outputDirectoryPath.get(), deviceSpecFile.name).apply {
-                        if (!exists()) {
-                            mkdirs()
-                        } else {
-                            clearDirectory()
-                        }
-                    }
-                    extractApksToDirectory(this, deviceSpecFile.path, outputDir)
-                    apkDirectories.add(outputDir)
-                } finally {
-                    delete()
-                    project.logger.log(LogLevel.INFO, "Temp files were deleted")
-                }
-            }
-        }
-    }
 
     private fun extractApksToDirectory(apksTempFile: File, deviceSpec: String, outputDirectory: File) {
         project.exec {
@@ -140,13 +143,10 @@ internal abstract class GenerateApkTask : DefaultTask() {
             extension: AppSizePluginExtension,
             variant: ApplicationVariant
         ): TaskProvider<GenerateApkTask> {
-            val apkDirectory = File("${variant.outputs.first().outputFile.parent}/apks")
             val bundleTask = project.tasks.named("sign${variant.name.capitalize()}Bundle")
             val task = project.tasks.register("generateApk${variant.name.capitalize()}", GenerateApkTask::class.java) {
-
                 deviceSpecFiles.setFrom(extension.android.apk.deviceSpecs)
                 bundleToolPath.set(extension.android.apk.bundleToolPath)
-                outputDirectoryPath.set(apkDirectory.path)
                 bundleFile.set(
                     bundleTask.map { (it as FinalizeBundleTask).finalBundleFile.get() }
                 )
