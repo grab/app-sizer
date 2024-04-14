@@ -89,7 +89,7 @@ appSizeAnalysis {
             bundleToolPath = new File(rootProject.rootDir, '/binary/bundletool-all-1.15.4.jar').toString()
             deviceSpecs = [
                     file("${rootProject.rootDir}/app-size-config/device-1.json"),
-                    file("${rootProject.rootDir}/app-size-config/device-2.json")
+                    file("${rootProject.rootDir}/app-size-config/oppo-cph1909.json")
             ]
         }
         variantFilter { variant ->

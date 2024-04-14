@@ -5,11 +5,13 @@ import com.grab.sizer.report.*
 import java.io.File
 import java.io.FileWriter
 
+typealias ReportField = com.grab.sizer.report.Field
+
 class JsonReportWriter(
     private val outputDirectory: File,
     private val gson: Gson = Gson()
 ) : ReportWriter {
-    override fun write(reportId: String, report: Report){
+    override fun write(reportId: String, report: Report) {
         File(File(outputDirectory, report.projectInfo.deviceName), "$reportId-metrics.json").apply {
             initOutPutFile()
             FileWriter(this).use { fileWriter ->
@@ -46,7 +48,7 @@ class JsonReportWriter(
         )
     )
 
-    private fun List<com.grab.sizer.report.Field>.toMetricsFields() = this.filterIsInstance<DefaultField>()
+    private fun List<ReportField>.toMetricsFields() = this.filterIsInstance<DefaultField>()
         .map { field ->
             Field(
                 name = field.name,
@@ -55,7 +57,7 @@ class JsonReportWriter(
             )
         }
 
-    private fun List<com.grab.sizer.report.Field>.toMetricsTags() = this.filterIsInstance<TagField>().map { field ->
+    private fun List<ReportField>.toMetricsTags() = this.filterIsInstance<TagField>().map { field ->
         Tag(
             name = field.name,
             value = field.value.toString(),
@@ -97,7 +99,7 @@ class JsonReportWriter(
         )
 }
 
-private fun com.grab.sizer.report.Field.toMetricsType(): String = when (value) {
+private fun ReportField.toMetricsType(): String = when (value) {
     is Int -> "integer"
     is Long -> "integer"
     else -> "string"

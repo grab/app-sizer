@@ -16,7 +16,7 @@ import org.gradle.api.tasks.*
  * This task is used to generate the list of the [com.grab.plugin.sizer.dependencies.ArchiveDependency] to a json file
  * The file will be consumed by the [AppSizeAnalysisTask] as the input for the list of aar/jar files
  */
-internal abstract class GenerateArchiveDependencyTask : DefaultTask() {
+internal abstract class GenerateArchivesListTask : DefaultTask() {
     @get:Internal
     abstract val variant: Property<BaseVariant>
 
@@ -58,9 +58,9 @@ internal abstract class GenerateArchiveDependencyTask : DefaultTask() {
             variant: BaseVariant,
             flavorMatchingFallbacks: List<String>,
             buildTypeMatchingFallbacks: List<String>
-        ): TaskProvider<GenerateArchiveDependencyTask> {
+        ): TaskProvider<GenerateArchivesListTask> {
             return project.tasks.register(
-                "generateArchiveDep${variant.name.capitalize()}", GenerateArchiveDependencyTask::class.java
+                "generateArchiveDep${variant.name.capitalize()}", GenerateArchivesListTask::class.java
             ) {
                 this.variant.set(variant)
                 this.buildTypeMatchingFallbacks.set(buildTypeMatchingFallbacks)

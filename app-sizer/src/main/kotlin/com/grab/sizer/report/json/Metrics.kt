@@ -24,7 +24,8 @@ data class Field(
      * Values: "float", "string", "integer", "boolean"
      */
     @SerializedName("value_type")
-    val valueType: String)
+    val valueType: String
+)
 
 data class Tag(
     @SerializedName("name")
@@ -32,4 +33,5 @@ data class Tag(
     @SerializedName("value")
     val value: String,
     @SerializedName("value_type")
-    val valueType: String)
+    val valueType: String
+)

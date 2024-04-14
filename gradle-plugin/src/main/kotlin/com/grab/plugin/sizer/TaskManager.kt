@@ -12,7 +12,7 @@ import com.grab.plugin.sizer.dependencies.DependenciesComponent
 import com.grab.plugin.sizer.dependencies.VariantExtractor
 import com.grab.plugin.sizer.tasks.AppSizeAnalysisTask
 import com.grab.plugin.sizer.tasks.GenerateApkTask
-import com.grab.plugin.sizer.tasks.GenerateArchiveDependencyTask
+import com.grab.plugin.sizer.tasks.GenerateArchivesListTask
 import com.grab.plugin.sizer.utils.isAndroidApplication
 import com.grab.plugin.sizer.utils.isAndroidLibrary
 import com.grab.plugin.sizer.utils.isJava
@@ -48,7 +48,7 @@ internal class TaskManager(
                         variant
                     )
 
-                    val generateArchiveDependencyTask = GenerateArchiveDependencyTask.registerTask(
+                    val generateArchivesListTask = GenerateArchivesListTask.registerTask(
                         project,
                         variant = variant,
                         flavorMatchingFallbacks = getProductFlavor(variant)?.matchingFallbacks ?: emptyList(),
@@ -61,7 +61,7 @@ internal class TaskManager(
                         variant,
                         pluginExtension,
                         generateApkTask,
-                        generateArchiveDependencyTask,
+                        generateArchivesListTask,
                     )
                     registerAppSizeTaskDep(project, variant, this, appSizeAnalysisTask)
                 }
