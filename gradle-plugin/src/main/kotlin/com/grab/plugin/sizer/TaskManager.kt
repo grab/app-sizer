@@ -18,6 +18,7 @@ import com.grab.plugin.sizer.utils.isAndroidLibrary
 import com.grab.plugin.sizer.utils.isJava
 import com.grab.plugin.sizer.utils.isKotlinJvm
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.the
@@ -73,7 +74,7 @@ internal class TaskManager(
         project: Project,
         variant: BaseVariant,
         appExtension: AppExtension,
-        appSizeTask: TaskProvider<AppSizeAnalysisTask>
+        appSizeTask: TaskProvider<out Task>
     ) {
         val dependenciesComponent = DaggerDependenciesComponent.factory().create(
             project = project,
@@ -89,7 +90,7 @@ internal class TaskManager(
         project: Project,
         markAsChecked: MutableSet<String>,
         dependenciesComponent: DependenciesComponent,
-        appSizeTask: TaskProvider<AppSizeAnalysisTask>
+        appSizeTask: TaskProvider<out Task>
     ) {
         if (markAsChecked.contains(project.path)) return
         markAsChecked.add(project.path)
@@ -105,7 +106,7 @@ internal class TaskManager(
 
     private fun handleSubProject(
         project: Project,
-        task: TaskProvider<AppSizeAnalysisTask>,
+        task: TaskProvider<out Task>,
         variantExtractor: VariantExtractor
     ) {
         when {
