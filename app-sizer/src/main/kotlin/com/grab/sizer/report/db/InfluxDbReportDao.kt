@@ -30,12 +30,22 @@ data class DatabaseRetentionPolicy(
     val shardDuration: String,
     val replicationFactor: Int,
     val isDefault: Boolean,
-)
+) {
+    companion object {
+        fun createDefault() = DatabaseRetentionPolicy(
+            name = "app_sizer",
+            duration = "360d",
+            shardDuration = "0m",
+            replicationFactor = 2,
+            isDefault = true
+        )
+    }
+}
 
 class InfluxDBFactory {
     fun create(config: InfluxDBConfig): InfluxDB {
         return org.influxdb.InfluxDBFactory.connect(config.url, config.username, config.password).apply {
-            setLogLevel(InfluxDB.LogLevel.FULL)
+            setLogLevel(InfluxDB.LogLevel.BASIC)
             enableBatch(
                 BatchOptions.DEFAULTS
                     .threadFactory { runnable: Runnable? ->

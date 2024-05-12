@@ -7,7 +7,6 @@ import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.*
 import javax.inject.Inject
 
-internal const val METRICS_ID_BASIC = "mobile.pax.app.size.components5"
 
 internal class BasicApkAnalyzer @Inject constructor(
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,

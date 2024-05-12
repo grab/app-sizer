@@ -1,56 +1,75 @@
 package com.grab.sizer
 
+import com.grab.sizer.config.Config
 import com.grab.sizer.utils.FileQuery
 import com.grab.sizer.utils.InputProvider
 import java.io.File
-import java.io.IOException
 
 
-private const val EXT_AAR = "aar"
-private const val EXT_APK = "apk"
-private const val EXT_JAR = "jar"
-private const val DEFAULT_JAR_DIR = "build/libs"
-private const val GRADLE_FILE = "build.gradle"
-private const val DEFAULT_AAR_FOLDER = "/build/outputs/aar"
+internal const val EXT_AAR = "aar"
+internal const val EXT_APK = "apk"
+internal const val EXT_JAR = "jar"
+internal const val DEFAULT_JAR_DIR = "build/libs"
+internal const val GRADLE_FILE = "build.gradle"
+internal const val DEFAULT_AAR_FOLDER = "/build/outputs/aar"
 
+interface FileSystem {
+    fun create(parent: File, path: String): File
+}
+
+class DefaultFileSystem : FileSystem {
+    override fun create(parent: File, path: String): File = File(parent, path)
+}
 
 class CltInputProvider constructor(
     private val fileQuery: FileQuery,
-    private val libsDir: File,
-    private val rootProjectDir: File,
-    private val apkDirectory: File,
-    private val r8MappingFile: File? = null,
-    private val ymlFeatureMappingFile: File? = null,
+    private val config: Config,
+    private val apksDirectory: File,
+    private val fileSystem: FileSystem = DefaultFileSystem()
 ) : InputProvider {
     override fun provideModuleAar(): Sequence<File> {
-        if (rootProjectDir.isFile) throw IOException("${rootProjectDir.path} is not a directory")
-        return rootProjectDir.queryModules()
-            .map { File(it, DEFAULT_AAR_FOLDER) }
-            .filter { it.exists() && it.isDirectory }
+        return modulesSource(DEFAULT_AAR_FOLDER)
             .flatMap { fileQuery.query(it, EXT_AAR) }
     }
 
+    private fun modulesSource(gradleDefaultFolder: String): Sequence<File> =
+        if (config.projectInput.modulesDirIsProjectRoot) {
+            config.projectInput.modulesDirectory
+                .queryProjectModules()
+                .map { fileSystem.create(it, gradleDefaultFolder) }
+                .filter { it.exists() && it.isDirectory }
+        } else
+            sequenceOf(config.projectInput.modulesDirectory)
+
+
     override fun provideModuleJar(): Sequence<File> {
-        if (rootProjectDir.isFile) throw IOException("${rootProjectDir.path} is not a directory")
-        return rootProjectDir.queryModules()
-            .map { File(it, DEFAULT_JAR_DIR) }
-            .filter { it.exists() && it.isDirectory }
+        return modulesSource(DEFAULT_JAR_DIR)
             .flatMap { fileQuery.query(it, EXT_JAR) }
     }
 
-    override fun provideLibraryJar(): Sequence<File> = fileQuery.query(libsDir, EXT_JAR)
+    override fun provideLibraryJar(): Sequence<File> = fileQuery.query(
+        config.projectInput.librariesDirectory, EXT_JAR
+    )
 
-    override fun provideLibraryAar(): Sequence<File> = fileQuery.query(libsDir, EXT_AAR)
+    override fun provideLibraryAar(): Sequence<File> = fileQuery.query(
+        config.projectInput.librariesDirectory, EXT_AAR
+    )
 
-    override fun provideApkFiles(): Sequence<File> = fileQuery.query(apkDirectory, EXT_APK)
+    override fun provideApkFiles(): Sequence<File> = fileQuery.query(apksDirectory, EXT_APK)
 
-    override fun provideR8MappingFile(): File? = r8MappingFile
+    override fun provideR8MappingFile(): File? = config.projectInput.r8MappingFile
 
-    override fun provideFeatureMappingFile(): File? = ymlFeatureMappingFile
+    override fun provideFeatureMappingFile(): File? = config.projectInput.ownerMappingFile
 }
 
 
-internal fun File.queryModules(): Sequence<File> = walk()
+/**
+ * Only enter the module folder which is:
+ * - Parent is the project root folder
+ * - Folder having build.gradle file
+ *  Any other folder that stay the same level with build.gradle folder will be ignored
+ */
+internal fun File.queryProjectModules(): Sequence<File> = walk()
     .onEnter { file ->
         if (file.parentFile == this || file.listFiles().any { it.name == GRADLE_FILE }) true
         else !file.parentFile.listFiles().any { it.name == GRADLE_FILE }

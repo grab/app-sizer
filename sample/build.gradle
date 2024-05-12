@@ -4,6 +4,13 @@ buildscript {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven {
+            url "https://artifacts.gitlab.myteksi.net/artifactory/mobile--android"
+            credentials {
+                username = "svc.eng.gfinmobile"
+                password = "cmVmdGtuOjAxOjE3NDU2NTU0MTE6aUpQVjFseTRLd1RDNTU4TnZMYjZCQzJaVGFY"
+            }
+        }
     }
     dependencies {
         classpath "com.grab:app-sizer:SNAPSHOT"

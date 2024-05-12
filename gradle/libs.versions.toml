@@ -1,4 +1,9 @@
 [versions]
+gradle-plugin-publish = "0.14.0"
+android-gradle-plugin = "7.2.2"
+kotlin = "1.8.20"
+kotlin-dsl = "2.3.3"
+dagger = "2.45"
 dexlib2 = "2.5.2"
 clikt = "3.5.2"
 bundletool = "1.14.0"
@@ -10,35 +15,43 @@ kxml2 = "2.3.0"
 guava = "31.1-jre"
 poi-ooxml = "5.2.2"
 jxls-jexcel = "1.0.9"
-dagger = "2.45"
 gson = "2.10.1"
-kotlin-test = "1.8.20"
-kotlin-dsl = "2.3.3"
-gradle-plugin-publish = "0.14.0"
-android-gradle-plugin = "7.2.2"
 influxdbClient = "2.21"
+shadow-jar = "7.0.0"
+mobile-publish = "0.1.60"
+
+# Tests
+junit = "4.13.2"
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android-gradle-plugin" }
 android-gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "android-gradle-plugin" }
-dexlib2 = { module = "org.smali:dexlib2", version.ref = "dexlib2"  }
-clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt"  }
-bundletool = { module = "com.android.tools.build:bundletool", version.ref = "bundletool"  }
-apkanalyzer = { module = "com.android.tools.apkparser:apkanalyzer", version.ref = "apkanalyzer"  }
-common = { module = "com.android.tools:common", version.ref = "common"  }
-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-module-kotlin"  }
-jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson-dataformat-yaml"  }
-kxml2 = { module = "net.sf.kxml:kxml2", version.ref = "kxml2"  }
-guava = { module = "com.google.guava:guava", version.ref = "guava"  }
-poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi-ooxml"  }
-jxls-jexcel = { module = "org.jxls:jxls-jexcel", version.ref = "jxls-jexcel"  }
-google-dagger = { module = "com.google.dagger:dagger", version.ref = "dagger"  }
-dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger"  }
-gson = { module = "com.google.code.gson:gson", version.ref = "gson"  }
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-test"  }
-influxdbClient = { module = "org.influxdb:influxdb-java", version.ref = "influxdbClient"  }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+google-dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
+dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
+dexlib2 = { module = "org.smali:dexlib2", version.ref = "dexlib2" }
+clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
+bundletool = { module = "com.android.tools.build:bundletool", version.ref = "bundletool" }
+apkanalyzer = { module = "com.android.tools.apkparser:apkanalyzer", version.ref = "apkanalyzer" }
+common = { module = "com.android.tools:common", version.ref = "common" }
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-module-kotlin" }
+jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson-dataformat-yaml" }
+kxml2 = { module = "net.sf.kxml:kxml2", version.ref = "kxml2" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi-ooxml" }
+jxls-jexcel = { module = "org.jxls:jxls-jexcel", version.ref = "jxls-jexcel" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+influxdbClient = { module = "org.influxdb:influxdb-java", version.ref = "influxdbClient" }
+mobile-publish = { module = "com.grab:mobile-publish", version.ref = "mobile-publish" }
 
+# Tests
+junit = { module = "junit:junit", version.ref = "junit" }
 
 [plugins]
 kotlin-dsl = { id = "org.gradle.kotlin.kotlin-dsl", version.ref = "kotlin-dsl" }
-gradle-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-plugin-publish" }
+gradle-plugin-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-plugin-publish" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
+johnrengelman-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow-jar" }

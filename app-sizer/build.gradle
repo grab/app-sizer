@@ -1,7 +1,5 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm"
-    id "org.jetbrains.kotlin.kapt"
-    id "com.grab.sizer.kotlin.buildplugin"
+    id "com.grab.sizer.build"
 }
 
 dependencies {
@@ -24,11 +22,4 @@ dependencies {
     testImplementation libs.kotlin.test
 }
 
-def libArtifactId = 'app-sizer'
-
-apply from: '../publish.gradle'
-configureArtifact(group, version, libArtifactId)
-
-repositories {
-    mavenCentral()
-}
+ext.artifactId = "app-sizer"

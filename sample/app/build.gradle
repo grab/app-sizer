@@ -15,8 +15,7 @@ android {
         minSdk 21
         targetSdk 32
         versionCode 1
-        versionName "1.0"
-
+        versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -89,7 +88,7 @@ appSizeAnalysis {
             bundleToolPath = new File(rootProject.rootDir, '/binary/bundletool-all-1.15.4.jar').toString()
             deviceSpecs = [
                     file("${rootProject.rootDir}/app-size-config/device-1.json"),
-                    file("${rootProject.rootDir}/app-size-config/oppo-cph1909.json")
+                    file("${rootProject.rootDir}/app-size-config/device-2.json")
             ]
         }
         variantFilter { variant ->

@@ -10,7 +10,6 @@ import com.grab.sizer.parser.getJars
 import com.grab.sizer.report.*
 import javax.inject.Inject
 
-internal const val METRICS_ID_MODULES = "mobile.pax.app.size.mds5"
 
 internal class ModuleAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,

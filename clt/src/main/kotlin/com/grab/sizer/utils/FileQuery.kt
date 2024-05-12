@@ -15,9 +15,9 @@ class DefaultFileQuery @Inject constructor() : FileQuery {
     override fun query(dir: File, vararg extensions: String): Sequence<File> {
         if (dir.isFile) throw IOException("${dir.path} is not a directory")
         return dir.walk()
-            .filter {
-                it.isFile && extensions.any { ext ->
-                    it.extension.equals(ext, true)
+            .filter { file ->
+                file.isFile && extensions.any { ext ->
+                    file.extension.equals(ext, true)
                 }
             }
     }

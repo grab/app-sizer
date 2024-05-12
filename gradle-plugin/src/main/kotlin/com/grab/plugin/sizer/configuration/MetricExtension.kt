@@ -1,5 +1,6 @@
 package com.grab.plugin.sizer.configuration
 
+import com.grab.sizer.report.db.DatabaseRetentionPolicy
 import groovy.lang.Closure
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
@@ -37,11 +38,12 @@ open class MetricExtension @Inject constructor(project: Project) {
 }
 
 open class RetentionPolicyExtension @Inject constructor(objects: ObjectFactory) {
-    var name: Property<String> = objects.property(String::class.java).convention("app_sizer")
-    var duration: Property<String> = objects.property(String::class.java).convention("360d")
-    var shardDuration: Property<String> = objects.property(String::class.java).convention("0m")
-    var replicationFactor: Property<Int> = objects.property(Int::class.java).convention(2)
-    var isDefault: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
+    private val default = DatabaseRetentionPolicy.createDefault()
+    var name: Property<String> = objects.property(String::class.java).convention(default.name)
+    var duration: Property<String> = objects.property(String::class.java).convention(default.duration)
+    var shardDuration: Property<String> = objects.property(String::class.java).convention(default.shardDuration)
+    var replicationFactor: Property<Int> = objects.property(Int::class.java).convention(default.replicationFactor)
+    var isDefault: Property<Boolean> = objects.property(Boolean::class.java).convention(default.isDefault)
 }
 
 open class InfluxDBExtension @Inject constructor(objects: ObjectFactory) {

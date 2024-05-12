@@ -1,29 +1,17 @@
 buildscript {
-    String artifactoryPluginVersion = '4.11.0'
     repositories {
         google()
         mavenCentral()
-        maven {
-            url "https://artifacts.gitlab.myteksi.net/artifactory/mobile--android"
-            credentials {
-                username = "svc.pax.adr.artifactory.local"
-                password = "cmVmdGtuOjAxOjE3MTQwOTk3MjQ6VWQzQWgybE1nNldDSUJ5RlZQcWYwRDV5NjRk"
-            }
-        }
     }
+
     dependencies {
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:$artifactoryPluginVersion"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.24.20"
     }
 }
 
 subprojects {
-    repositories {
-        mavenCentral()
-        google()
-    }
-
     group = 'com.grab'
-    version = System.getenv("CI")?.toBoolean() ?  "SNAPSHOT-01" : "SNAPSHOT"
+    version = System.getenv("CI")?.toBoolean() ? "SNAPSHOT-01" : "SNAPSHOT"
 }
 
 

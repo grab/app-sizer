@@ -1,5 +1,5 @@
-
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         gradlePluginPortal()
         mavenCentral()
@@ -7,22 +7,27 @@ pluginManagement {
         maven {
             url "https://artifacts.gitlab.myteksi.net/artifactory/mobile--android"
             credentials {
-                username = "svc.pax.adr.artifactory.local"
-                password = "cmVmdGtuOjAxOjE3MTQwOTk3MjQ6VWQzQWgybE1nNldDSUJ5RlZQcWYwRDV5NjRk"
+                username = "svc.eng.gfinmobile"
+                password = "cmVmdGtuOjAxOjE3NDU2NTU0MTE6aUpQVjFseTRLd1RDNTU4TnZMYjZCQzJaVGFY"
             }
         }
     }
     plugins {
-        id 'com.jfrog.artifactory' version '4.24.5'
         id 'com.android.application' version '7.3.1'
         id 'org.jetbrains.kotlin.jvm' version '1.8.20'
         id 'org.jetbrains.kotlin.kapt' version '1.8.20'
         id 'com.github.johnrengelman.shadow' version '7.0.0'
         id "org.gradle.kotlin.kotlin-dsl" version "2.3.3"
+        id "com.grab.mobile-publish" version "0.1.60"
+        id "com.jfrog.artifactory" version "4.24.20"
     }
 }
 
+enableFeaturePreview("VERSION_CATALOGS")
+//enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 dependencyResolutionManagement {
+//    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
         mavenCentral()
@@ -30,7 +35,7 @@ dependencyResolutionManagement {
     }
 }
 
-enableFeaturePreview('VERSION_CATALOGS')
+rootProject.name = "app-sizer"
 
 include 'app-sizer'
 include 'gradle-plugin'

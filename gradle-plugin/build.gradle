@@ -8,10 +8,8 @@
  */
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm'
+    id "com.grab.sizer.build"
     id 'java-gradle-plugin'
-    id "org.jetbrains.kotlin.kapt"
-    id "com.grab.sizer.kotlin.buildplugin"
     alias(libs.plugins.kotlin.dsl)
 }
 
@@ -25,7 +23,6 @@ dependencies {
 }
 
 gradlePlugin {
-    // Define the plugin
     plugins {
         sizeAnalysis {
             id = 'com.grab.app-sizer'
@@ -35,10 +32,5 @@ gradlePlugin {
     }
 }
 
-def libArtifactId = 'app-sizer-plugin'
-apply from: '../publish.gradle'
-configureArtifact(group, version, libArtifactId)
+ext.artifactId = "app-sizer-plugin"
 
-repositories {
-    mavenCentral()
-}
