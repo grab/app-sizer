@@ -24,7 +24,7 @@ internal class DefaultArchiveExtractor @Inject constructor(
                 )
             }
 
-            project.isAndroidLibrary || project.isKotlinJvm -> {
+            project.isAndroidLibrary -> {
                 return ModuleDependency(
                     name = project.path,
                     pathToArtifact = matchVariant.binaryOutPut.path

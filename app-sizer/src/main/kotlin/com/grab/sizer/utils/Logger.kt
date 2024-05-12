@@ -6,7 +6,6 @@ const val DEFAULT_TAG = "AppSize"
 interface Logger {
     fun log(tag: String, message: String)
     fun log(tag: String, e: Exception)
-
     fun logDebug(tag: String, message: String)
 }
 

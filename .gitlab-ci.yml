@@ -11,7 +11,7 @@ stages:
 
 build:
   stage: build
-  script: ./gradlew gradle-plugin:assemble --rerun-tasks
+  script: ./gradlew gradle-plugin:assemble
   tags:
     - xlarge
   artifacts:
@@ -25,8 +25,15 @@ test:
   tags:
     - xlarge
   script:
+    - ./gradlew test
+
+build_sample_app:
+  stage: test
+  tags:
+    - xlarge
+  script:
     - cd ./sample
-    - ./gradlew app:appSizeAnalysisProRelease --stacktrace -Dorg.gradle.debug=false --no-daemon --info
+    - ./gradlew app:appSizeAnalysisProRelease --stacktrace -Dorg.gradle.debug=false --no-daemon
 
 publish_artifact:
   stage: build

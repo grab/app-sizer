@@ -1,12 +1,8 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm'
-    id "org.jetbrains.kotlin.kapt"
     id 'com.github.johnrengelman.shadow'
-    id "com.grab.sizer.kotlin.buildplugin"
+    id "com.grab.sizer.build"
 }
 
-group = "com.grab.tool"
-version = "1.1-SNAPSHOT"
 
 shadowJar {
     zip64 true
@@ -27,5 +23,6 @@ dependencies {
     implementation libs.jackson.dataformat.yaml
     implementation libs.kxml2
     implementation libs.gson
+    testImplementation libs.junit
 }
 

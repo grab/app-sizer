@@ -2,39 +2,30 @@ package com.grab.sizer
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.*
-import com.grab.sizer.utils.*
+import com.grab.sizer.config.Config
+import com.grab.sizer.config.ConfigYmlLoader
+import com.grab.sizer.utils.CltLogger
+import com.grab.sizer.utils.DefaultFileQuery
+import com.grab.sizer.utils.Logger
+import com.grab.sizer.utils.ProjectInfoProviderImpl
 import java.io.File
+import java.lang.Exception
 
 
 class AnalyzerCommand : CliktCommand() {
-
     private val settingFile: File by option(
         "-s",
-        "--setting-file",
+        "--config-file",
         help = "Path to the config file"
     ).convert { File(it) }.required()
-
-    private val version: String by option(
-        "-v",
-        "--app-version"
-    ).default("0.0.0")
-
-    private val deviceName: String by option(
-        "-d",
-        "--device-name",
-        help = "The device name in the device spec that we generate the APK from the app bundle"
-    ).required()
-
-    private val extraTag: String by option(
-        "-t",
-        "--tag",
-        help = "A tag value send along with the report"
-    ).required()
 
     private val libName: String? by option(
         "-l",
         "--lib-name",
-        help = "Name of the lib/module you want to list the content contributed to the apks"
+        help = """
+            Name of the lib/module you want to list the content contributed to the apks
+            Note that this param only necessary for the AnalyticsOption.LIB_CONTENT option
+        """.trimIndent()
     )
 
 
@@ -47,53 +38,34 @@ class AnalyzerCommand : CliktCommand() {
             "--codebase" to AnalyticsOption.CODEBASE,
             "--large-files" to AnalyticsOption.LARGE_FILE,
             "--lib-content" to AnalyticsOption.LIB_CONTENT,
-        ).default(AnalyticsOption.CODEBASE)
+        ).default(AnalyticsOption.DEFAULT)
 
-    private fun validateCommand() {
+    override fun run() {
+        val config = ConfigYmlLoader().load(settingFile)
+            .also {
+                it.validateInput()
+            }
+        val logger: Logger = CltLogger()
+        val appSizeAnalysis = DefaultAppSizeAnalysis(logger, reportOption, libName)
+        DefaultApkGenerator.create(config)
+            .generate(config.apkGeneration.deviceSpecs)
+            .forEach { apkDirectory ->
+                appSizeAnalysis.analysis(
+                    inputProvider = CltInputProvider(
+                        fileQuery = DefaultFileQuery(),
+                        config = config,
+                        apksDirectory = apkDirectory
+                    ),
+                    outputProvider = CltOutputProvider(config.report),
+                    projectInfoProvider = ProjectInfoProviderImpl(config, apkDirectory.nameWithoutExtension)
+                )
+            }
+    }
+
+    private fun Config.validateInput() {
         if (reportOption == AnalyticsOption.LIB_CONTENT && libName == null) {
             throw IllegalArgumentException("You have to pass the --lib-name to execute this option")
         }
-    }
-
-    override fun run() {
-        val settings = SettingYmlLoader().load(settingFile)
-        val logger: Logger = CltLogger()
-        logger.log("Lib directory ${settings.libraryDirectoryPath}")
-        logger.log("Project directory ${settings.projectDirectoryPath}")
-        logger.log("Feature mapping file ${settings.featureMappingFilePath}")
-        logger.log("Proguard mapping file ${settings.mappingFilePath}")
-        logger.log("Apk directory ${settings.apkDirectoryPath}")
-        validateCommand()
-
-        val projectInfoProvider = ProjectInfoProviderImpl(
-            projectName = settings.projectName,
-            deviceName = deviceName,
-            pipelineId = extraTag,
-            versionName = version,
-            buildType = "production",
-            tag = extraTag
-        )
-
-        val inputFileProvider = CltInputProvider(
-            fileQuery = DefaultFileQuery(),
-            libsDir = settings.libraryDirectory,
-            rootProjectDir = settings.projectDirectory,
-            apkDirectory = settings.apkDirectory,
-            r8MappingFile = settings.mappingFile,
-            ymlFeatureMappingFile = settings.featureMappingFile
-        )
-
-        val outputProvider = CltOutputProvider(
-            outputDirectory = settings.outputFile
-        )
-        AnalyzerFactory()
-            .create(
-                inputFileProvider,
-                outputProvider,
-                projectInfoProvider,
-                libName,
-                logger
-            )[reportOption]?.process()
     }
 }
 

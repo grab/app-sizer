@@ -12,7 +12,6 @@ import com.grab.sizer.parser.getJars
 import com.grab.sizer.report.*
 import javax.inject.Inject
 
-internal const val METRICS_ID_LARGE_FILES = "mobile.pax.app.size.files5"
 
 // Todo : move to a configurable value
 private const val SIZE_THRESHOLD = 10 * 1024

@@ -9,4 +9,8 @@ class CltLogger : Logger {
         println("$tag :")
         e.printStackTrace()
     }
+
+    override fun logDebug(tag: String, message: String) {
+        println("$tag : $message")
+    }
 }

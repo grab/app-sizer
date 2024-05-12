@@ -13,7 +13,6 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
 
-internal const val LIB_CONTENT_METRICS_ID = "mobile.pax.app.size.lib.content5"
 internal class LibContentAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
