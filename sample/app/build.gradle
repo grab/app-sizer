@@ -15,7 +15,7 @@ android {
         minSdk 21
         targetSdk 32
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -81,9 +81,8 @@ dependencies {
 apply plugin: "com.grab.app-sizer"
 
 appSizeAnalysis {
-    forGrabTeamOnly = false
     enabled = true
-    android {
+    projectInput {
         apk {
             bundleToolPath = new File(rootProject.rootDir, '/binary/bundletool-all-1.15.4.jar').toString()
             deviceSpecs = [
@@ -94,6 +93,9 @@ appSizeAnalysis {
         variantFilter { variant ->
             variant.setIgnore(variant.flavors.contains("gea"))
         }
+        enableMatchDebugVariant = true
+        largeFileThreshold = 10
+        featureMappingFile = new File(rootProject.rootDir, 'module-owner.yml')
     }
     metrics {
         influxDB {
@@ -107,5 +109,4 @@ appSizeAnalysis {
                 ["pipelineId": "100"]
         )
     }
-    featureMappingFile = new File(rootProject.rootDir, 'module-owner.yml')
 }

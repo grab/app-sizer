@@ -19,10 +19,16 @@ import com.grab.plugin.sizer.utils.isJava
 import com.grab.plugin.sizer.utils.isKotlinJvm
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.the
 
+/*
+ * This internal `TaskManager` class is used for configuring tasks for the Plugin
+ *
+ * The `TaskManager` class is responsible for setting up tasks based on plugin extensions.
+ * It evaluates and applies tasks to projects based on the configuration found in a provided `AppSizePluginExtension`.
+ */
 internal class TaskManager(
     private val project: Project,
     private val pluginExtension: AppSizePluginExtension
@@ -41,7 +47,7 @@ internal class TaskManager(
         with(project.the<AppExtension>()) {
             applicationVariants.forEach { variant ->
                 val variantFilter = DefaultVariantFilter(variant)
-                pluginExtension.android.variantFilter?.execute(variantFilter)
+                pluginExtension.input.variantFilter?.execute(variantFilter)
                 if (!variantFilter.ignored) {
                     val generateApkTask = GenerateApkTask.registerTask(
                         project,
@@ -53,7 +59,8 @@ internal class TaskManager(
                         project,
                         variant = variant,
                         flavorMatchingFallbacks = getProductFlavor(variant)?.matchingFallbacks ?: emptyList(),
-                        buildTypeMatchingFallbacks = getOriginalBuildType(variant).matchingFallbacks
+                        buildTypeMatchingFallbacks = getOriginalBuildType(variant).matchingFallbacks,
+                        enableMatchDebugVariant = pluginExtension.input.enableMatchDebugVariant
                     )
 
 
@@ -80,7 +87,8 @@ internal class TaskManager(
             project = project,
             variant = variant,
             flavorMatchingFallbacks = appExtension.getProductFlavor(variant)?.matchingFallbacks ?: emptyList(),
-            buildTypeMatchingFallbacks = appExtension.getOriginalBuildType(variant).matchingFallbacks
+            buildTypeMatchingFallbacks = appExtension.getOriginalBuildType(variant).matchingFallbacks,
+            enableMatchDebugVariant = pluginExtension.input.enableMatchDebugVariant
         )
         val markAsChecked = mutableSetOf<String>()
         dfs(project, markAsChecked, dependenciesComponent, appSizeTask)
@@ -98,7 +106,7 @@ internal class TaskManager(
         dependenciesComponent.configurationExtractor()
             .runtimeConfigurations(project)
             .flatMap { configuration ->
-                configuration.dependencies.withType(DefaultProjectDependency::class.java)
+                configuration.dependencies.withType(ProjectDependency::class.java)
             }.forEach {
                 dfs(it.dependencyProject, markAsChecked, dependenciesComponent, appSizeTask)
             }

@@ -8,10 +8,13 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.module.kotlin.contains
 import java.io.File
 
+private const val DEFAULT_LARGE_FILE = 10240 // 10kb
+
 @JsonDeserialize(using = ProjectInputConfigDeserializer::class)
 data class ProjectInputConfig(
     val version: String,
     val projectName: String,
+    val largeFileThreshold: Int = DEFAULT_LARGE_FILE,
     val modulesDirIsProjectRoot: Boolean,
     val librariesDirectory: File,
     val modulesDirectory: File,
@@ -19,12 +22,12 @@ data class ProjectInputConfig(
     val ownerMappingFile: File? = null,
 )
 
-
 class ProjectInputConfigDeserializer(vc: Class<*>? = null) : StdDeserializer<ProjectInputConfig>(vc) {
     override fun deserialize(jsonParser: JsonParser, ctxt: DeserializationContext): ProjectInputConfig =
         jsonParser.codec.readTree<JsonNode>(jsonParser).run {
             ProjectInputConfig(
                 version = get("version").asText(),
+                largeFileThreshold = if (contains("large-file-threshold")) get("large-file-threshold").asInt() else DEFAULT_LARGE_FILE,
                 projectName = get("project-name").asText(),
                 modulesDirIsProjectRoot = get("modules-dir-is-project-root").asBoolean(),
                 librariesDirectory = File(get("libraries-directory").asText()),

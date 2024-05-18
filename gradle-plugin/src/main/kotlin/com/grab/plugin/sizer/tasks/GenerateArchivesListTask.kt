@@ -26,11 +26,16 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
     @get:Input
     abstract val buildTypeMatchingFallbacks: ListProperty<String>
 
+    @get:Input
+    abstract val enableMatchDebugVariant: Property<Boolean>
+
     @get:OutputFile
     abstract val archiveDepFile: RegularFileProperty
 
     init {
-        archiveDepFile.convention(project.layout.buildDirectory.file("sizer/dep/dependencies.json"))
+        archiveDepFile.convention {
+            project.layout.buildDirectory.file("sizer/dep/${variant.get().name}/dependencies.json").get().asFile
+        }
     }
 
     @TaskAction
@@ -49,7 +54,8 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
         project,
         variant.get(),
         flavorMatchingFallbacks.get(),
-        buildTypeMatchingFallbacks.get()
+        buildTypeMatchingFallbacks.get(),
+        enableMatchDebugVariant.get()
     )
 
     companion object {
@@ -57,7 +63,8 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
             project: Project,
             variant: BaseVariant,
             flavorMatchingFallbacks: List<String>,
-            buildTypeMatchingFallbacks: List<String>
+            buildTypeMatchingFallbacks: List<String>,
+            enableMatchDebugVariant: Boolean
         ): TaskProvider<GenerateArchivesListTask> {
             return project.tasks.register(
                 "generateArchiveDep${variant.name.capitalize()}", GenerateArchivesListTask::class.java
@@ -65,6 +72,7 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
                 this.variant.set(variant)
                 this.buildTypeMatchingFallbacks.set(buildTypeMatchingFallbacks)
                 this.flavorMatchingFallbacks.set(flavorMatchingFallbacks)
+                this.enableMatchDebugVariant.set(enableMatchDebugVariant)
             }
         }
     }

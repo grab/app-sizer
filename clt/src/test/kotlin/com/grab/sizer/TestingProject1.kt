@@ -39,7 +39,6 @@ class TestingProject1 : FileSystem {
 
     private fun createConfig(): Config {
         return Config(
-            forGrabTeamOnly = false,
             projectInput = ProjectInputConfig(
                 version = "0.0.1",
                 projectName = "testing01",

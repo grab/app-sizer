@@ -30,6 +30,9 @@ internal abstract class GenerateApkTask : DefaultTask() {
     @get:Input
     abstract val bundleToolPath: Property<String>
 
+    @get:Input
+    abstract val variantName: Property<String>
+
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val deviceSpecFiles: ConfigurableFileCollection
@@ -47,7 +50,7 @@ internal abstract class GenerateApkTask : DefaultTask() {
         outputDirectories.set(
             project.provider {
                 deviceSpecFiles.map { specFile ->
-                    project.layout.buildDirectory.dir("sizer/apk/${specFile.nameWithoutExtension}").get()
+                    project.layout.buildDirectory.dir("sizer/apk/${variantName.get()}/${specFile.nameWithoutExtension}").get()
                 }
             }
         )
@@ -63,7 +66,7 @@ internal abstract class GenerateApkTask : DefaultTask() {
                         .find {
                             it.asFile.nameWithoutExtension == deviceSpecFile.nameWithoutExtension
                         }?.asFile
-                        ?: throw IllegalArgumentException("output folders are not match for ${deviceSpecFile.nameWithoutExtension}")
+                        ?: throw IllegalArgumentException("Output folders are not match for ${deviceSpecFile.nameWithoutExtension}")
                     if (!outputDir.exists()) {
                         outputDir.mkdirs()
                     } else {
@@ -81,7 +84,7 @@ internal abstract class GenerateApkTask : DefaultTask() {
     private val deviceSpecs: Iterable<File>
         get() = if (deviceSpecFiles.isEmpty) {
             setOf(
-                File.createTempFile("default_device", ".json")
+                File.createTempFile(DEFAULT_DEVICE_NAME, ".json")
                     .apply {
                         writeBytes(
                             DEFAULT_DEVICE_SPEC.toByteArray()
@@ -145,12 +148,13 @@ internal abstract class GenerateApkTask : DefaultTask() {
         ): TaskProvider<GenerateApkTask> {
             val bundleTask = project.tasks.named("sign${variant.name.capitalize()}Bundle")
             val task = project.tasks.register("generateApk${variant.name.capitalize()}", GenerateApkTask::class.java) {
-                deviceSpecFiles.setFrom(extension.android.apk.deviceSpecs)
-                bundleToolPath.set(extension.android.apk.bundleToolPath)
+                deviceSpecFiles.setFrom(extension.input.apk.deviceSpecs)
+                bundleToolPath.set(extension.input.apk.bundleToolPath)
                 bundleFile.set(
                     bundleTask.map { (it as FinalizeBundleTask).finalBundleFile.get() }
                 )
                 signingConfig.set(variant.signingConfig.toInternalSigningConfig())
+                variantName.set(variant.name)
             }
             return task
         }
