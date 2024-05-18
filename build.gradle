@@ -9,9 +9,4 @@ buildscript {
     }
 }
 
-subprojects {
-    group = 'com.grab'
-    version = System.getenv("CI")?.toBoolean() ? "SNAPSHOT-01" : "SNAPSHOT"
-}
-
 
