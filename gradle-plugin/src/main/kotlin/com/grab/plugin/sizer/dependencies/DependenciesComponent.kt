@@ -33,7 +33,8 @@ internal interface DependenciesComponent {
             @BindsInstance project: Project,
             @BindsInstance variant: BaseVariant,
             @BindsInstance @Named(BUILD_FLAVOR) flavorMatchingFallbacks: List<String>,
-            @BindsInstance @Named(BUILD_TYPE) buildTypeMatchingFallbacks: List<String>
+            @BindsInstance @Named(BUILD_TYPE) buildTypeMatchingFallbacks: List<String>,
+            @BindsInstance @Named(ENABLE_MATCH_DEBUG_VARIANT) enableMatchDebugVariant: Boolean
         ): DependenciesComponent
     }
 }

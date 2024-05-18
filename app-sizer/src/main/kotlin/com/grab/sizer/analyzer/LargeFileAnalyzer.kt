@@ -3,25 +3,22 @@ package com.grab.sizer.analyzer
 import com.grab.sizer.AnalyticsOption
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.*
-import com.grab.sizer.analyzer.model.castToClass
-import com.grab.sizer.analyzer.model.castToRawFile
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.parser.getAars
 import com.grab.sizer.parser.getJars
 import com.grab.sizer.report.*
+import com.grab.sizer.utils.InputProvider
 import javax.inject.Inject
 
-
-// Todo : move to a configurable value
-private const val SIZE_THRESHOLD = 10 * 1024
 
 internal class LargeFileAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val featureMapping: FeatureMapping,
-    private val projectInfoProvider: ProjectInfoProvider
+    private val projectInfoProvider: ProjectInfoProvider,
+    private val inputProvider: InputProvider
 ) : Analyzer {
     override fun process() {
         /**
@@ -60,8 +57,8 @@ internal class LargeFileAnalyzer @Inject constructor(
     }
 
     private fun Set<Contributor>.filterLargeFileContributors(): Set<Contributor> = map {
-        val resources = it.resources.filter { file -> file.size >= SIZE_THRESHOLD }.toSet()
-        val assets = it.assets.filter { file -> file.size >= SIZE_THRESHOLD }.toSet()
+        val resources = it.resources.filter { file -> file.size >= inputProvider.provideLargeFileThreshold() }.toSet()
+        val assets = it.assets.filter { file -> file.size >= inputProvider.provideLargeFileThreshold() }.toSet()
         return@map it.copy(resources = resources, assets = assets)
     }.filter { it.resources.isNotEmpty() || it.assets.isNotEmpty() }
         .toSet()

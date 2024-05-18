@@ -110,12 +110,7 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
                 this.extension = pluginExtension
                 this.variant.set(variant)
                 this.apkDirectories.setFrom(generateApkTask.map { it.outputDirectories })
-                // This hardcode config is specific for Grab team only. For some reason, we got the archives.json beforehand
-                if(pluginExtension.forGrabTeamOnly)
-                    this.archiveDepJsonFile.set(project.layout.buildDirectory.file("sizer/dep/dependencies.json"))
-                else
-                    this.archiveDepJsonFile.set(generateArchivesListTask.map { it.archiveDepFile.get() })
-
+                this.archiveDepJsonFile.set(generateArchivesListTask.map { it.archiveDepFile.get() })
                 this.libName.set(project.params().libraryName())
                 this.option.set(project.params().option())
                 this.outputDirectory.set(extension.metrics.localExtension.outputDirectory)

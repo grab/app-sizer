@@ -42,7 +42,9 @@ class PluginInputProvider(
     }
 
     override fun provideFeatureMappingFile(): File? =
-        if(extension.featureMappingFile.isPresent) extension.featureMappingFile.asFile.get() else null
+        if(extension.input.featureMappingFile.isPresent) extension.input.featureMappingFile.asFile.get() else null
+
+    override fun provideLargeFileThreshold(): Int = extension.input.largeFileThreshold
 }
 
 fun ArchiveDependencyStore.getExternalDependencies(): Sequence<ExternalDependency> =

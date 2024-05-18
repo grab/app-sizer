@@ -8,7 +8,6 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
 
 data class Config(
-    @JsonProperty("grab-team-only") val forGrabTeamOnly: Boolean,
     @JsonProperty("project-input") val projectInput: ProjectInputConfig,
     @JsonProperty("apk-generation") val apkGeneration: ApkGenerationConfig,
     @JsonProperty("report") val report: ReportConfig

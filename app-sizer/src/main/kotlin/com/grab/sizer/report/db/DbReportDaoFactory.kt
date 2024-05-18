@@ -20,13 +20,11 @@ class DbReportDaoFactory @Inject constructor(
     private fun InfluxDB.canConnectToSever(): Boolean = try {
         ping()
         true
-    }catch (e: InfluxDBIOException) {
+    } catch (e: InfluxDBIOException) {
         logger.log("Can not connect to the InfluxDb database", e)
-        e.printStackTrace()
         false
-    } catch (e : ConnectException){
+    } catch (e: ConnectException) {
         logger.log("Can not connect to the InfluxDb database", e)
-        e.printStackTrace()
         false
     }
 }
