@@ -106,7 +106,7 @@ appSizeAnalysis {
         }
 
         customAttributes.putAll(
-                ["pipelineId": "100"]
+                ["pipeline_id": "100"]
         )
     }
 }
