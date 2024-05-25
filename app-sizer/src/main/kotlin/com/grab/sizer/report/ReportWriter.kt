@@ -70,8 +70,8 @@ data class Report(
  * The ReportWriter is an abstraction layer for the reporting process. It's allowing for flexibility in the reporting logics
  * It could be implemented to send reports to database, markdown, json file, etc.
  *
- * This interface is utilized by the [com.grab.sizer.analyzer.Analyzer]'s implementations to report the output.
- * [com.grab.sizer.analyzer.Analyzer] will consume a set of [ReportWriter] instances provided by the [ReportModule] Dagger module.
+ * This interface is utilized by the [com.grab.sizer.AppSizer] to report the output.
+ * [com.grab.sizer.AppSizer] will consume a set of [ReportWriter] instances provided by the [ReportModule] Dagger module.
  *
  * Implement this interface to add a new reporting method, and add it to the [ReportModule]
  * The new implementation will then be automatically consumed by all [com.grab.sizer.analyzer.Analyzer].

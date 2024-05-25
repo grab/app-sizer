@@ -1,13 +1,11 @@
 package com.grab.sizer.analyzer
 
-import com.grab.sizer.AnalyticsOption
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.Contributor
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.*
 import java.io.File
-import java.util.*
 import javax.inject.Inject
 
 internal const val CODE_BASE_ID = "Codebase"
@@ -25,25 +23,23 @@ internal const val CODE_BASE_ID = "Codebase"
  *
  * @property apkComponentProcessor Responsible for processing APK, AAR or JAR files to generate the contributors
  * @property dataParser to parse APK, AAR or JAR files.
- * @property reportWriters Set of writers that handle writing the report output.
  * @property projectInfoProvider Provides information about the project.
  */
 internal class ApkAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
-    private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val projectInfoProvider: ProjectInfoProvider
 ) : Analyzer {
-    override fun process() {
+    override fun process(): Report {
         val processedData = apkComponentProcessor.process(
             dataParser.apks,
             dataParser.libAars,
             dataParser.libJars
         )
-        report(dataParser.apks, processedData.contributors)
+        return generateReport(dataParser.apks, processedData.contributors)
     }
 
-    private fun report(apks: Set<ApkFileInfo>, contributors: Set<Contributor>) {
+    private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
         val dexCompressedRatio = apks.dexDownloadRatio()
         val contributorList = contributors.sortedBy { it.getDownloadSize(dexCompressedRatio) }
         val apkReportRow = createApkReportRow(apks, dexCompressedRatio)
@@ -53,18 +49,13 @@ internal class ApkAnalyzer @Inject constructor(
         val codeBaseReports = codeBaseComponentReport(codeBaseReport(totalLibsReport, apkReport))
         val listOfReport = listOf(apkReportRow) + codeBaseReports + libComponentReport
 
-        reportWriters.forEach {
-            it.write(
-                AnalyticsOption.APK.name.lowercase(Locale.getDefault()),
-                Report(
-                    rows = listOfReport,
-                    id = METRICS_ID_APK,
-                    name = METRICS_ID_APK,
-                    projectInfo = projectInfoProvider.getProjectInfo(),
-                    customProperties = projectInfoProvider.getCustomProperties()
-                )
-            )
-        }
+        return Report(
+            rows = listOfReport,
+            id = METRICS_ID_APK,
+            name = METRICS_ID_APK,
+            projectInfo = projectInfoProvider.getProjectInfo(),
+            customProperties = projectInfoProvider.getCustomProperties()
+        )
     }
 
     private fun createApkReportRow(

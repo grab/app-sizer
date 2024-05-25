@@ -1,13 +1,14 @@
 package com.grab.sizer.analyzer
 
-import com.grab.sizer.AnalyticsOption
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.*
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.parser.getAars
 import com.grab.sizer.parser.getJars
-import com.grab.sizer.report.*
+import com.grab.sizer.report.Report
+import com.grab.sizer.report.Row
+import com.grab.sizer.report.TagField
 import com.grab.sizer.utils.InputProvider
 import javax.inject.Inject
 
@@ -19,7 +20,6 @@ import javax.inject.Inject
  *
  * @property apkComponentProcessor Responsible for processing APK, AAR, or JAR files to compile a list of contributors.
  * @property dataParser Parse APK, AAR, or JAR files.
- * @property reportWriters A set of report writers
  * @property teamMapping Handles the bi-directional mapping between modules and teams.
  * @property projectInfoProvider Provide project-related information.
  * @property inputProvider Provides the input used for analysis, such as threshold value for large file identification.
@@ -27,12 +27,11 @@ import javax.inject.Inject
 internal class LargeFileAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
-    private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val teamMapping: TeamMapping,
     private val projectInfoProvider: ProjectInfoProvider,
     private val inputProvider: InputProvider
 ) : Analyzer {
-    override fun process() {
+    override fun process(): Report {
         /**
          * Process the whole project to get the app module information
          */
@@ -57,13 +56,14 @@ internal class LargeFileAnalyzer @Inject constructor(
             dataParser.moduleJars
         )
 
-        report(dataParser.apks, processedData.contributors + appModule)
+        return generateReport(dataParser.apks, processedData.contributors + appModule)
     }
 
-    private fun report(apks: Set<ApkFileInfo>, contributors: Set<Contributor>) {
-        contributors.filterLargeFileContributors()
-            .toTeams(teamMapping).also { teams ->
-                reportLargeFiles(teams)
+    private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
+        return contributors.filterLargeFileContributors()
+            .toTeams(teamMapping)
+            .run {
+                reportLargeFiles(this)
             }
 
     }
@@ -75,22 +75,16 @@ internal class LargeFileAnalyzer @Inject constructor(
     }.filter { it.resources.isNotEmpty() || it.assets.isNotEmpty() }
         .toSet()
 
-    private fun reportLargeFiles(teams: List<Team>) {
+    private fun reportLargeFiles(teams: List<Team>): Report {
         val sortedTeamsReport = teams.sorByResources()
         val reportRows = sortedTeamsReport.toReportRows()
-
-        reportWriters.forEach {
-            it.write(
-                AnalyticsOption.LARGE_FILE.name.toLowerCase(),
-                Report(
-                    id = METRICS_ID_LARGE_FILES,
-                    name = METRICS_ID_LARGE_FILES,
-                    rows = reportRows,
-                    projectInfo = projectInfoProvider.getProjectInfo(),
-                    customProperties = projectInfoProvider.getCustomProperties()
-                )
-            )
-        }
+        return Report(
+            id = METRICS_ID_LARGE_FILES,
+            name = METRICS_ID_LARGE_FILES,
+            rows = reportRows,
+            projectInfo = projectInfoProvider.getProjectInfo(),
+            customProperties = projectInfoProvider.getCustomProperties()
+        )
     }
 
     private fun List<Team>.sorByResources(): List<Team> = this.sortedBy {

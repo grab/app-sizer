@@ -9,7 +9,7 @@ import com.grab.plugin.sizer.utils.PluginInputProvider
 import com.grab.plugin.sizer.utils.PluginLogger
 import com.grab.plugin.sizer.utils.PluginOutputProvider
 import com.grab.sizer.AnalyticsOption
-import com.grab.sizer.AnalyzerFactory
+import com.grab.sizer.AppSizer
 import com.grab.sizer.analyzer.ProjectInfoProvider
 import com.grab.sizer.report.CustomProperties
 import com.grab.sizer.report.ProjectInfo
@@ -58,27 +58,17 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
                 deviceName = apkDirectory.nameWithoutExtension,
                 buildType = variant.get().name
             )
-
             val archiveDependencyStore = ArchiveDependencyManager().readFromJsonFile(archiveDepJsonFile.asFile.get())
-
-            val analyzerMap = AnalyzerFactory()
-                .create(
-                    inputProvider = createInputProvider(archiveDependencyStore, apkDirectory),
-                    outputProvider = createOutputProvider(),
-                    projectInfoProvider = object : ProjectInfoProvider {
-                        override fun getProjectInfo() = projectInfo
-                        override fun getCustomProperties(): CustomProperties = extension.metrics.customAttributes.get()
-                    },
-                    libName = libName.orNull,
-                    logger = PluginLogger(project),
-                )
-            if (option.get() == AnalyticsOption.DEFAULT) {
-                analyzerMap
-                    .filterKeys { it != AnalyticsOption.LIB_CONTENT }
-                    .forEach { (_, analyzer) -> analyzer.process() }
-            } else {
-                analyzerMap[option.get()]?.process()
-            }
+            AppSizer(
+                inputProvider = createInputProvider(archiveDependencyStore, apkDirectory),
+                outputProvider = createOutputProvider(),
+                projectInfoProvider = object : ProjectInfoProvider {
+                    override fun getProjectInfo() = projectInfo
+                    override fun getCustomProperties(): CustomProperties = extension.metrics.customAttributes.get()
+                },
+                libName = libName.orNull,
+                logger = PluginLogger(project),
+            ).process(option.get())
         }
 
     }
@@ -94,7 +84,8 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
         apksDirectory
     )
 
-    private fun createOutputProvider(): PluginOutputProvider = PluginOutputProvider(extension, outputDirectory.asFile.get())
+    private fun createOutputProvider(): PluginOutputProvider =
+        PluginOutputProvider(extension, outputDirectory.asFile.get())
 
     companion object {
         fun registerTask(

@@ -1,6 +1,5 @@
 package com.grab.sizer.analyzer
 
-import com.grab.sizer.AnalyticsOption
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.*
 import com.grab.sizer.parser.ApkFileInfo
@@ -19,18 +18,16 @@ import javax.inject.Inject
  *
  * @property apkComponentProcessor An instance for processing APK, AAR, or JAR files to produce a list of contributors.
  * @property dataParser Parses APK, AAR, and JAR files for analysis.
- * @property reportWriters A set of ReportWriter instances to generate the final report output.
  * @property teamMapping Maps module to their corresponding team and vise versa
  * @property projectInfoProvider Provides necessary information related to the project.
  */
 internal class ModuleAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
-    private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val teamMapping: TeamMapping,
     private val projectInfoProvider: ProjectInfoProvider
 ) : Analyzer {
-    override fun process() {
+    override fun process(): Report {
         /**
          * Process the whole project to get the app module information
          */
@@ -53,29 +50,23 @@ internal class ModuleAnalyzer @Inject constructor(
             dataParser.moduleAars,
             dataParser.moduleJars
         )
-        report(dataParser.apks, processedData.contributors + appModule)
+        return generateReport(dataParser.apks, processedData.contributors + appModule)
     }
 
-    private fun report(apks: Set<ApkFileInfo>, contributors: Set<Contributor>) {
-        contributors.toModules().also { modules -> report(apks, modules) }
-    }
-
-    private fun report(apks: Set<ApkFileInfo>, modules: List<Module>) {
-        val dexCompressedRatio = apks.dexDownloadRatio()
-        val sortedTeamsReport = modules.sortedBy { it.getDownloadSize(dexCompressedRatio) }
-            .map { it.toReportItem(dexCompressedRatio, teamMapping.moduleToTeamMap) }
-        reportWriters.forEach {
-            it.write(
-                AnalyticsOption.MODULES.name.toLowerCase(),
-                Report(
+    private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
+        contributors.toModules()
+            .run {
+                val dexCompressedRatio = apks.dexDownloadRatio()
+                val sortedTeamsReport = sortedBy { it.getDownloadSize(dexCompressedRatio) }
+                    .map { it.toReportItem(dexCompressedRatio, teamMapping.moduleToTeamMap) }
+                return Report(
                     id = METRICS_ID_MODULES,
                     name = METRICS_ID_MODULES,
                     projectInfo = projectInfoProvider.getProjectInfo(),
                     rows = toReportRows(sortedTeamsReport),
                     customProperties = projectInfoProvider.getCustomProperties()
                 )
-            )
-        }
+            }
     }
 
     private fun toReportRows(reportItems: List<ReportItem>) =

@@ -1,6 +1,5 @@
 package com.grab.sizer.analyzer
 
-import com.grab.sizer.AnalyticsOption
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.Contributor
 import com.grab.sizer.analyzer.model.FileInfo
@@ -18,27 +17,25 @@ import javax.inject.Named
  *
  * @property apkComponentProcessor Responsible for processing APK, AAR, or JAR files to compile a list of contributors.
  * @property dataParser Parse APK, AAR, or JAR files.
- * @property reportWriters A set of report writers
  * @property projectInfoProvider Provide project-related information.
  */
 internal class LibContentAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
-    private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val projectInfoProvider: ProjectInfoProvider,
     private val dataParser: DataParser,
     @Named(NAMED_LIB_NAME)
     private val libName: String?
 ) : Analyzer {
-    override fun process() {
+    override fun process(): Report {
         val processedData = apkComponentProcessor.process(
             dataParser.apks,
             dataParser.libAars,
             dataParser.libJars
         )
-        report(dataParser.apks, processedData.contributors)
+        return generateReport(dataParser.apks, processedData.contributors)
     }
 
-    private fun report(apks: Set<ApkFileInfo>, contributors: Set<Contributor>) {
+    private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
         val dexCompressedRatio = apks.dexDownloadRatio()
         val library = contributors.find { File(it.path).nameWithoutExtension == libName }
             ?: throw RuntimeException("Can not find the $libName")
@@ -50,19 +47,13 @@ internal class LibContentAnalyzer @Inject constructor(
         val classRows = library.classes
             .map { clazz -> clazz.copy(downloadSize = (clazz.size * dexCompressedRatio).toLong()) }
             .toReportRows("Class")
-
-        reportWriters.forEach {
-            it.write(
-                AnalyticsOption.LIB_CONTENT.name.toLowerCase(),
-                Report(
-                    id = LIB_CONTENT_METRICS_ID,
-                    name = LIB_CONTENT_METRICS_ID,
-                    rows = resourceRows + assetRows + nativeLibRows + otherRows + classRows,
-                    projectInfo = projectInfoProvider.getProjectInfo(),
-                    customProperties = projectInfoProvider.getCustomProperties()
-                )
-            )
-        }
+        return Report(
+            id = LIB_CONTENT_METRICS_ID,
+            name = LIB_CONTENT_METRICS_ID,
+            rows = resourceRows + assetRows + nativeLibRows + otherRows + classRows,
+            projectInfo = projectInfoProvider.getProjectInfo(),
+            customProperties = projectInfoProvider.getCustomProperties()
+        )
     }
 
     private fun Collection<FileInfo>.toReportRows(type: String): List<Row> = map {

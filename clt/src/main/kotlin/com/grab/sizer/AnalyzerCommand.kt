@@ -9,7 +9,6 @@ import com.grab.sizer.utils.DefaultFileQuery
 import com.grab.sizer.utils.Logger
 import com.grab.sizer.utils.ProjectInfoProviderImpl
 import java.io.File
-import java.lang.Exception
 
 
 class AnalyzerCommand : CliktCommand() {
@@ -46,19 +45,20 @@ class AnalyzerCommand : CliktCommand() {
                 it.validateInput()
             }
         val logger: Logger = CltLogger()
-        val appSizeAnalysis = DefaultAppSizeAnalysis(logger, reportOption, libName)
         DefaultApkGenerator.create(config)
             .generate(config.apkGeneration.deviceSpecs)
             .forEach { apkDirectory ->
-                appSizeAnalysis.analysis(
+                AppSizer(
                     inputProvider = CltInputProvider(
                         fileQuery = DefaultFileQuery(),
                         config = config,
                         apksDirectory = apkDirectory
                     ),
                     outputProvider = CltOutputProvider(config.report),
-                    projectInfoProvider = ProjectInfoProviderImpl(config, apkDirectory.nameWithoutExtension)
-                )
+                    projectInfoProvider = ProjectInfoProviderImpl(config, apkDirectory.nameWithoutExtension),
+                    libName = libName,
+                    logger = logger
+                ).process(reportOption)
             }
     }
 

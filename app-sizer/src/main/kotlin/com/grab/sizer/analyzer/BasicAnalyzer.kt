@@ -1,7 +1,5 @@
 package com.grab.sizer.analyzer
 
-import com.grab.sizer.AnalyticsOption
-import com.grab.sizer.analyzer.model.Contributor
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.*
@@ -17,33 +15,22 @@ import javax.inject.Inject
  * - asset : The cumulative size contribution from assets.
  * - code : The cumulative size contribution from Java/Kotlin code.
  *
- * @property reportWriters Set of writers for generating report output.
  * @property projectInfoProvider Provides project-related information.
  * @property dataParser Parses APK, AAR and JAR for analysis.
  **/
 internal class BasicApkAnalyzer @Inject constructor(
-    private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val projectInfoProvider: ProjectInfoProvider,
     private val dataParser: DataParser
 ) : Analyzer {
-    override fun process() {
-        report(dataParser.apks, setOf())
-    }
-
-    private fun report(androidBinaryInfo: Set<ApkFileInfo>, contributors: Set<Contributor>) {
-        val dexCompressedRatio = androidBinaryInfo.dexDownloadRatio()
-        reportWriters.forEach {
-            it.write(
-                AnalyticsOption.BASIC.name.lowercase(),
-                Report(
-                    rows = androidBinaryInfo.createApkReportRows(dexCompressedRatio),
-                    id = METRICS_ID_BASIC,
-                    name = METRICS_ID_BASIC,
-                    projectInfo = projectInfoProvider.getProjectInfo(),
-                    customProperties = projectInfoProvider.getCustomProperties()
-                )
-            )
-        }
+    override fun process(): Report {
+        val androidBinaryInfo = dataParser.apks
+        return Report(
+            rows = androidBinaryInfo.createApkReportRows(androidBinaryInfo.dexDownloadRatio()),
+            id = METRICS_ID_BASIC,
+            name = METRICS_ID_BASIC,
+            projectInfo = projectInfoProvider.getProjectInfo(),
+            customProperties = projectInfoProvider.getCustomProperties()
+        )
     }
 
     private fun Set<ApkFileInfo>.createApkReportRows(dexCompressedRatio: Double): List<Row> {
