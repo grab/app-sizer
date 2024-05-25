@@ -1,4 +1,4 @@
-package com.grab.sizer.report
+package com.grab.sizer.analyzer
 
 import org.yaml.snakeyaml.Yaml
 import java.io.File

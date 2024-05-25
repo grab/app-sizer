@@ -1,7 +1,7 @@
 package com.grab.sizer.analyzer.model
 
 import com.grab.sizer.analyzer.toModules
-import com.grab.sizer.report.TeamMapping
+import com.grab.sizer.analyzer.TeamMapping
 import com.grab.sizer.report.ReportItem
 
 data class Team(

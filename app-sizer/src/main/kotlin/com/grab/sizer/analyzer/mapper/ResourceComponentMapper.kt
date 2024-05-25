@@ -45,7 +45,8 @@ internal class ResourceComponentMapper @Inject constructor() : ComponentMapper {
     private fun RawFileInfo.tryOriginalFile(): RawFileInfo {
         when {
             path.contains("$") -> {
-                /** There are cases the resources files are renamed, not sure why and how.
+                /**
+                 * There are cases the resources files are renamed, not sure why and how.
                  * Here is an example: "/res/drawable/$bg_network_error__0.xml"
                  */
                 val newPath = path.replace("$", "")

@@ -3,17 +3,15 @@ plugins {
 }
 
 dependencies {
-    implementation libs.influxdbClient
-    implementation libs.dexlib2
-    implementation libs.clikt
-    implementation libs.bundletool
-    implementation libs.apkanalyzer
-    implementation libs.common
+    implementation libs.org.influxdb.client
+    implementation libs.org.smali.dexlib2
+    implementation libs.android.tools.bundletool
+    implementation libs.android.tools.apkanalyzer
+    implementation libs.android.tools.common
     implementation libs.jackson.module.kotlin
     implementation libs.jackson.dataformat.yaml
     implementation libs.kxml2
     implementation libs.guava
-    implementation libs.poi.ooxml
     implementation libs.google.dagger
     implementation libs.gson
 

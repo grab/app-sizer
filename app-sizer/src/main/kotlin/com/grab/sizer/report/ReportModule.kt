@@ -1,5 +1,8 @@
 package com.grab.sizer.report
 
+import com.grab.sizer.analyzer.DummyTeamMapping
+import com.grab.sizer.analyzer.TeamMapping
+import com.grab.sizer.analyzer.YmlTeamMapping
 import com.grab.sizer.di.AppScope
 import com.grab.sizer.report.db.DbReportDaoFactory
 import com.grab.sizer.report.db.ReportDao
@@ -13,20 +16,11 @@ import dagger.multibindings.IntoSet
 
 @Module
 object ReportModule {
-
-    @Provides
-    fun provideTeamMapping(
-        inputProvider: InputProvider
-    ): TeamMapping {
-        val ownerMapping = inputProvider.provideTeamMappingFile()
-        return if (ownerMapping == null) DummyTeamMapping()
-        else YmlTeamMapping(ownerMapping)
-    }
-
     @Provides
     @IntoSet
-    fun provideXlsReportWriter(inputProvider: OutputProvider): ReportWriter =
-        XlsReportWriter(inputProvider.provideOutPutDirectory())
+    fun provideMarkdownReportWriter(inputProvider: OutputProvider): ReportWriter =
+        MarkdownReportWriter(inputProvider.provideOutPutDirectory())
+
 
     @Provides
     @IntoSet

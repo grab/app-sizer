@@ -9,8 +9,19 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
 
+
+/**
+ * JarStreamParser interface provides a method to parse a JAR file within an AAR.
+ * It uses the ZipEntry of the JAR file and a provided InputStream to access JAR content within the AAR file.
+ */
 interface JarStreamParser {
-    fun parse(entry: ZipEntry, inputStream: InputStream): JarFileInfo
+    /**
+     * Parses the contents of a JAR file within the AAR file.
+     * @param jarEntry ZipEntry of the JAR file within the AAR file.
+     * @param inputStream InputStream to access the JAR content.
+     * @return A JarFileInfo object containing the properties of parsed JAR file.
+     */
+    fun parse(jarEntry: ZipEntry, inputStream: InputStream): JarFileInfo
 }
 
 @AppScope
@@ -46,6 +57,10 @@ class DefaultJarStreamParser @Inject constructor() : JarStreamParser {
 
 internal fun ZipEntry.toClass(): ClassFileInfo {
     return ClassFileInfo(
+        /**
+         * Convert ZipEntry name to class name
+         * Example: "/com/grab/sample/dummy/DummyClass1.class" -> "com.grab.sample.dummy.DummyClass1"
+         */
         name = name.replace('/', '.').removeSuffix(".class"),
         compressedSize = compressedSize,
         size = size

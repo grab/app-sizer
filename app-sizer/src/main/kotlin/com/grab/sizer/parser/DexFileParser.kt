@@ -13,7 +13,15 @@ import java.io.InputStream
 import java.util.zip.ZipEntry
 import javax.inject.Inject
 
+
+/**
+ * DexFileParser interface provides a method for parsing a dex file located within an APK file.
+ */
 internal interface DexFileParser {
+    /**
+     * Parses a dex file within the APK.
+     * Reads input stream of the dex file, retrieves class details and converts the file attributes into a DexFileInfo object.
+     */
     fun parse(
         entry: ZipEntry,
         inputStream: InputStream,
@@ -22,6 +30,10 @@ internal interface DexFileParser {
     ): DexFileInfo
 }
 
+/**
+ * DefaultDexFileParser is the default implementation of the DexFileParser interface.
+ * It utilizes the DexBackedDexFile class from the 'org.smali:dexlib2' library to perform dex file parsing.
+ */
 @AppScope
 internal class DefaultDexFileParser @Inject constructor(
     private val logger: Logger

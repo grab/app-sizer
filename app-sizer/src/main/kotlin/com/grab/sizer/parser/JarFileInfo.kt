@@ -3,6 +3,10 @@ package com.grab.sizer.parser
 import com.grab.sizer.analyzer.model.ClassFileInfo
 import com.grab.sizer.analyzer.model.RawFileInfo
 
+/**
+ * A data class that represents a jar file parsed from the jar by [JarFileParser] or [JarStreamParser].
+ * It contains details like the classes, path to the file, native libs and others
+ */
 data class JarFileInfo(
     val name: String,
     val path : String,

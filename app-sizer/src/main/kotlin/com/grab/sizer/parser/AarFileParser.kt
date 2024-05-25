@@ -7,11 +7,19 @@ import java.io.File
 import java.util.zip.ZipFile
 import javax.inject.Inject
 
+/**
+ * The AarFileParser interface provides the method to parse a sequence of AAR files into a set of [AarFileInfo].
+ * Note: For native libraries located in the "jni" folder, their paths will be converted with "jni" replaced by "lib".
+ * This adjustment ensures the path inside the AAR file matches the path in the APK file.
+ */
 interface AarFileParser {
     fun parseAars(files : Sequence<File>): Set<AarFileInfo>
 }
 
-// http://tools.android.com/tech-docs/new-build-system/aar-format
+/**
+ * Default implementation of [AarFileParser].
+ * For more about the AAR file format, see: http://tools.android.com/tech-docs/new-build-system/aar-format
+ */
 @AppScope
 class DefaultAarFileParser @Inject constructor(private val jarParser: JarStreamParser) : AarFileParser {
 
@@ -22,7 +30,7 @@ class DefaultAarFileParser @Inject constructor(private val jarParser: JarStreamP
             val assets = mutableSetOf<RawFileInfo>()
             val nativeLibs = mutableSetOf<RawFileInfo>()
             val others = mutableSetOf<RawFileInfo>()
-            var jars = mutableSetOf<JarFileInfo>()
+            val jars = mutableSetOf<JarFileInfo>()
             while (entries.hasMoreElements()) {
                 val entry = entries.nextElement()
                 var fileInfo = RawFileInfo(
@@ -31,7 +39,7 @@ class DefaultAarFileParser @Inject constructor(private val jarParser: JarStreamP
                     size = entry.size,
                     downloadSize = -1,
                 )
-                // Todo, this is a hack
+                // Replace "jni" with "lib" to ensure the path matches with native lib in apk file
                 if (fileInfo.type == FileType.NATIVE_LIB) {
                     fileInfo = fileInfo.copy(path = fileInfo.path.replace("jni", "lib"))
                 }

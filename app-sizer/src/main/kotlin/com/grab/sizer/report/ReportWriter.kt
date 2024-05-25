@@ -55,7 +55,9 @@ data class TagField(
     override val value: Any,
 ) : Field
 
-
+/**
+ *
+ */
 data class Report(
     val id: String,
     val name: String,
@@ -64,6 +66,16 @@ data class Report(
     val customProperties: CustomProperties
 )
 
+/**
+ * The ReportWriter is an abstraction layer for the reporting process. It's allowing for flexibility in the reporting logics
+ * It could be implemented to send reports to database, markdown, json file, etc.
+ *
+ * This interface is utilized by the [com.grab.sizer.analyzer.Analyzer]'s implementations to report the output.
+ * [com.grab.sizer.analyzer.Analyzer] will consume a set of [ReportWriter] instances provided by the [ReportModule] Dagger module.
+ *
+ * Implement this interface to add a new reporting method, and add it to the [ReportModule]
+ * The new implementation will then be automatically consumed by all [com.grab.sizer.analyzer.Analyzer].
+ */
 interface ReportWriter {
     fun write(reportId: String, report: Report)
 }
