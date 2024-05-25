@@ -6,6 +6,16 @@ const val KEY_SIZE = "size"
 
 typealias CustomProperties = Map<String, String>
 
+/**
+ * A data class that encapsulates information about a project.
+ * It includes information such as the version name, project name, device name, and build type.
+ * All these attributes will be treated as tags in the database.
+ *
+ * @property versionName The version name of the application.
+ * @property projectName The name of the project.
+ * @property deviceName The name of the device where the application is analysis.
+ * @property buildType The type of the build (defaults to "production").
+ */
 data class ProjectInfo(
     val versionName: String,
     val projectName: String,

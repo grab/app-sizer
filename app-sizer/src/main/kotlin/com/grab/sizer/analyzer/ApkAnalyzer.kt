@@ -12,14 +12,30 @@ import javax.inject.Inject
 
 internal const val CODE_BASE_ID = "Codebase"
 
+/**
+ * A specific implementation of the Analyzer, focusing on APK analysis.
+ * This class take responsibility to handle [com.grab.sizer.AnalyticsOption.APK]
+ * It processes APK, AAR, and JAR components and generates detailed reports that break down the binary download size into:
+ * - android-java-libraries: Represents the size contributions from jar & aar libraries (excluding native .so files).
+ * - codebase-kotlin-java: Denotes the size contributions from the codebase's Java and Kotlin classes.
+ * - codebase-resources: Specifies the size contributions from the codebase's resources (eg: images, layouts).
+ * - codebase-assets: Represents the size contributions from the codebase's asset files.
+ * - codebase-native: Symbolizes the size contributions from the codebase's native C/C++ libraries.
+ * - native-libraries: Indicates the size contributions from native libraries (C/C++).
+ *
+ * @property apkComponentProcessor Responsible for processing APK, AAR or JAR files to generate the contributors
+ * @property dataParser to parse APK, AAR or JAR files.
+ * @property reportWriters Set of writers that handle writing the report output.
+ * @property projectInfoProvider Provides information about the project.
+ */
 internal class ApkAnalyzer @Inject constructor(
-    private val apkComponentAnalytic: ApkComponentProcessor,
+    private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val projectInfoProvider: ProjectInfoProvider
 ) : Analyzer {
     override fun process() {
-        val processedData = apkComponentAnalytic.process(
+        val processedData = apkComponentProcessor.process(
             dataParser.apks,
             dataParser.libAars,
             dataParser.libJars

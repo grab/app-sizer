@@ -15,12 +15,12 @@ import dagger.multibindings.IntoSet
 object ReportModule {
 
     @Provides
-    fun provideFeatureMapping(
+    fun provideTeamMapping(
         inputProvider: InputProvider
-    ): FeatureMapping {
-        val ownerMapping = inputProvider.provideFeatureMappingFile()
-        return if (ownerMapping == null) DummyFeatureMapping()
-        else YmlFeatureMapping(ownerMapping)
+    ): TeamMapping {
+        val ownerMapping = inputProvider.provideTeamMappingFile()
+        return if (ownerMapping == null) DummyTeamMapping()
+        else YmlTeamMapping(ownerMapping)
     }
 
     @Provides

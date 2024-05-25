@@ -7,7 +7,8 @@ import com.grab.sizer.report.ReportModule
 import com.grab.sizer.utils.InputProvider
 import com.grab.sizer.utils.Logger
 import com.grab.sizer.utils.OutputProvider
-import dagger.*
+import dagger.BindsInstance
+import dagger.Component
 import javax.inject.Named
 
 internal const val NAMED_LIB_NAME = "lib_name"

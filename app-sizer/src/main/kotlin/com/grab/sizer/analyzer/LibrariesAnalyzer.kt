@@ -13,6 +13,16 @@ import java.io.File
 import javax.inject.Inject
 
 
+/**
+ * An implementation of the Analyzer interface, focused on analyzing all libraries within the project.
+ * This class is designed to handle [com.grab.sizer.AnalyticsOption.LIBRARIES].
+ * The resulting report lists all libraries in the project along with their respective contributions to the total app download size.
+ *
+ * @property apkComponentProcessor An instance for processing APK, AAR, or JAR files to produce a list of contributors.
+ * @property dataParser Parses APK, AAR, and JAR files for analysis.
+ * @property reportWriters A set of ReportWriter instances to generate the final report output.
+ * @property projectInfoProvider Provides necessary information related to the project.
+ */
 internal class LibrariesAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,

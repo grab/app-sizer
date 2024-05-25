@@ -1,8 +1,8 @@
 package com.grab.sizer.parser
 
 
-import com.grab.sizer.di.AppScope
 import com.grab.sizer.analyzer.model.ClassFileInfo
+import com.grab.sizer.di.AppScope
 import com.grab.sizer.utils.Logger
 import com.grab.sizer.utils.log
 import org.jf.dexlib2.dexbacked.DexBackedClassDef
@@ -13,7 +13,7 @@ import java.io.InputStream
 import java.util.zip.ZipEntry
 import javax.inject.Inject
 
-interface DexFileParser {
+internal interface DexFileParser {
     fun parse(
         entry: ZipEntry,
         inputStream: InputStream,
@@ -23,7 +23,7 @@ interface DexFileParser {
 }
 
 @AppScope
-class DefaultDexFileParser @Inject constructor(
+internal class DefaultDexFileParser @Inject constructor(
     private val logger: Logger
 ) : DexFileParser {
     override fun parse(

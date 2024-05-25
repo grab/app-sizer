@@ -1,10 +1,10 @@
 package com.grab.sizer.parser
 
 import com.android.tools.apk.analyzer.ApkSizeCalculator
-import com.grab.sizer.di.AppScope
 import com.grab.sizer.analyzer.model.FileInfo
 import com.grab.sizer.analyzer.model.FileType
 import com.grab.sizer.analyzer.model.RawFileInfo
+import com.grab.sizer.di.AppScope
 import shadow.bundletool.com.android.tools.proguard.ProguardMap
 import java.io.File
 import java.nio.file.Path
@@ -12,16 +12,29 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import javax.inject.Inject
 
-interface ApkFileParser {
+
+internal interface ApkFileParser {
+    /**
+     * Parses a sequence of APK files and use R8 mapping file to extract and return the set of APK file information.
+     * This method de-obfuscates class names to make them readable, and estimates the download size of each file
+     * in the [ApkFileInfo] output.
+     *
+     * @param apks A sequence of APK files to be parsed.
+     * @param proguardMap A ProguardMap used for de-obfuscating class names in the APK files.
+     * @return A set of ApkFileInfo instances, each representing information about a parsed APK file.
+     */
     fun parseApks(apks: Sequence<File>, proguardMap: ProguardMap): Set<ApkFileInfo>
 }
 
 @AppScope
-class DefaultApkFileParser @Inject constructor(
+internal class DefaultApkFileParser @Inject constructor(
     private val dexFileParser: DexFileParser,
-    private val apkSizeCalculator: ApkSizeCalculator,
-    private val manifestFileParser: ManifestFileParser
+    private val apkSizeCalculator: ApkSizeCalculator
 ) : ApkFileParser {
+    override fun parseApks(apks: Sequence<File>, proguardMap: ProguardMap): Set<ApkFileInfo> = apks
+        .map { apkFile -> parse(apkFile, proguardMap) }
+        .toSet()
+
     private fun parse(file: File, proguardMap: ProguardMap): ApkFileInfo {
         val apkSizeInfo = apkSizeCalculator.parseSize(file.toPath())
         return parseApkFile(file, apkSizeInfo, proguardMap)
@@ -35,7 +48,6 @@ class DefaultApkFileParser @Inject constructor(
             val nativeLibs = mutableSetOf<RawFileInfo>()
             val others = mutableSetOf<FileInfo>()
             val dexes = mutableSetOf<DexFileInfo>()
-            var manifestFileInfo = ManifestFileInfo(downloadSize = 0, compressedSize = 0, size = 0, path = "")
             while (entries.hasMoreElements()) {
                 val entry = entries.nextElement()
                 val path = entry.getPath()
@@ -61,10 +73,7 @@ class DefaultApkFileParser @Inject constructor(
                             proguardMap
                         )
                     )
-                    FileType.MANIFEST -> {
-                        manifestFileInfo = manifestFileParser.parse(zipFile.getInputStream(entry), fileInfo)
-                        others.add(manifestFileInfo)
-                    }
+
                     else -> others.add(fileInfo)
                 }
             }
@@ -77,27 +86,22 @@ class DefaultApkFileParser @Inject constructor(
                 others = others,
                 dexes = dexes,
                 size = apkSizeInfo.size,
-                downloadSize = apkSizeInfo.downloadSize,
-                manifestFileInfo = manifestFileInfo
+                downloadSize = apkSizeInfo.downloadSize
             )
         }
     }
 
-    override fun parseApks(apks: Sequence<File>, proguardMap: ProguardMap): Set<ApkFileInfo> = apks
-        .map { apkFile -> parse(apkFile, proguardMap) }
-        .toSet()
-
     private fun ApkSizeCalculator.parseSize(path: Path): ApkSizeInfo = ApkSizeInfo(
-        downloadSize = apkSizeCalculator.getFullApkDownloadSize(path),
-        size = apkSizeCalculator.getFullApkDownloadSize(path),
-        downloadFileSizeMap = apkSizeCalculator.getDownloadSizePerFile(path),
-        rawFileSizeMap = apkSizeCalculator.getRawSizePerFile(path)
+        downloadSize = getFullApkDownloadSize(path),
+        size = getFullApkDownloadSize(path),
+        downloadFileSizeMap = getDownloadSizePerFile(path),
+        rawFileSizeMap = getRawSizePerFile(path)
     )
 }
 
 internal fun ZipEntry.getPath() = "/$name"
 
-class ApkSizeInfo(
+internal class ApkSizeInfo(
     val downloadSize: Long,
     val size: Long,
     val downloadFileSizeMap: Map<String, Long>,

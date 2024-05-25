@@ -8,11 +8,19 @@ import com.grab.sizer.di.NAMED_LIB_NAME
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.*
-import com.grab.sizer.report.dexDownloadRatio
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
 
+/**
+ * A specific implementation of the Analyzer interface with a focus on analysis a library content.
+ * This class handles [com.grab.sizer.AnalyticsOption.LIB_CONTENT] and generates a detail report on the library content
+ *
+ * @property apkComponentProcessor Responsible for processing APK, AAR, or JAR files to compile a list of contributors.
+ * @property dataParser Parse APK, AAR, or JAR files.
+ * @property reportWriters A set of report writers
+ * @property projectInfoProvider Provide project-related information.
+ */
 internal class LibContentAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,

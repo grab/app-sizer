@@ -59,7 +59,7 @@ class CltInputProvider constructor(
 
     override fun provideR8MappingFile(): File? = config.projectInput.r8MappingFile
 
-    override fun provideFeatureMappingFile(): File? = config.projectInput.ownerMappingFile
+    override fun provideTeamMappingFile(): File? = config.projectInput.ownerMappingFile
 
     override fun provideLargeFileThreshold(): Int = config.projectInput.largeFileThreshold
 }

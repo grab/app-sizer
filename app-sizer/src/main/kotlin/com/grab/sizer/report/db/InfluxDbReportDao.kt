@@ -153,8 +153,8 @@ class InfluxDbReportDao @Inject constructor(
         influxDB.write(pointsBuilder.build())
     }
 
-    private fun Report.customPropertiesToTags(): List<TagField> = customProperties.map { property ->
-        TagField(property.key, property.value)
+    private fun Report.customPropertiesToTags(): List<DefaultField> = customProperties.map { property ->
+        DefaultField(property.key, property.value)
     }
 
     private fun ProjectInfo.toCommonTags(): List<TagField> =

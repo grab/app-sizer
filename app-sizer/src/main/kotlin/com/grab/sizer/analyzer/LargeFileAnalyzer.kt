@@ -11,12 +11,24 @@ import com.grab.sizer.report.*
 import com.grab.sizer.utils.InputProvider
 import javax.inject.Inject
 
-
+/**
+ * A specific implementation of the Analyzer interface with a focus on identifying large files in the project.
+ * This class handles [com.grab.sizer.AnalyticsOption.LARGE_FILE] and generates a report listing large files
+ * along with their corresponding modules and owners.
+ * Files are considered 'large' if their download size exceeds a user-configurable threshold.
+ *
+ * @property apkComponentProcessor Responsible for processing APK, AAR, or JAR files to compile a list of contributors.
+ * @property dataParser Parse APK, AAR, or JAR files.
+ * @property reportWriters A set of report writers
+ * @property teamMapping Handles the bi-directional mapping between modules and teams.
+ * @property projectInfoProvider Provide project-related information.
+ * @property inputProvider Provides the input used for analysis, such as threshold value for large file identification.
+ */
 internal class LargeFileAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
-    private val featureMapping: FeatureMapping,
+    private val teamMapping: TeamMapping,
     private val projectInfoProvider: ProjectInfoProvider,
     private val inputProvider: InputProvider
 ) : Analyzer {
@@ -50,8 +62,8 @@ internal class LargeFileAnalyzer @Inject constructor(
 
     private fun report(apks: Set<ApkFileInfo>, contributors: Set<Contributor>) {
         contributors.filterLargeFileContributors()
-            .toFeatures(featureMapping).also { features ->
-                reportLargeFiles(features)
+            .toTeams(teamMapping).also { teams ->
+                reportLargeFiles(teams)
             }
 
     }
@@ -63,9 +75,9 @@ internal class LargeFileAnalyzer @Inject constructor(
     }.filter { it.resources.isNotEmpty() || it.assets.isNotEmpty() }
         .toSet()
 
-    private fun reportLargeFiles(features: List<Feature>) {
-        val sortedFeaturesReport = features.sorByResources()
-        val reportRows = sortedFeaturesReport.toReportRows()
+    private fun reportLargeFiles(teams: List<Team>) {
+        val sortedTeamsReport = teams.sorByResources()
+        val reportRows = sortedTeamsReport.toReportRows()
 
         reportWriters.forEach {
             it.write(
@@ -81,11 +93,11 @@ internal class LargeFileAnalyzer @Inject constructor(
         }
     }
 
-    private fun List<Feature>.sorByResources(): List<Feature> = this.sortedBy {
+    private fun List<Team>.sorByResources(): List<Team> = this.sortedBy {
         it.resourcesDownloadSize + it.assetsDownloadSize
     }
 
-    private fun List<Feature>.toReportRows(): List<Row> = map { it to it.modules }
+    private fun List<Team>.toReportRows(): List<Row> = map { it to it.modules }
         .flatMap { pair ->
             pair.second.flatMap { module ->
                 module.contributors.flatMap { contributor -> contributor.resources + contributor.assets }

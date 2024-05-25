@@ -3,10 +3,6 @@ package com.grab.sizer.analyzer
 import com.grab.sizer.AnalyticsOption
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.*
-import com.grab.sizer.analyzer.model.castToClass
-import com.grab.sizer.analyzer.model.castToRawFile
-import com.grab.sizer.analyzer.model.sort
-import com.grab.sizer.analyzer.model.toFeatures
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.parser.getAars
@@ -15,11 +11,21 @@ import com.grab.sizer.report.*
 import javax.inject.Inject
 
 
-
+/**
+ * A specific implementation of the Analyzer interface with a focus on project codebase analysis.
+ * Assigned to handle [com.grab.sizer.AnalyticsOption.CODEBASE], this class provides a detailed report on the
+ * size contributions of individual team to the total app download size.
+ *
+ * @property dataParser Handles the parsing of APK, AAR, or JAR files.
+ * @property apkComponentProcessor Processes APK, AAR, or JAR files to produce a list of contributors.
+ * @property teamMapping Maps module to their corresponding team and vise versa
+ * @property reportWriters A set of writers for generating and handling report output.
+ * @property projectInfoProvider Provides information related to the current project.
+ */
 internal class CodebaseAnalyzer @Inject constructor(
     private val dataParser: DataParser,
     private val apkComponentProcessor: ApkComponentProcessor,
-    private val featureMapping: FeatureMapping,
+    private val teamMapping: TeamMapping,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val projectInfoProvider: ProjectInfoProvider
 ) : Analyzer {
@@ -52,20 +58,20 @@ internal class CodebaseAnalyzer @Inject constructor(
     }
 
     private fun report(androidBinaryInfo: Set<ApkFileInfo>, contributors: Set<Contributor>) {
-        reportFeatures(androidBinaryInfo, contributors.toFeatures(featureMapping))
+        reportTeam(androidBinaryInfo, contributors.toTeams(teamMapping))
     }
 
-    private fun reportFeatures(apks: Set<ApkFileInfo>, features: List<com.grab.sizer.analyzer.model.Feature>) {
+    private fun reportTeam(apks: Set<ApkFileInfo>, teams: List<Team>) {
         val dexCompressedRatio = apks.dexDownloadRatio()
-        val sortedFeaturesReport = features.sort(dexCompressedRatio)
+        val sortedTeamsReport = teams.sort(dexCompressedRatio)
             .map { it.toReportRow(dexCompressedRatio) }
         reportWriters.forEach {
             it.write(
                 AnalyticsOption.CODEBASE.name.toLowerCase(),
                 Report(
-                    id = METRICS_ID_FEATURES,
-                    name = METRICS_ID_FEATURES,
-                    rows = sortedFeaturesReport,
+                    id = METRICS_ID_CODEBASE,
+                    name = METRICS_ID_CODEBASE,
+                    rows = sortedTeamsReport,
                     projectInfo = projectInfoProvider.getProjectInfo(),
                     customProperties = projectInfoProvider.getCustomProperties()
                 )
@@ -73,7 +79,7 @@ internal class CodebaseAnalyzer @Inject constructor(
         }
     }
 
-    private fun com.grab.sizer.analyzer.model.Feature.toReportRow(dexCompressedRatio: Double): Row = createRow(
+    private fun Team.toReportRow(dexCompressedRatio: Double): Row = createRow(
         name,
         getDownloadSize(dexCompressedRatio),
     )

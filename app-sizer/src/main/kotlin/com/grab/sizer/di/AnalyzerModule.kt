@@ -6,8 +6,6 @@ import com.grab.sizer.AnalyticsOption
 import com.grab.sizer.analyzer.*
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.parser.DefaultDataParser
-import com.grab.sizer.parser.ManifestFileParser
-import com.grab.sizer.parser.ManifestFileParserImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -28,11 +26,6 @@ object AnalyzerModule {
     @Provides
     @AppScope
     fun provideXmlPullParserFactory(): XmlPullParserFactory = XmlPullParserFactory.newInstance()
-
-    @Provides
-    @AppScope
-    fun provideManifestFileParser(xmlPullParserFactory: XmlPullParserFactory): ManifestFileParser =
-        ManifestFileParserImpl(xmlPullParserFactory)
 
     @Provides
     @AppScope

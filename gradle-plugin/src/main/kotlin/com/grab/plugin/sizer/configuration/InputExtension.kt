@@ -12,7 +12,7 @@ private const val DEFAULT_LARGE_FILE = 10240 // 10kb
 open class InputExtension @Inject constructor(objects: ObjectFactory) {
     var apk: ApkGeneratorConfig = objects.newInstance(ApkGeneratorConfig::class.java, objects)
     var variantFilter: Action<VariantFilter>? = null
-    var featureMappingFile: RegularFileProperty = objects.fileProperty()
+    var teamMappingFile: RegularFileProperty = objects.fileProperty()
     var largeFileThreshold : Int = DEFAULT_LARGE_FILE
     var enableMatchDebugVariant = false
 
