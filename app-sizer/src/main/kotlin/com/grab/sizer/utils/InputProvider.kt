@@ -10,7 +10,7 @@ interface InputProvider {
     fun provideLibraryAar(): Sequence<File>
     fun provideApkFiles(): Sequence<File>
     fun provideR8MappingFile(): File?
-    fun provideFeatureMappingFile(): File?
+    fun provideTeamMappingFile(): File?
     fun provideLargeFileThreshold(): Int
 }
 

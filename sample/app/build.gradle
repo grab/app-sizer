@@ -95,7 +95,7 @@ appSizeAnalysis {
         }
         enableMatchDebugVariant = true
         largeFileThreshold = 10
-        featureMappingFile = new File(rootProject.rootDir, 'module-owner.yml')
+        teamMappingFile = new File(rootProject.rootDir, 'module-owner.yml')
     }
     metrics {
         influxDB {

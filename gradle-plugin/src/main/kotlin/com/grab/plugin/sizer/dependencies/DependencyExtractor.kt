@@ -3,11 +3,13 @@ package com.grab.plugin.sizer.dependencies
 import com.grab.sizer.utils.Logger
 import com.grab.sizer.utils.log
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.internal.artifacts.DefaultResolvedDependency
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency
+import org.gradle.internal.component.AmbiguousVariantSelectionException
 import java.util.*
 import javax.inject.Inject
 
@@ -50,7 +52,7 @@ class DefaultDependencyExtractor @Inject constructor(
     ) {
         configurationExtractor.runtimeConfigurations(project)
             .flatMap { it.dependencies }
-            .filterIsInstance<DefaultProjectDependency>()
+            .filterIsInstance<ProjectDependency>()
             .map { it.dependencyProject }
             .forEach { dependencyProject ->
                 archiveDependencyStore.add(
@@ -81,8 +83,12 @@ class DefaultDependencyExtractor @Inject constructor(
             .filterIsInstance<DefaultResolvedDependency>()
             .forEach { resolvedDep ->
                 if (resolvedDep.moduleVersion != INTERNAL_DEP_VERSION) {
-                    resolvedDep.allModuleArtifacts.forEach { artifact ->
-                        archiveDependencyStore.add(artifact.toArchiveDependency())
+                    try {
+                        resolvedDep.allModuleArtifacts.forEach { artifact ->
+                            archiveDependencyStore.add(artifact.toArchiveDependency())
+                        }
+                    } catch (e: AmbiguousVariantSelectionException) {
+                        logger.log("Fetching allModuleArtifacts having issue with ${resolvedDep.name}")
                     }
                 }
             }

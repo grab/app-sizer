@@ -11,11 +11,23 @@ import com.grab.sizer.report.*
 import javax.inject.Inject
 
 
+/**
+ * An implementation of the Analyzer interface, focused on analyzing all modules within the project.
+ * This class is designed to handle [com.grab.sizer.AnalyticsOption.MODULES].
+ * The resulting report lists all module in the project along with their respective contributions to the total app download size.
+ * The list of modules could be grouped by the owner.
+ *
+ * @property apkComponentProcessor An instance for processing APK, AAR, or JAR files to produce a list of contributors.
+ * @property dataParser Parses APK, AAR, and JAR files for analysis.
+ * @property reportWriters A set of ReportWriter instances to generate the final report output.
+ * @property teamMapping Maps module to their corresponding team and vise versa
+ * @property projectInfoProvider Provides necessary information related to the project.
+ */
 internal class ModuleAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
     private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
-    private val featureMapping: FeatureMapping,
+    private val teamMapping: TeamMapping,
     private val projectInfoProvider: ProjectInfoProvider
 ) : Analyzer {
     override fun process() {
@@ -50,8 +62,8 @@ internal class ModuleAnalyzer @Inject constructor(
 
     private fun report(apks: Set<ApkFileInfo>, modules: List<Module>) {
         val dexCompressedRatio = apks.dexDownloadRatio()
-        val sortedFeaturesReport = modules.sortedBy { it.getDownloadSize(dexCompressedRatio) }
-            .map { it.toReportItem(dexCompressedRatio, featureMapping.moduleToFeatureMap) }
+        val sortedTeamsReport = modules.sortedBy { it.getDownloadSize(dexCompressedRatio) }
+            .map { it.toReportItem(dexCompressedRatio, teamMapping.moduleToTeamMap) }
         reportWriters.forEach {
             it.write(
                 AnalyticsOption.MODULES.name.toLowerCase(),
@@ -59,7 +71,7 @@ internal class ModuleAnalyzer @Inject constructor(
                     id = METRICS_ID_MODULES,
                     name = METRICS_ID_MODULES,
                     projectInfo = projectInfoProvider.getProjectInfo(),
-                    rows = toReportRows(sortedFeaturesReport),
+                    rows = toReportRows(sortedTeamsReport),
                     customProperties = projectInfoProvider.getCustomProperties()
                 )
             )

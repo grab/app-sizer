@@ -14,7 +14,7 @@ import dagger.Binds
 import dagger.Module
 
 @Module
-interface ParserBinder {
+internal interface ParserBinder {
     @Binds
     fun DefaultDexFileParser.bindDexFileParser(): DexFileParser
 

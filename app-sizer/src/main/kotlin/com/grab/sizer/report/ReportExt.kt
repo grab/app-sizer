@@ -47,10 +47,6 @@ internal fun Set<ApkFileInfo>.toReportField(dexCompressedRatio: Double): List<Fi
     )
 }
 
-private const val DEFAULT_VERSION_NAME = "0.0.0"
-internal fun Set<ApkFileInfo>.getVersionName(): String =
-    find { it.manifestFileInfo.versionName != null }?.manifestFileInfo?.versionName ?: DEFAULT_VERSION_NAME
-
 
 internal fun Set<ApkFileInfo>.dexDownloadRatio(): Double {
     val dexDownloadSize = flatMap { it.dexes }.sumOf { it.downloadSize }

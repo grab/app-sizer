@@ -1,10 +1,10 @@
 package com.grab.sizer.analyzer.model
 
 import com.grab.sizer.analyzer.toModules
-import com.grab.sizer.report.FeatureMapping
+import com.grab.sizer.report.TeamMapping
 import com.grab.sizer.report.ReportItem
 
-data class Feature(
+data class Team(
     val name: String,
     val modules: List<Module>
 ) {
@@ -34,16 +34,16 @@ data class Module(
         )
 }
 
-internal fun Set<Contributor>.toFeatures(featureMapping: FeatureMapping): List<Feature> {
+internal fun Set<Contributor>.toTeams(teamMapping: TeamMapping): List<Team> {
     val modules = toModules()
-    return featureMapping.featureToModuleMap.mapValues { entry ->
+    return teamMapping.teamToModuleMap.mapValues { entry ->
         entry.value.mapNotNull { moduleName ->
             modules.find { it.name == moduleName }
         }
-    }.map { Feature(it.key, it.value) }
+    }.map { Team(it.key, it.value) }
 }
 
-internal fun List<Feature>.sort(dexCompressedRatio: Double): List<Feature> {
+internal fun List<Team>.sort(dexCompressedRatio: Double): List<Team> {
     return sortedWith { o1, o2 ->
         val size1 = o1.getDownloadSize(dexCompressedRatio)
         val size2 = o2.getDownloadSize(dexCompressedRatio)
@@ -67,11 +67,11 @@ internal fun Set<Contributor>.moduleToContributors(): Map<String, List<Contribut
         }
 }
 
-fun Module.toReportItem(dexCompressedRatio: Double, moduleToFeatureMap: Map<String, String>): ReportItem =
+fun Module.toReportItem(dexCompressedRatio: Double, moduleToTeamMap: Map<String, String>): ReportItem =
     ReportItem(
         name = name,
         id = name,
-        owner = moduleToFeatureMap[name],
+        owner = moduleToTeamMap[name],
         extraInfo = "Sum up all codebase for $name",
         totalDownloadSize = getDownloadSize(dexCompressedRatio),
         classesSize = classSize,

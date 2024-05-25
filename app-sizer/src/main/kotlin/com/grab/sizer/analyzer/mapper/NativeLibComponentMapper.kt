@@ -6,6 +6,9 @@ import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.JarFileInfo
 import javax.inject.Inject
 
+/**
+ * Analyzes, maps and creates a ComponentMapperResult focusing on native libraries.
+ */
 internal class NativeLibComponentMapper @Inject constructor() : ComponentMapper {
     override fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): ComponentMapperResult {
         val apkLibs = apks.flatMap { apk -> apk.nativeLibs }

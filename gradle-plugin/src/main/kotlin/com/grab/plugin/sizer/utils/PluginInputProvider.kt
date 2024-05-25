@@ -41,8 +41,8 @@ class PluginInputProvider(
         } else null
     }
 
-    override fun provideFeatureMappingFile(): File? =
-        if(extension.input.featureMappingFile.isPresent) extension.input.featureMappingFile.asFile.get() else null
+    override fun provideTeamMappingFile(): File? =
+        if(extension.input.teamMappingFile.isPresent) extension.input.teamMappingFile.asFile.get() else null
 
     override fun provideLargeFileThreshold(): Int = extension.input.largeFileThreshold
 }

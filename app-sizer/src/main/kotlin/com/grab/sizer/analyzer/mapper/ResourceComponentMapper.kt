@@ -9,6 +9,9 @@ import javax.inject.Inject
 
 private const val RESOURCE_VERSION_EXTENSION = "-v\\d\\d"
 
+/**
+ * Analyzes, maps and creates a ComponentMapperResult focusing on resource.
+ */
 internal class ResourceComponentMapper @Inject constructor() : ComponentMapper {
     override fun analyze(
         apks: Set<ApkFileInfo>,
