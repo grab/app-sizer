@@ -20,7 +20,7 @@ class AppSizerConfigPlugin : Plugin<Project> {
 
         project.the<MobilePublishExtension>().apply {
             groupId = "com.grab"
-            version = if (System.getenv("CI") != null) "SNAPSHOT-02" else "SNAPSHOT"
+            version = if (System.getenv("CI") != null) "SNAPSHOT-03" else "SNAPSHOT"
         }
 
         project.tasks.withType(KotlinCompile::class.java).forEach {
