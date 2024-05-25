@@ -6,6 +6,7 @@ import com.grab.sizer.AnalyticsOption
 import com.grab.sizer.analyzer.*
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.parser.DefaultDataParser
+import com.grab.sizer.utils.InputProvider
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -30,6 +31,16 @@ object AnalyzerModule {
     @Provides
     @AppScope
     fun provideGson() = Gson()
+
+    @Provides
+    fun provideTeamMapping(
+        inputProvider: InputProvider
+    ): TeamMapping {
+        // Todo : Remove this logic from dagger module, possible remove DummyTeamMapping
+        val ownerMapping = inputProvider.provideTeamMappingFile()
+        return if (ownerMapping == null) DummyTeamMapping()
+        else YmlTeamMapping(ownerMapping)
+    }
 }
 
 

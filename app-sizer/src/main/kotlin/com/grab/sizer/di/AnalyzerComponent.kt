@@ -4,6 +4,7 @@ import com.grab.sizer.AnalyticsOption
 import com.grab.sizer.analyzer.Analyzer
 import com.grab.sizer.analyzer.ProjectInfoProvider
 import com.grab.sizer.report.ReportModule
+import com.grab.sizer.report.ReportWriter
 import com.grab.sizer.utils.InputProvider
 import com.grab.sizer.utils.Logger
 import com.grab.sizer.utils.OutputProvider
@@ -25,6 +26,7 @@ internal const val NAMED_LIB_NAME = "lib_name"
 @AppScope
 interface AnalyzerComponent {
     fun analyzerMap(): Map<AnalyticsOption, @JvmSuppressWildcards Analyzer>
+    fun reportWriters(): Set<@JvmSuppressWildcards ReportWriter>
 
     @Component.Factory
     interface Factory {

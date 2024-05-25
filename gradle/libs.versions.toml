@@ -13,8 +13,6 @@ jackson-module-kotlin = "2.14.2"
 jackson-dataformat-yaml = "2.14.2"
 kxml2 = "2.3.0"
 guava = "31.1-jre"
-poi-ooxml = "5.2.2"
-jxls-jexcel = "1.0.9"
 gson = "2.10.1"
 influxdbClient = "2.21"
 shadow-jar = "7.0.0"
@@ -30,19 +28,17 @@ kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", v
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 google-dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
-dexlib2 = { module = "org.smali:dexlib2", version.ref = "dexlib2" }
+org-smali-dexlib2 = { module = "org.smali:dexlib2", version.ref = "dexlib2" }
 clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
-bundletool = { module = "com.android.tools.build:bundletool", version.ref = "bundletool" }
-apkanalyzer = { module = "com.android.tools.apkparser:apkanalyzer", version.ref = "apkanalyzer" }
-common = { module = "com.android.tools:common", version.ref = "common" }
+android-tools-bundletool = { module = "com.android.tools.build:bundletool", version.ref = "bundletool" }
+android-tools-apkanalyzer = { module = "com.android.tools.apkparser:apkanalyzer", version.ref = "apkanalyzer" }
+android-tools-common = { module = "com.android.tools:common", version.ref = "common" }
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-module-kotlin" }
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson-dataformat-yaml" }
 kxml2 = { module = "net.sf.kxml:kxml2", version.ref = "kxml2" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
-poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi-ooxml" }
-jxls-jexcel = { module = "org.jxls:jxls-jexcel", version.ref = "jxls-jexcel" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-influxdbClient = { module = "org.influxdb:influxdb-java", version.ref = "influxdbClient" }
+org-influxdb-client = { module = "org.influxdb:influxdb-java", version.ref = "influxdbClient" }
 mobile-publish = { module = "com.grab:mobile-publish", version.ref = "mobile-publish" }
 
 # Tests

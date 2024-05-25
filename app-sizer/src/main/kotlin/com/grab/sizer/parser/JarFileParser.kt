@@ -1,13 +1,20 @@
 package com.grab.sizer.parser
 
-import com.grab.sizer.di.AppScope
 import com.grab.sizer.analyzer.model.ClassFileInfo
 import com.grab.sizer.analyzer.model.FileType
 import com.grab.sizer.analyzer.model.RawFileInfo
+import com.grab.sizer.di.AppScope
 import java.io.File
 import java.util.zip.ZipFile
 import javax.inject.Inject
 
+
+
+/**
+ * JarFileParser interface provides a method to parse a sequence of JAR files into a set of [JarFileInfo].
+ * Note: For native libraries (*.so), their paths will be adjusted to ensure the files reside under the "lib" folder.
+ * This modification facilitates mapping to native libraries in the APK file.
+ */
 interface JarFileParser {
     fun parseJars(files: Sequence<File>): Set<JarFileInfo>
 }
@@ -30,11 +37,14 @@ class DefaultJarFileParser @Inject constructor() : JarFileParser {
                 )
                 when (fileInfo.type) {
                     FileType.NATIVE_LIB -> {
+                        // Todo: revisit to only replace the folder, not the file name
+                        // This approach will not work if the lib name contain "jni"
                         val fileInfoCorrectName = fileInfo.copy(
                             path = fileInfo.path.replace("jni", "lib")
                         )
                         nativeLibs.add(fileInfoCorrectName)
                     }
+
                     FileType.CLASS -> classes.add(entry.toClass())
                     else -> others.add(fileInfo)
                 }

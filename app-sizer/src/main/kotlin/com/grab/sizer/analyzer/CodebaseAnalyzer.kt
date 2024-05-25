@@ -1,13 +1,14 @@
 package com.grab.sizer.analyzer
 
-import com.grab.sizer.AnalyticsOption
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.*
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.parser.getAars
 import com.grab.sizer.parser.getJars
-import com.grab.sizer.report.*
+import com.grab.sizer.report.Report
+import com.grab.sizer.report.Row
+import com.grab.sizer.report.dexDownloadRatio
 import javax.inject.Inject
 
 
@@ -19,17 +20,15 @@ import javax.inject.Inject
  * @property dataParser Handles the parsing of APK, AAR, or JAR files.
  * @property apkComponentProcessor Processes APK, AAR, or JAR files to produce a list of contributors.
  * @property teamMapping Maps module to their corresponding team and vise versa
- * @property reportWriters A set of writers for generating and handling report output.
  * @property projectInfoProvider Provides information related to the current project.
  */
 internal class CodebaseAnalyzer @Inject constructor(
     private val dataParser: DataParser,
     private val apkComponentProcessor: ApkComponentProcessor,
     private val teamMapping: TeamMapping,
-    private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val projectInfoProvider: ProjectInfoProvider
 ) : Analyzer {
-    override fun process() {
+    override fun process(): Report {
         /**
          * Process the whole project to get the app module information
          */
@@ -54,29 +53,21 @@ internal class CodebaseAnalyzer @Inject constructor(
                 dataParser.moduleAars,
                 dataParser.moduleJars
             )
-        report(dataParser.apks, modulesData.contributors + appModule)
+        return generateReport(dataParser.apks, modulesData.contributors + appModule)
     }
 
-    private fun report(androidBinaryInfo: Set<ApkFileInfo>, contributors: Set<Contributor>) {
-        reportTeam(androidBinaryInfo, contributors.toTeams(teamMapping))
-    }
-
-    private fun reportTeam(apks: Set<ApkFileInfo>, teams: List<Team>) {
+    private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
+        val teams: List<Team> = contributors.toTeams(teamMapping)
         val dexCompressedRatio = apks.dexDownloadRatio()
         val sortedTeamsReport = teams.sort(dexCompressedRatio)
             .map { it.toReportRow(dexCompressedRatio) }
-        reportWriters.forEach {
-            it.write(
-                AnalyticsOption.CODEBASE.name.toLowerCase(),
-                Report(
-                    id = METRICS_ID_CODEBASE,
-                    name = METRICS_ID_CODEBASE,
-                    rows = sortedTeamsReport,
-                    projectInfo = projectInfoProvider.getProjectInfo(),
-                    customProperties = projectInfoProvider.getCustomProperties()
-                )
-            )
-        }
+        return Report(
+            id = METRICS_ID_CODEBASE,
+            name = METRICS_ID_CODEBASE,
+            rows = sortedTeamsReport,
+            projectInfo = projectInfoProvider.getProjectInfo(),
+            customProperties = projectInfoProvider.getCustomProperties()
+        )
     }
 
     private fun Team.toReportRow(dexCompressedRatio: Double): Row = createRow(

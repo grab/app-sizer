@@ -14,12 +14,12 @@ import com.grab.sizer.analyzer.model.RawFileInfo
  */
 data class DexFileInfo(
     val name: String,
-    val downloadSize : Long,
+    val downloadSize: Long,
     val classes: Set<ClassFileInfo>,
     val others: Set<RawFileInfo> = emptySet(),
-    val size : Long,
-){
+    val size: Long,
+) {
     // The total size of classes and other files in the dex file (computed lazily).
-    val classSize : Long by lazy { classes.sumOf { it.size } + others.sumOf { it.size }}
+    val classSize: Long by lazy { classes.sumOf { it.size } + others.sumOf { it.size } }
 }
 

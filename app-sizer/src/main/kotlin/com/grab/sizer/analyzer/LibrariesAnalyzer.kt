@@ -1,13 +1,11 @@
 package com.grab.sizer.analyzer
 
-import com.grab.sizer.AnalyticsOption
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.Contributor
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.ReportItem
-import com.grab.sizer.report.ReportWriter
 import com.grab.sizer.report.dexDownloadRatio
 import java.io.File
 import javax.inject.Inject
@@ -20,40 +18,33 @@ import javax.inject.Inject
  *
  * @property apkComponentProcessor An instance for processing APK, AAR, or JAR files to produce a list of contributors.
  * @property dataParser Parses APK, AAR, and JAR files for analysis.
- * @property reportWriters A set of ReportWriter instances to generate the final report output.
  * @property projectInfoProvider Provides necessary information related to the project.
  */
 internal class LibrariesAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
-    private val reportWriters: Set<@JvmSuppressWildcards ReportWriter>,
     private val projectInfoProvider: ProjectInfoProvider,
     private val dataParser: DataParser
 ) : Analyzer {
-    override fun process() {
+    override fun process(): Report {
         val processedData = apkComponentProcessor.process(
             dataParser.apks,
             dataParser.libAars,
             dataParser.libJars
         )
-        report(dataParser.apks, processedData.contributors)
+        return generateReport(dataParser.apks, processedData.contributors)
     }
 
-    private fun report(apks: Set<ApkFileInfo>, contributors: Set<Contributor>) {
+    private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
         val dexCompressedRatio = apks.dexDownloadRatio()
         val contributorList = contributors.sortedBy { it.getDownloadSize(dexCompressedRatio) }
         val listOfReport = reportPerLibrary(dexCompressedRatio, contributorList)
-        reportWriters.forEach {
-            it.write(
-                AnalyticsOption.LIBRARIES.name.toLowerCase(),
-                Report(
-                    id = LIBRARY_METRICS_ID,
-                    name = LIBRARY_METRICS_ID,
-                    rows = listOfReport.toReportRows(),
-                    projectInfo = projectInfoProvider.getProjectInfo(),
-                    customProperties = projectInfoProvider.getCustomProperties()
-                )
-            )
-        }
+        return Report(
+            id = LIBRARY_METRICS_ID,
+            name = LIBRARY_METRICS_ID,
+            rows = listOfReport.toReportRows(),
+            projectInfo = projectInfoProvider.getProjectInfo(),
+            customProperties = projectInfoProvider.getCustomProperties()
+        )
     }
 
     private fun List<ReportItem>.toReportRows() =
