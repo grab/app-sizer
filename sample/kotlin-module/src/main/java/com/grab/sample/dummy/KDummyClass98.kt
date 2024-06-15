@@ -12,6 +12,7 @@ class KDummyClass98 {
         method8()
         method9()
         method10()
+
         return KDummyClass99().method1()
     }
 

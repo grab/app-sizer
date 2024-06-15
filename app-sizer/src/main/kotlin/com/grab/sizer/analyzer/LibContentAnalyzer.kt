@@ -6,7 +6,9 @@ import com.grab.sizer.analyzer.model.FileInfo
 import com.grab.sizer.di.NAMED_LIB_NAME
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
-import com.grab.sizer.report.*
+import com.grab.sizer.report.Report
+import com.grab.sizer.report.Row
+import com.grab.sizer.report.dexDownloadRatio
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
@@ -17,11 +19,9 @@ import javax.inject.Named
  *
  * @property apkComponentProcessor Responsible for processing APK, AAR, or JAR files to compile a list of contributors.
  * @property dataParser Parse APK, AAR, or JAR files.
- * @property projectInfoProvider Provide project-related information.
  */
 internal class LibContentAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
-    private val projectInfoProvider: ProjectInfoProvider,
     private val dataParser: DataParser,
     @Named(NAMED_LIB_NAME)
     private val libName: String?
@@ -51,19 +51,15 @@ internal class LibContentAnalyzer @Inject constructor(
             id = LIB_CONTENT_METRICS_ID,
             name = LIB_CONTENT_METRICS_ID,
             rows = resourceRows + assetRows + nativeLibRows + otherRows + classRows,
-            projectInfo = projectInfoProvider.getProjectInfo(),
-            customProperties = projectInfoProvider.getCustomProperties()
         )
     }
 
     private fun Collection<FileInfo>.toReportRows(type: String): List<Row> = map {
-        Row(
+        createRow(
+            rowName = it.name,
             name = it.name,
-            fields = listOf(
-                Field.createDefault("file-name", it.name),
-                Field.createDefault("size", it.downloadSize),
-                TagField("type", type),
-            )
+            value = it.downloadSize,
+            tag = type
         )
     }
 

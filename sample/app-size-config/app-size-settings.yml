@@ -20,14 +20,14 @@ apk-generation:
     key-pw: "12345678"
 report:
   output-directory: "./build/app-sizer"
-  customAttributes:
+  custom-attributes:
     pipelineId: "100"
   influx-db-config:
     db-name: "sizer"
     url: "http://localhost:8086"
     username: "root"
     password: "root"
-    retentionPolicy:
+    retention-policy:
       name: "app_sizer"
       duration: "360d"
       shard-duration: "0m"

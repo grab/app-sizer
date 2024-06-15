@@ -37,11 +37,11 @@ internal fun Set<ApkFileInfo>.toReportField(dexCompressedRatio: Double): List<Fi
         resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + classDownloadSize
     return listOf(
         TagField(
-            name = KEY_CONTRIBUTOR,
+            name = FIELD_KEY_CONTRIBUTOR,
             value = "apk"
         ),
         DefaultField(
-            name = KEY_SIZE,
+            name = FIELD_KEY_SIZE,
             value = total
         )
     )

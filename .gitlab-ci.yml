@@ -11,7 +11,9 @@ stages:
 
 build:
   stage: build
-  script: ./gradlew gradle-plugin:assemble
+  script:
+    - free -h
+    - ./gradlew gradle-plugin:assemble
   tags:
     - xlarge
   artifacts:

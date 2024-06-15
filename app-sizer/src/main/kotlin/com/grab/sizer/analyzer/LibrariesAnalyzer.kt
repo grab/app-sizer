@@ -18,11 +18,9 @@ import javax.inject.Inject
  *
  * @property apkComponentProcessor An instance for processing APK, AAR, or JAR files to produce a list of contributors.
  * @property dataParser Parses APK, AAR, and JAR files for analysis.
- * @property projectInfoProvider Provides necessary information related to the project.
  */
 internal class LibrariesAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
-    private val projectInfoProvider: ProjectInfoProvider,
     private val dataParser: DataParser
 ) : Analyzer {
     override fun process(): Report {
@@ -41,16 +39,9 @@ internal class LibrariesAnalyzer @Inject constructor(
         return Report(
             id = LIBRARY_METRICS_ID,
             name = LIBRARY_METRICS_ID,
-            rows = listOfReport.toReportRows(),
-            projectInfo = projectInfoProvider.getProjectInfo(),
-            customProperties = projectInfoProvider.getCustomProperties()
+            rows = listOfReport.map { reportItem -> createRow(reportItem.name, reportItem.totalDownloadSize) },
         )
     }
-
-    private fun List<ReportItem>.toReportRows() =
-        map { reportItem ->
-            createRow(reportItem.name, reportItem.totalDownloadSize)
-        }
 
     private fun Contributor.toReportItem(dexCompressedRatio: Double): ReportItem = ReportItem(
         name = File(path).nameWithoutExtension,

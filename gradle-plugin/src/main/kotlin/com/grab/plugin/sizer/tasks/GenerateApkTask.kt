@@ -27,8 +27,8 @@ private const val DEFAULT_DEVICE_SPEC = """
 internal const val DEFAULT_DEVICE_NAME = "default_device"
 
 internal abstract class GenerateApkTask : DefaultTask() {
-    @get:Input
-    abstract val bundleToolPath: Property<String>
+    @get:InputFile
+    abstract val bundleToolFile: RegularFileProperty
 
     @get:Input
     abstract val variantName: Property<String>
@@ -38,7 +38,7 @@ internal abstract class GenerateApkTask : DefaultTask() {
     abstract val deviceSpecFiles: ConfigurableFileCollection
 
     @get:InputFile
-    abstract val bundleFile: RegularFileProperty
+    abstract val appBundleFile: RegularFileProperty
 
     @get:Input
     abstract val signingConfig: Property<InternalSigningConfig>
@@ -47,10 +47,13 @@ internal abstract class GenerateApkTask : DefaultTask() {
     abstract val outputDirectories: ListProperty<Directory>
 
     init {
-        outputDirectories.set(
+        outputDirectories.convention(
+            // Add the provider to ensure the deviceSpecFiles values has set
             project.provider {
                 deviceSpecFiles.map { specFile ->
-                    project.layout.buildDirectory.dir("sizer/apk/${variantName.get()}/${specFile.nameWithoutExtension}").get()
+                    project.layout.buildDirectory
+                        .dir("sizer/apk/${variantName.get()}/${specFile.nameWithoutExtension}")
+                        .get()
                 }
             }
         )
@@ -100,7 +103,7 @@ internal abstract class GenerateApkTask : DefaultTask() {
             commandLine(
                 "java",
                 "-jar",
-                bundleToolPath.get(),
+                bundleToolFile.asFile.get().path,
                 "extract-apks",
                 "--apks=${apksTempFile.path}",
                 "--output-dir=${outputDirectory.path}",
@@ -117,9 +120,9 @@ internal abstract class GenerateApkTask : DefaultTask() {
             commandLine(
                 "java",
                 "-jar",
-                bundleToolPath.get(),
+                bundleToolFile.asFile.get().path,
                 "build-apks",
-                "--bundle=${bundleFile.asFile.get().path}",
+                "--bundle=${appBundleFile.asFile.get().path}",
                 "--output=${apksTempFile.path}",
                 "--ks=${realSigningConfig.storeFile}",
                 "--ks-pass=pass:${realSigningConfig.storePassword}",
@@ -149,8 +152,8 @@ internal abstract class GenerateApkTask : DefaultTask() {
             val bundleTask = project.tasks.named("sign${variant.name.capitalize()}Bundle")
             val task = project.tasks.register("generateApk${variant.name.capitalize()}", GenerateApkTask::class.java) {
                 deviceSpecFiles.setFrom(extension.input.apk.deviceSpecs)
-                bundleToolPath.set(extension.input.apk.bundleToolPath)
-                bundleFile.set(
+                bundleToolFile.set(extension.input.apk.bundleToolFile)
+                appBundleFile.set(
                     bundleTask.map { (it as FinalizeBundleTask).finalBundleFile.get() }
                 )
                 signingConfig.set(variant.signingConfig.toInternalSigningConfig())

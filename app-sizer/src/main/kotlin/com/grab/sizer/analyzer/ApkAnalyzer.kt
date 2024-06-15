@@ -23,12 +23,10 @@ internal const val CODE_BASE_ID = "Codebase"
  *
  * @property apkComponentProcessor Responsible for processing APK, AAR or JAR files to generate the contributors
  * @property dataParser to parse APK, AAR or JAR files.
- * @property projectInfoProvider Provides information about the project.
  */
 internal class ApkAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
-    private val dataParser: DataParser,
-    private val projectInfoProvider: ProjectInfoProvider
+    private val dataParser: DataParser
 ) : Analyzer {
     override fun process(): Report {
         val processedData = apkComponentProcessor.process(
@@ -53,8 +51,6 @@ internal class ApkAnalyzer @Inject constructor(
             rows = listOfReport,
             id = METRICS_ID_APK,
             name = METRICS_ID_APK,
-            projectInfo = projectInfoProvider.getProjectInfo(),
-            customProperties = projectInfoProvider.getCustomProperties()
         )
     }
 

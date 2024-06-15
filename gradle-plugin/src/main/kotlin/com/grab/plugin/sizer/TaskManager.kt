@@ -6,10 +6,7 @@ import com.android.build.gradle.internal.dsl.BuildType
 import com.android.build.gradle.internal.dsl.ProductFlavor
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import com.grab.plugin.sizer.configuration.DefaultVariantFilter
-import com.grab.plugin.sizer.dependencies.AndroidAppSizeVariant
-import com.grab.plugin.sizer.dependencies.DaggerDependenciesComponent
-import com.grab.plugin.sizer.dependencies.DependenciesComponent
-import com.grab.plugin.sizer.dependencies.VariantExtractor
+import com.grab.plugin.sizer.dependencies.*
 import com.grab.plugin.sizer.tasks.AppSizeAnalysisTask
 import com.grab.plugin.sizer.tasks.GenerateApkTask
 import com.grab.plugin.sizer.tasks.GenerateArchivesListTask
@@ -81,34 +78,34 @@ internal class TaskManager(
         project: Project,
         variant: BaseVariant,
         appExtension: AppExtension,
-        appSizeTask: TaskProvider<out Task>
+        depTask: TaskProvider<out Task>
     ) {
         val dependenciesComponent = DaggerDependenciesComponent.factory().create(
             project = project,
-            variant = variant,
+            variantInput = variant.toVariantInput(),
             flavorMatchingFallbacks = appExtension.getProductFlavor(variant)?.matchingFallbacks ?: emptyList(),
             buildTypeMatchingFallbacks = appExtension.getOriginalBuildType(variant).matchingFallbacks,
             enableMatchDebugVariant = pluginExtension.input.enableMatchDebugVariant
         )
         val markAsChecked = mutableSetOf<String>()
-        dfs(project, markAsChecked, dependenciesComponent, appSizeTask)
+        dfs(project, markAsChecked, dependenciesComponent, depTask)
     }
 
     private fun dfs(
         project: Project,
         markAsChecked: MutableSet<String>,
         dependenciesComponent: DependenciesComponent,
-        appSizeTask: TaskProvider<out Task>
+        depTask: TaskProvider<out Task>
     ) {
         if (markAsChecked.contains(project.path)) return
         markAsChecked.add(project.path)
-        handleSubProject(project, appSizeTask, dependenciesComponent.variantExtractor())
+        handleSubProject(project, depTask, dependenciesComponent.variantExtractor())
         dependenciesComponent.configurationExtractor()
             .runtimeConfigurations(project)
             .flatMap { configuration ->
                 configuration.dependencies.withType(ProjectDependency::class.java)
             }.forEach {
-                dfs(it.dependencyProject, markAsChecked, dependenciesComponent, appSizeTask)
+                dfs(it.dependencyProject, markAsChecked, dependenciesComponent, depTask)
             }
     }
 

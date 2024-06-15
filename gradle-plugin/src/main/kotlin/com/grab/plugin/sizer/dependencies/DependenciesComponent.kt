@@ -21,7 +21,6 @@ internal annotation class DependenciesScope
 @DependenciesScope
 internal interface DependenciesComponent {
     fun dependencyExtractor(): DependencyExtractor
-    fun buildVariant(): BaseVariant
     fun configurationExtractor(): ConfigurationExtractor
     fun variantExtractor(): VariantExtractor
 
@@ -31,7 +30,7 @@ internal interface DependenciesComponent {
     interface Factory {
         fun create(
             @BindsInstance project: Project,
-            @BindsInstance variant: BaseVariant,
+            @BindsInstance variantInput: VariantInput,
             @BindsInstance @Named(BUILD_FLAVOR) flavorMatchingFallbacks: List<String>,
             @BindsInstance @Named(BUILD_TYPE) buildTypeMatchingFallbacks: List<String>,
             @BindsInstance @Named(ENABLE_MATCH_DEBUG_VARIANT) enableMatchDebugVariant: Boolean

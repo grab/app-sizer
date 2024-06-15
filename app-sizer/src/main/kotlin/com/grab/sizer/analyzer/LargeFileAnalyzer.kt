@@ -8,7 +8,6 @@ import com.grab.sizer.parser.getAars
 import com.grab.sizer.parser.getJars
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.Row
-import com.grab.sizer.report.TagField
 import com.grab.sizer.utils.InputProvider
 import javax.inject.Inject
 
@@ -21,14 +20,12 @@ import javax.inject.Inject
  * @property apkComponentProcessor Responsible for processing APK, AAR, or JAR files to compile a list of contributors.
  * @property dataParser Parse APK, AAR, or JAR files.
  * @property teamMapping Handles the bi-directional mapping between modules and teams.
- * @property projectInfoProvider Provide project-related information.
  * @property inputProvider Provides the input used for analysis, such as threshold value for large file identification.
  */
 internal class LargeFileAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
     private val teamMapping: TeamMapping,
-    private val projectInfoProvider: ProjectInfoProvider,
     private val inputProvider: InputProvider
 ) : Analyzer {
     override fun process(): Report {
@@ -82,8 +79,6 @@ internal class LargeFileAnalyzer @Inject constructor(
             id = METRICS_ID_LARGE_FILES,
             name = METRICS_ID_LARGE_FILES,
             rows = reportRows,
-            projectInfo = projectInfoProvider.getProjectInfo(),
-            customProperties = projectInfoProvider.getCustomProperties()
         )
     }
 
@@ -98,21 +93,12 @@ internal class LargeFileAnalyzer @Inject constructor(
                     .map { res ->
                         val segmentPaths = res.path.split("/")
                         val fileName = segmentPaths.last()
-                        Row(
-                            name = pair.first.name,
-                            fields = listOf(
-                                TagField(
-                                    name = "owner",
-                                    value = pair.first.name
-                                ),
-                                TagField(
-                                    name = "module",
-                                    value = module.name
-                                )
-                            ) + createContributorFields(
-                                name = fileName,
-                                value = res.downloadSize,
-                            )
+                        createRow(
+                            name = fileName,
+                            value = res.downloadSize,
+                            owner = pair.first.name,
+                            tag = module.name,
+                            rowName = pair.first.name
                         )
                     }
             }

@@ -6,7 +6,9 @@ import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.parser.getAars
 import com.grab.sizer.parser.getJars
-import com.grab.sizer.report.*
+import com.grab.sizer.report.Report
+import com.grab.sizer.report.ReportItem
+import com.grab.sizer.report.dexDownloadRatio
 import javax.inject.Inject
 
 
@@ -19,13 +21,11 @@ import javax.inject.Inject
  * @property apkComponentProcessor An instance for processing APK, AAR, or JAR files to produce a list of contributors.
  * @property dataParser Parses APK, AAR, and JAR files for analysis.
  * @property teamMapping Maps module to their corresponding team and vise versa
- * @property projectInfoProvider Provides necessary information related to the project.
  */
 internal class ModuleAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
     private val teamMapping: TeamMapping,
-    private val projectInfoProvider: ProjectInfoProvider
 ) : Analyzer {
     override fun process(): Report {
         /**
@@ -62,23 +62,18 @@ internal class ModuleAnalyzer @Inject constructor(
                 return Report(
                     id = METRICS_ID_MODULES,
                     name = METRICS_ID_MODULES,
-                    projectInfo = projectInfoProvider.getProjectInfo(),
                     rows = toReportRows(sortedTeamsReport),
-                    customProperties = projectInfoProvider.getCustomProperties()
                 )
             }
     }
 
     private fun toReportRows(reportItems: List<ReportItem>) =
         reportItems.map { reportItem ->
-            Row(
-                name = reportItem.name,
-                fields = listOf(
-                    TagField(
-                        name = "owner",
-                        value = reportItem.owner ?: ""
-                    )
-                ) + createContributorFields(name = reportItem.id, value = reportItem.totalDownloadSize)
+            createRow(
+                name = reportItem.id,
+                value = reportItem.totalDownloadSize,
+                owner = reportItem.owner ?: "",
+                rowName = reportItem.name
             )
         }
 }

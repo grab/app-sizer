@@ -1,10 +1,10 @@
-package com.grab.plugin.sizer.tasks
+package com.grab.plugin.sizer.dependencies
 
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import com.grab.plugin.sizer.dependencies.*
+import com.grab.plugin.sizer.tasks.*
 
 private const val NAME = "name"
 private const val TYPE = "type"
@@ -14,7 +14,6 @@ private const val TYPE_EXTERNAL = "external"
 private const val TYPE_APP = "app"
 
 private const val PATH_TO_ARTIFACT = "pathToArtifact"
-
 class ArchiveDependencyTypeAdapter : TypeAdapter<ArchiveDependency>() {
     override fun write(writer: JsonWriter, dependency: ArchiveDependency) {
         writer.beginObject()

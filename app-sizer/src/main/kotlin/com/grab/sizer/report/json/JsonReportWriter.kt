@@ -4,20 +4,24 @@ import com.google.gson.Gson
 import com.grab.sizer.report.*
 import java.io.File
 import java.io.FileWriter
+import javax.inject.Inject
+import javax.inject.Named
 
 typealias ReportField = com.grab.sizer.report.Field
 
-class JsonReportWriter(
-    private val outputDirectory: File,
+class JsonReportWriter @Inject constructor(
+    @Named(NAMED_OUTPUT_DIR) private val outputDirectory: File,
+    private val projectInfo: ProjectInfo,
+    private val customProperties: CustomProperties,
     private val gson: Gson = Gson()
 ) : ReportWriter {
-    override fun write(reportId: String, report: Report) {
-        File(File(outputDirectory, report.projectInfo.deviceName), "$reportId-metrics.json").apply {
+    override fun write(report: Report) {
+        File(File(outputDirectory, projectInfo.deviceName), "${report.id}-metrics.json").apply {
             initOutPutFile()
             FileWriter(this).use { fileWriter ->
                 gson.toJson(
                     report.rows.flatMap { row ->
-                        row.toMetrics(report.projectInfo, report.customProperties, report.id)
+                        row.toMetrics(projectInfo, customProperties, report.id)
                     },
                     fileWriter
                 )
