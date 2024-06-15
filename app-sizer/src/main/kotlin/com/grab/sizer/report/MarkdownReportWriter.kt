@@ -1,17 +1,22 @@
 package com.grab.sizer.report
 
+import com.grab.sizer.analyzer.NOT_AVAILABLE_VALUE
 import java.io.File
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Named
 
 private const val KILO_BYTE = 1024L
 private const val MEGA_BYTE = 1024L * 1024L
 
+internal const val NAMED_OUTPUT_DIR = "output_dir"
+
 class MarkdownReportWriter @Inject constructor(
-    private val outputDirectory: File
+    @Named(NAMED_OUTPUT_DIR) private val outputDirectory: File,
+    private val projectInfo: ProjectInfo
 ) : ReportWriter {
-    override fun write(reportId: String, report: Report) {
-        File(File(outputDirectory, report.projectInfo.deviceName), "$reportId-report.md").apply {
+    override fun write(report: Report) {
+        File(File(outputDirectory, projectInfo.deviceName), "${report.id}-report.md").apply {
             initOutPutFile()
             writeText(
                 MarkdownTable(report.createHeader()).apply {
@@ -24,20 +29,23 @@ class MarkdownReportWriter @Inject constructor(
     }
 
     private fun Row.toMarkDown(): List<String> {
-        return fields.map { field ->
-            when (field.value) {
-                is Long -> (field.value as Long).reportSize()
-                else -> field.value.toString()
+        return fields.filter { it.value != NOT_AVAILABLE_VALUE }
+            .map { field ->
+                when (field.value) {
+                    is Long -> (field.value as Long).reportSize()
+                    else -> field.value.toString()
+                }
             }
-        }
     }
 
     private fun Report.createHeader(): List<String> {
-        return rows.firstOrNull()?.fields?.map { field ->
-            field.name.replaceFirstChar {
-                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-            }
-        } ?: emptyList()
+        return rows.firstOrNull()
+            ?.fields?.filter { it.value != NOT_AVAILABLE_VALUE }
+            ?.map { field ->
+                field.name.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                }
+            } ?: emptyList()
     }
 
     private fun File.initOutPutFile() {

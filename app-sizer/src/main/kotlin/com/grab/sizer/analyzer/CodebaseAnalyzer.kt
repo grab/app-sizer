@@ -20,13 +20,11 @@ import javax.inject.Inject
  * @property dataParser Handles the parsing of APK, AAR, or JAR files.
  * @property apkComponentProcessor Processes APK, AAR, or JAR files to produce a list of contributors.
  * @property teamMapping Maps module to their corresponding team and vise versa
- * @property projectInfoProvider Provides information related to the current project.
  */
 internal class CodebaseAnalyzer @Inject constructor(
     private val dataParser: DataParser,
     private val apkComponentProcessor: ApkComponentProcessor,
     private val teamMapping: TeamMapping,
-    private val projectInfoProvider: ProjectInfoProvider
 ) : Analyzer {
     override fun process(): Report {
         /**
@@ -64,9 +62,7 @@ internal class CodebaseAnalyzer @Inject constructor(
         return Report(
             id = METRICS_ID_CODEBASE,
             name = METRICS_ID_CODEBASE,
-            rows = sortedTeamsReport,
-            projectInfo = projectInfoProvider.getProjectInfo(),
-            customProperties = projectInfoProvider.getCustomProperties()
+            rows = sortedTeamsReport
         )
     }
 

@@ -51,6 +51,7 @@ open class InfluxDBExtension @Inject constructor(objects: ObjectFactory) {
     var url: Property<String> = objects.property(String::class.java)
     var username: Property<String> = objects.property(String::class.java)
     var password: Property<String> = objects.property(String::class.java)
+    var reportTableName: Property<String> = objects.property(String::class.java)
     var retentionPolicy: RetentionPolicyExtension = objects.newInstance(RetentionPolicyExtension::class.java, objects)
 
     fun retentionPolicy(closure: Closure<*>) {

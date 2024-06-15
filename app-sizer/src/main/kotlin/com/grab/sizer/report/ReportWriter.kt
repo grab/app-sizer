@@ -1,8 +1,11 @@
 package com.grab.sizer.report
 
 
-const val KEY_CONTRIBUTOR = "contributor"
-const val KEY_SIZE = "size"
+internal const val FIELD_KEY_CONTRIBUTOR = "contributor"
+internal const val FIELD_KEY_SIZE = "size"
+internal const val FIELD_KEY_OWNER = "owner"
+internal const val FIELD_KEY_TAG = "tag"
+
 
 typealias CustomProperties = Map<String, String>
 
@@ -61,9 +64,7 @@ data class TagField(
 data class Report(
     val id: String,
     val name: String,
-    val projectInfo: ProjectInfo,
-    val rows: List<Row>,
-    val customProperties: CustomProperties
+    val rows: List<Row>
 )
 
 /**
@@ -77,7 +78,7 @@ data class Report(
  * The new implementation will then be automatically consumed by all [com.grab.sizer.analyzer.Analyzer].
  */
 interface ReportWriter {
-    fun write(reportId: String, report: Report)
+    fun write(report: Report)
 }
 
 

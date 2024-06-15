@@ -1,10 +1,8 @@
-package com.grab.plugin.sizer.tasks
+package com.grab.plugin.sizer.dependencies
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import com.grab.plugin.sizer.dependencies.ArchiveDependency
-import com.grab.plugin.sizer.dependencies.ArchiveDependencyStore
 import java.io.File
 
 class ArchiveDependencyManager {

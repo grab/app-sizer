@@ -14,6 +14,7 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.the
 import java.io.File
+import java.io.Serializable
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -42,20 +43,35 @@ internal interface AppSizeVariant {
     val buildFlavor: String
 }
 
+data class VariantInput(
+    val name: String,
+    val flavorName: String,
+    val buildTypeName: String,
+    val versionName: String?
+) : Serializable
+
+internal fun BaseVariant.toVariantInput() = VariantInput(
+    name = name,
+    flavorName = flavorName,
+    buildTypeName = buildType.name,
+    versionName = mergedFlavor.versionName,
+)
+
+
 /**
  * DefaultVariantExtractor class is designed to extract matching variant and debug variant from various project types.
  * This class supports Android Applications, Android Libraries, Java and Kotlin JVM projects.
  * Based on the enableMatchDebugVariant flag, this implement of VariantExtractor will return the variant accordingly
  * - enableMatchDebugVariant is true, the variant debug build type will be selected by default, and the flavor will be matched
  * - enableMatchDebugVariant is false, the build type and flavor will be taken into account
- * @property baseVariant references the base variant being used for matching.
+ * @property variantInput references the base variant info being used for matching.
  * @property flavorMatchingFallbacks references list of build flavors to be used as fallbacks.
  * @property buildTypeMatchingFallbacks references list of build types to be used as fallbacks.
  * @property enableMatchDebugVariant specifies whether to match debug variant.
  */
 @DependenciesScope
 internal class DefaultVariantExtractor @Inject constructor(
-    private val baseVariant: BaseVariant,
+    private val variantInput: VariantInput,
     @Named(BUILD_FLAVOR)
     private val flavorMatchingFallbacks: List<String>,
     @Named(BUILD_TYPE)
@@ -64,10 +80,12 @@ internal class DefaultVariantExtractor @Inject constructor(
     private val enableMatchDebugVariant: Boolean,
 ) : VariantExtractor {
 
-    override fun findMatchVariant(project: Project): AppSizeVariant = if (enableMatchDebugVariant)
-        findMatchDebugVariant(project)
-    else
-        defaultFindMatchVariant(project)
+    override fun findMatchVariant(project: Project): AppSizeVariant{
+        return when{
+            enableMatchDebugVariant -> findMatchDebugVariant(project)
+            else -> defaultFindMatchVariant(project)
+        }
+    }
 
     /**
      * This method finds a matching variant for a provided project.
@@ -79,8 +97,14 @@ internal class DefaultVariantExtractor @Inject constructor(
      */
     private fun defaultFindMatchVariant(project: Project): AppSizeVariant {
         return when {
-            project.isAndroidApplication -> AndroidAppSizeVariant(baseVariant)
-            project.isAndroidLibrary -> AndroidAppSizeVariant(project.extractLibVariant())
+            project.isAndroidApplication -> AndroidAppSizeVariant(
+                project.extractVariant(project.the<AppExtension>().applicationVariants)
+            )
+
+            project.isAndroidLibrary -> AndroidAppSizeVariant(
+                project.extractVariant(project.the<LibraryExtension>().libraryVariants)
+            )
+
             project.isJava || project.isKotlinJvm -> JarAppSizeVariant(project)
             else -> {
                 throw IllegalArgumentException("${project.name} is not supported")
@@ -127,7 +151,7 @@ internal class DefaultVariantExtractor @Inject constructor(
         }
         // Try finding a debug variant that matches the flavor of the base variant.
         val matchFlavor = debugVariants.find { variant ->
-            variant.flavorName == baseVariant.flavorName
+            variant.flavorName == variantInput.flavorName
         }
 
         // If a match is found, return it.
@@ -157,20 +181,19 @@ internal class DefaultVariantExtractor @Inject constructor(
      * @return BaseVariant that is the variant matching the flavor and build type of the base variant.
      * @throws RuntimeException if no matching variant can be found.
      */
-    private fun Project.extractLibVariant(): BaseVariant {
-        val extension = the<LibraryExtension>()
+    private fun Project.extractVariant(variants: DomainObjectSet<out BaseVariant>): BaseVariant {
 
         // Try to find a variant that fully matches the base variant
-        val fullMatch = extension.libraryVariants.find { variant ->
-            variant.name == baseVariant.name
+        val fullMatch = variants.find { variant ->
+            variant.name == variantInput.name
         }
 
         // If a full match is found, return it
         if (fullMatch != null) return fullMatch
 
         // Filter variants that has the same flavor as base variant
-        val matchFlavorVariant = extension.libraryVariants.filter { variant ->
-            variant.flavorName == baseVariant.flavorName
+        val matchFlavorVariant = variants.filter { variant ->
+            variant.flavorName == variantInput.flavorName
         }
 
         // If we found matching flavor
@@ -178,7 +201,7 @@ internal class DefaultVariantExtractor @Inject constructor(
             // Find the build type that matches the base variant
             matchFlavorVariant.forEach {
                 // match both, buildType & flavor
-                if (it.buildType.name == baseVariant.buildType.name)
+                if (it.buildType.name == variantInput.buildTypeName)
                     return it
             }
 
@@ -191,8 +214,8 @@ internal class DefaultVariantExtractor @Inject constructor(
         }
 
         // If no variant with matching flavor is found, filter by build type
-        val matchBuildType = extension.libraryVariants.filter { variant ->
-            variant.buildType.name == baseVariant.buildType.name
+        val matchBuildType = variants.filter { variant ->
+            variant.buildType.name == variantInput.buildTypeName
         }
 
         // If found, return; if there are multiple matches, find the first match flavor by our fallbacks
@@ -206,7 +229,7 @@ internal class DefaultVariantExtractor @Inject constructor(
         }
 
         // When no flavor or build type match, return debug by default
-        val matchDefaultBuildType = extension.libraryVariants.filter { variant ->
+        val matchDefaultBuildType = variants.filter { variant ->
             variant.buildType.name == BUILD_TYPE_DEBUG
         }
 

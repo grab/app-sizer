@@ -66,12 +66,10 @@ dependencies {
     implementation project(":android-module-level1")
     implementation project(":kotlin-module")
 
-    implementation 'androidx.core:core-ktx:1.10.1'
+//    implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
     implementation 'androidx.navigation:navigation-ui-ktx:2.6.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
@@ -84,7 +82,7 @@ appSizeAnalysis {
     enabled = true
     projectInput {
         apk {
-            bundleToolPath = new File(rootProject.rootDir, '/binary/bundletool-all-1.15.4.jar').toString()
+            bundleToolFile = file("${rootProject.rootDir}/binary/bundletool-all-1.15.4.jar")
             deviceSpecs = [
                     file("${rootProject.rootDir}/app-size-config/device-1.json"),
                     file("${rootProject.rootDir}/app-size-config/device-2.json")
@@ -95,11 +93,12 @@ appSizeAnalysis {
         }
         enableMatchDebugVariant = true
         largeFileThreshold = 10
-        teamMappingFile = new File(rootProject.rootDir, 'module-owner.yml')
+        teamMappingFile = file("${rootProject.rootDir}/module-owner.yml")
     }
     metrics {
         influxDB {
             dbName = "sizer"
+            reportTableName = "app_size"
             url = "http://localhost:8086"
             username = "root"
             password = "root"

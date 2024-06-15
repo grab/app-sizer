@@ -7,7 +7,6 @@ import com.grab.sizer.config.ConfigYmlLoader
 import com.grab.sizer.utils.CltLogger
 import com.grab.sizer.utils.DefaultFileQuery
 import com.grab.sizer.utils.Logger
-import com.grab.sizer.utils.ProjectInfoProviderImpl
 import java.io.File
 
 
@@ -54,8 +53,7 @@ class AnalyzerCommand : CliktCommand() {
                         config = config,
                         apksDirectory = apkDirectory
                     ),
-                    outputProvider = CltOutputProvider(config.report),
-                    projectInfoProvider = ProjectInfoProviderImpl(config, apkDirectory.nameWithoutExtension),
+                    outputProvider = CltOutputProvider(config, apkDirectory.nameWithoutExtension),
                     libName = libName,
                     logger = logger
                 ).process(reportOption)

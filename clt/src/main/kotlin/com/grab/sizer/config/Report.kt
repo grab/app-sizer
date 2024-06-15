@@ -6,7 +6,7 @@ import java.io.File
 
 data class ReportConfig(
     @JsonProperty("output-directory") private val outputDirectoryPath: String,
-    @JsonProperty("customAttributes") val customAttributes: Map<String, String>?,
+    @JsonProperty("custom-attributes") val customAttributes: Map<String, String>?,
     @JsonProperty("influx-db-config") val influxDbConfig: InfluxDbConfig?
 ) {
     @get:JsonIgnore
@@ -16,7 +16,8 @@ data class ReportConfig(
 
 data class InfluxDbConfig(
     @JsonProperty("db-name") val dbName: String,
-    @JsonProperty("retentionPolicy") val retentionPolicy: RetentionPolicy?,
+    @JsonProperty("retention-policy") val retentionPolicy: RetentionPolicy?,
+    @JsonProperty("report-table-name") val reportTableName: String?,
     val url: String,
     val username: String,
     val password: String,

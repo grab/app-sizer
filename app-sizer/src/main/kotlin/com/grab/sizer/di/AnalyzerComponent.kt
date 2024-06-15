@@ -2,8 +2,8 @@ package com.grab.sizer.di
 
 import com.grab.sizer.AnalyticsOption
 import com.grab.sizer.analyzer.Analyzer
-import com.grab.sizer.analyzer.ProjectInfoProvider
 import com.grab.sizer.report.ReportModule
+import com.grab.sizer.report.ReportModuleBinder
 import com.grab.sizer.report.ReportWriter
 import com.grab.sizer.utils.InputProvider
 import com.grab.sizer.utils.Logger
@@ -18,9 +18,10 @@ internal const val NAMED_LIB_NAME = "lib_name"
     modules = [
         AnalyzerModule::class,
         ComponentMapperModule::class,
-        ReportModule::class,
         AnalyzerBinder::class,
-        ParserBinder::class
+        ParserBinder::class,
+        ReportModule::class,
+        ReportModuleBinder::class
     ]
 )
 @AppScope
@@ -33,7 +34,6 @@ interface AnalyzerComponent {
         fun create(
             @BindsInstance inputProvider: InputProvider,
             @BindsInstance outputProvider: OutputProvider,
-            @BindsInstance projectInfoProvider: ProjectInfoProvider,
             @BindsInstance @Named(NAMED_LIB_NAME) libName: String?,
             @BindsInstance logger: Logger,
         ): AnalyzerComponent

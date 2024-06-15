@@ -1,5 +1,7 @@
 package com.grab.sizer.utils
 
+import com.grab.sizer.report.CustomProperties
+import com.grab.sizer.report.ProjectInfo
 import com.grab.sizer.report.db.InfluxDBConfig
 import java.io.File
 
@@ -29,4 +31,7 @@ interface InputProvider {
 interface OutputProvider {
     fun provideInfluxDbConfig(): InfluxDBConfig?
     fun provideOutPutDirectory(): File
+
+    fun provideProjectInfo(): ProjectInfo
+    fun provideCustomProperties(): CustomProperties
 }

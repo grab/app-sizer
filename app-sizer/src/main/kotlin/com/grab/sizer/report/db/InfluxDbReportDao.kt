@@ -1,7 +1,6 @@
 package com.grab.sizer.report.db
 
 import com.grab.sizer.report.DefaultField
-import com.grab.sizer.report.ProjectInfo
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.TagField
 import org.influxdb.BatchOptions
@@ -11,18 +10,22 @@ import org.influxdb.dto.Point
 import org.influxdb.dto.Query
 import org.influxdb.dto.QueryResult
 import org.influxdb.impl.Preconditions
+import java.io.Serializable
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val SHOW_DATABASE_COMMAND = "SHOW DATABASES"
+private const val DEFAULT_TABLE = "app_size"
+
 
 data class InfluxDBConfig(
     val dbName: String,
     val url: String,
     val username: String?,
     val password: String?,
+    val reportTableName: String?,
     val databaseRetentionPolicy: DatabaseRetentionPolicy
-)
+) : Serializable
 
 data class DatabaseRetentionPolicy(
     val name: String,
@@ -30,7 +33,7 @@ data class DatabaseRetentionPolicy(
     val shardDuration: String,
     val replicationFactor: Int,
     val isDefault: Boolean,
-) {
+) : Serializable {
     companion object {
         fun createDefault() = DatabaseRetentionPolicy(
             name = "app_sizer",
@@ -123,12 +126,10 @@ class InfluxDbReportDao @Inject constructor(
     override fun addReport(report: Report) {
         val pointsBuilder = BatchPoints.builder()
         report.rows.forEach { row ->
-            val point = Point.measurement(report.id)
+            val point = Point.measurement(config.reportTableName ?: DEFAULT_TABLE)
                 .apply {
                     time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                    val allFields = row.fields + report.projectInfo.toCommonTags() + report.customPropertiesToTags()
-
-                    allFields.forEach { field ->
+                    row.fields.forEach { field ->
                         when (field) {
                             is DefaultField -> {
                                 when (val value = field.value) {
@@ -153,29 +154,6 @@ class InfluxDbReportDao @Inject constructor(
         influxDB.write(pointsBuilder.build())
     }
 
-    private fun Report.customPropertiesToTags(): List<DefaultField> = customProperties.map { property ->
-        DefaultField(property.key, property.value)
-    }
-
-    private fun ProjectInfo.toCommonTags(): List<TagField> =
-        listOf(
-            TagField(
-                name = "project",
-                value = projectName,
-            ),
-            TagField(
-                name = "app_version",
-                value = versionName,
-            ),
-            TagField(
-                name = "build_type",
-                value = buildType,
-            ),
-            TagField(
-                name = "device_name",
-                value = deviceName,
-            )
-        )
 
     override fun getReportById(id: String) {
         TODO("Not yet implemented")
