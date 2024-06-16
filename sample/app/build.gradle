@@ -96,6 +96,7 @@ appSizeAnalysis {
         teamMappingFile = file("${rootProject.rootDir}/module-owner.yml")
     }
     metrics {
+        /**
         influxDB {
             dbName = "sizer"
             reportTableName = "app_size"
@@ -103,7 +104,7 @@ appSizeAnalysis {
             username = "root"
             password = "root"
         }
-
+        */
         customAttributes.putAll(
                 ["pipeline_id": "100"]
         )

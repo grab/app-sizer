@@ -14,9 +14,10 @@ plugins {
 }
 
 dependencies {
+    compileOnly libs.android.gradle.plugin
+    compileOnly libs.android.gradle.api
+    
     implementation project(':app-sizer')
-    implementation libs.android.gradle.plugin
-    implementation libs.android.gradle.api
     implementation libs.google.dagger
     implementation libs.gson
     kapt libs.dagger.compiler

@@ -13,18 +13,6 @@ class DbReportDaoFactory @Inject constructor(
 ) {
     fun create(): Set<ReportDao> = outputProvider.provideInfluxDbConfig()?.run {
         val influxClient = InfluxDBFactory().create(this)
-        if (!influxClient.canConnectToSever()) return@run null
         setOf(InfluxDbReportDao(influxClient, this))
     } ?: emptySet()
-
-    private fun InfluxDB.canConnectToSever(): Boolean = try {
-        ping()
-        true
-    } catch (e: InfluxDBIOException) {
-        logger.log("Can not connect to the InfluxDb database", e)
-        false
-    } catch (e: ConnectException) {
-        logger.log("Can not connect to the InfluxDb database", e)
-        false
-    }
 }

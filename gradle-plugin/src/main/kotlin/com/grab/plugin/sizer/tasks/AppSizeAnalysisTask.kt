@@ -132,7 +132,12 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
                     this.influxDBConfig.set(pluginExtension.metrics.influxDBExtension.toInfluxDBConfig())
                 }
                 this.customProperties.set(pluginExtension.metrics.customAttributes)
-                this.outputDirectory.set(pluginExtension.metrics.localExtension.outputDirectory)
+                if(pluginExtension.metrics.localExtension.outputDirectory.isPresent){
+                    this.outputDirectory.set(pluginExtension.metrics.localExtension.outputDirectory)
+                }else{
+                    this.outputDirectory.set(project.layout.buildDirectory.dir("sizer/reports/${variant.name}"))
+                }
+
                 this.teamMappingFile.set(pluginExtension.input.teamMappingFile)
                 this.largeFileThreshold.set(pluginExtension.input.largeFileThreshold)
                 if (variant.mappingFileProvider.isPresent) {

@@ -1,5 +1,6 @@
 package com.grab.sizer.report
 
+import com.grab.sizer.analyzer.ReportItem
 import com.grab.sizer.parser.ApkFileInfo
 
 internal fun Set<ApkFileInfo>.apksSizeReport(dexCompressedRatio: Double): ReportItem {

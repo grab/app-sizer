@@ -14,29 +14,28 @@ internal interface ComponentMapperModule {
     @Binds
     @IntoMap
     @ClassKey(ResourceComponentMapper::class)
-    fun ResourceComponentMapper.bindResourceAnalyzer(): ComponentMapper
+    fun bindResourceAnalyzer(mapper: ResourceComponentMapper): ComponentMapper
 
     @Binds
     @IntoMap
     @ClassKey(NativeLibComponentMapper::class)
-    fun NativeLibComponentMapper.bindNativeLibAnalyzer(): ComponentMapper
+    fun bindNativeLibAnalyzer(mapper: NativeLibComponentMapper): ComponentMapper
 
     @Binds
     @IntoMap
     @ClassKey(AssetsComponentMapper::class)
-    fun AssetsComponentMapper.bindAssetsAnalyzer(): ComponentMapper
+    fun bindAssetsAnalyzer(mapper: AssetsComponentMapper): ComponentMapper
 
     @Binds
     @IntoMap
     @ClassKey(ClassesComponentMapper::class)
-    fun ClassesComponentMapper.bindClassesAnalyzer(): ComponentMapper
+    fun bindClassesAnalyzer(mapper: ClassesComponentMapper): ComponentMapper
 
     @Binds
     @IntoMap
     @ClassKey(OtherComponentMapper::class)
-    fun OtherComponentMapper.bindOtherAnalyzer(): ComponentMapper
-
+    fun bindOtherAnalyzer(other: OtherComponentMapper): ComponentMapper
 
     @Binds
-    fun DefaultApkComponentProcessor.bindApkComponentProcessor(): ApkComponentProcessor
+    fun bindApkComponentProcessor(processor: DefaultApkComponentProcessor): ApkComponentProcessor
 }

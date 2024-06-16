@@ -5,7 +5,6 @@ import com.grab.sizer.analyzer.model.Contributor
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.Report
-import com.grab.sizer.report.ReportItem
 import com.grab.sizer.report.dexDownloadRatio
 import java.io.File
 import javax.inject.Inject

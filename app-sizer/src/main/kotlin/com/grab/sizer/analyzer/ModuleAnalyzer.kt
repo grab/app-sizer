@@ -7,7 +7,6 @@ import com.grab.sizer.parser.DataParser
 import com.grab.sizer.parser.getAars
 import com.grab.sizer.parser.getJars
 import com.grab.sizer.report.Report
-import com.grab.sizer.report.ReportItem
 import com.grab.sizer.report.dexDownloadRatio
 import javax.inject.Inject
 

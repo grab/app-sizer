@@ -2,7 +2,7 @@ package com.grab.sizer.analyzer.model
 
 import com.grab.sizer.analyzer.toModules
 import com.grab.sizer.analyzer.TeamMapping
-import com.grab.sizer.report.ReportItem
+import com.grab.sizer.analyzer.ReportItem
 
 data class Team(
     val name: String,
@@ -67,7 +67,7 @@ internal fun Set<Contributor>.moduleToContributors(): Map<String, List<Contribut
         }
 }
 
-fun Module.toReportItem(dexCompressedRatio: Double, moduleToTeamMap: Map<String, String>): ReportItem =
+internal fun Module.toReportItem(dexCompressedRatio: Double, moduleToTeamMap: Map<String, String>): ReportItem =
     ReportItem(
         name = name,
         id = name,

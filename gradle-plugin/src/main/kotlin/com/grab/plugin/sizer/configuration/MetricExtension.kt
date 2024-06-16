@@ -66,7 +66,5 @@ open class InfluxDBExtension @Inject constructor(objects: ObjectFactory) {
 
 
 open class LocalExtension @Inject constructor(project: Project) {
-    var outputDirectory: DirectoryProperty = project.objects.directoryProperty().convention(
-        project.layout.buildDirectory.dir("sizer/reports")
-    )
+    var outputDirectory: DirectoryProperty = project.objects.directoryProperty()
 }

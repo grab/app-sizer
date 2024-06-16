@@ -13,21 +13,17 @@ pluginManagement {
         }
     }
     plugins {
-        id 'com.android.application' version '7.3.1'
         id 'org.jetbrains.kotlin.jvm' version '1.8.20'
         id 'org.jetbrains.kotlin.kapt' version '1.8.20'
         id 'com.github.johnrengelman.shadow' version '7.0.0'
-        id "org.gradle.kotlin.kotlin-dsl" version "2.3.3"
+        id "org.gradle.kotlin.kotlin-dsl" version "4.4.0"
         id "com.grab.mobile-publish" version "0.1.60"
         id "com.jfrog.artifactory" version "4.24.20"
     }
 }
 
-enableFeaturePreview("VERSION_CATALOGS")
-//enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 dependencyResolutionManagement {
-//    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
         mavenCentral()

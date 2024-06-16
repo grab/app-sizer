@@ -34,14 +34,14 @@ object ReportModule {
 interface ReportModuleBinder {
     @IntoSet
     @Binds
-    fun MarkdownReportWriter.bindMarkdownReportWriter(): ReportWriter
+    fun bindMarkdownReportWriter(writer: MarkdownReportWriter): ReportWriter
 
     @Binds
     @IntoSet
-    fun JsonReportWriter.bindJsonReportWriter(): ReportWriter
+    fun bindJsonReportWriter(writer: JsonReportWriter): ReportWriter
 
     @Binds
     @IntoSet
-    fun DatabaseReportWriter.bindDatabaseReportWriter(): ReportWriter
+    fun bindDatabaseReportWriter(writer: DatabaseReportWriter): ReportWriter
 }
 
