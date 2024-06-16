@@ -7,20 +7,20 @@ import dagger.Module
 @Module
 internal interface ParserBinder {
     @Binds
-    fun DefaultDexFileParser.bindDexFileParser(): DexFileParser
+    fun bindDexFileParser(parser: DefaultDexFileParser): DexFileParser
 
     @Binds
-    fun DefaultApkFileParser.bindApkParser(): ApkFileParser
+    fun bindApkParser(parser: DefaultApkFileParser): ApkFileParser
 
     @Binds
-    fun DefaultJarStreamParser.bindJarStreamParser(): JarStreamParser
+    fun bindJarStreamParser(parser: DefaultJarStreamParser): JarStreamParser
 
     @Binds
-    fun DefaultJarFileParser.bindJarFileParser(): JarFileParser
+    fun bindJarFileParser(parser: DefaultJarFileParser): JarFileParser
 
     @Binds
-    fun DefaultAarFileParser.bindAarFileParser(): AarFileParser
+    fun bindAarFileParser(parser: DefaultAarFileParser): AarFileParser
 
     @Binds
-    fun DefaultProguardFileParser.bindProguardFileParser(): ProguardFileParser
+    fun bindProguardFileParser(parser: DefaultProguardFileParser): ProguardFileParser
 }

@@ -9,7 +9,7 @@ import org.gradle.kotlin.dsl.the
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 /** This plugin represents a build configuration
- * of java-libraries]/kotlin modules.
+ * of java-libraries/kotlin modules.
  * These modules will require common build logic for unit tests and jacoco
  */
 class AppSizerConfigPlugin : Plugin<Project> {
@@ -20,16 +20,16 @@ class AppSizerConfigPlugin : Plugin<Project> {
 
         project.the<MobilePublishExtension>().apply {
             groupId = "com.grab"
-            version = if (System.getenv("CI") != null) "SNAPSHOT-03" else "SNAPSHOT"
+            version = if (System.getenv("CI") != null) "SNAPSHOT-05" else "SNAPSHOT"
         }
 
         project.tasks.withType(KotlinCompile::class.java).forEach {
-            it.kotlinOptions.jvmTarget = "11"
+            it.kotlinOptions.jvmTarget = "17"
         }
 
         project.tasks.withType(JavaCompile::class.java).configureEach {
-            sourceCompatibility = JavaVersion.VERSION_11.toString()
-            targetCompatibility = JavaVersion.VERSION_11.toString()
+            sourceCompatibility = JavaVersion.VERSION_17.toString()
+            targetCompatibility = JavaVersion.VERSION_17.toString()
         }
     }
 }

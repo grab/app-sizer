@@ -1,6 +1,6 @@
 ## Define a variable for the version of your Docker image
 CI_REGISTRY_IMAGE = mikenguyen
-VERSION = 0.0.1
+VERSION = SNAPSHOT
 # Define a variable for the name of your Docker image
 IMAGE_NAME = sizer-influx-grafana
 IMAGE_REPO = ${CI_REGISTRY_IMAGE}/${IMAGE_NAME}

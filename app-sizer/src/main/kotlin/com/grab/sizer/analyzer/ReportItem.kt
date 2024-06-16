@@ -1,8 +1,7 @@
-package com.grab.sizer.report
+package com.grab.sizer.analyzer
 
 
-@Deprecated("A new report API have built. Use com.grab.sizer.analyzer.report.Field instead")
-data class ReportItem(
+internal data class ReportItem(
     val id: String,
     val totalDownloadSize: Long,
     val name: String = "",

@@ -1,5 +1,5 @@
 default:
-  image: gitlab.myteksi.net:4567/mobile/platform/mobile-tooling/base-android:33.1.2
+  image: gitlab.myteksi.net:4567/mobile/platform/mobile-tooling/base-android:34.0.0
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"

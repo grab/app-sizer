@@ -25,7 +25,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 3,
-  "iteration": 1715500256022,
+  "iteration": 1718528153248,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -115,7 +115,7 @@
             "uid": "m2unCvxIk"
           },
           "hide": false,
-          "query": "SELECT \"size\" FROM \"apk_basic\" WHERE (\"contributor\"= 'apk' and \"device_name\" =~ /^$reference_device$/ ) AND $timeFilter ",
+          "query": "SELECT \"size\" FROM \"app_size\" WHERE (\"type\" = 'apk_basic' and \"contributor\"= 'apk' and \"device_name\" =~ /^$reference_device$/ ) AND $timeFilter ",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -127,7 +127,7 @@
             "uid": "m2unCvxIk"
           },
           "hide": false,
-          "query": "SELECT \"size\" FROM \"apk_basic\" WHERE (\"contributor\"= 'apk' and \"device_name\" =~ /^$reference_device$/ ) AND $timeFilter GROUP BY \"app_version\"",
+          "query": "SELECT \"size\" FROM \"app_size\" WHERE (\"type\" = 'apk_basic' and \"contributor\"= 'apk' and \"device_name\" =~ /^$reference_device$/ ) AND $timeFilter GROUP BY \"app_version\"",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -196,7 +196,7 @@
             "type": "influxdb",
             "uid": "m2unCvxIk"
           },
-          "query": "SELECT last(\"size\") FROM \"apk\" WHERE (\"app_version\" =~ /^$app_version$/ AND \"device_name\" =~ /^$reference_device$/ AND \"contributor\" != 'apk' AND $timeFilter )  GROUP BY \"contributor\"",
+          "query": "SELECT last(\"size\") FROM \"app_size\" WHERE (\"type\" = 'apk' AND \"app_version\" =~ /^$app_version$/ AND \"device_name\" =~ /^$reference_device$/ AND \"contributor\" != 'apk' AND $timeFilter )  GROUP BY \"contributor\"",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -265,7 +265,7 @@
             "type": "influxdb",
             "uid": "m2unCvxIk"
           },
-          "query": "SELECT last(\"size\") FROM \"team\" WHERE (\"app_version\" =~ /^$app_version$/ and \"device_name\" =~ /^$reference_device$/ AND $timeFilter )  GROUP BY \"contributor\"",
+          "query": "SELECT last(\"size\") FROM \"app_size\" WHERE (\"type\"='team' and \"app_version\" =~ /^$app_version$/ and \"device_name\" =~ /^$reference_device$/ AND $timeFilter )  GROUP BY \"contributor\"",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -333,7 +333,7 @@
             "type": "influxdb",
             "uid": "m2unCvxIk"
           },
-          "query": "SELECT last(\"size\") FROM \"module\" WHERE (\"app_version\" =~ /^$app_version$/  and \"device_name\" =~ /^$reference_device$/ and \"owner\"  =~ /^$tf_name$/  ) GROUP BY \"contributor\"",
+          "query": "SELECT last(\"size\") FROM \"app_size\" WHERE (\"type\" = 'module' AND \"app_version\" =~ /^$app_version$/  and \"device_name\" =~ /^$reference_device$/ and \"owner\"  =~ /^$tf_name$/  ) GROUP BY \"contributor\"",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -402,7 +402,7 @@
             "type": "influxdb",
             "uid": "m2unCvxIk"
           },
-          "query": "SELECT last(\"size\") FROM \"library\" WHERE (\"app_version\" =~ /^$app_version$/ AND \"device_name\" =~ /^$reference_device$/ AND $timeFilter )  GROUP BY \"contributor\"\n",
+          "query": "SELECT last(\"size\") FROM \"app_size\" WHERE (\"type\" = 'library' AND \"app_version\" =~ /^$app_version$/ AND \"device_name\" =~ /^$reference_device$/ AND $timeFilter )  GROUP BY \"contributor\"\n",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -433,8 +433,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -474,7 +473,7 @@
             "type": "influxdb",
             "uid": "m2unCvxIk"
           },
-          "query": "SELECT last(\"size\") as Size , \"contributor\" as \"File Name\",  \"owner\" as Owner FROM \"large_file\" WHERE (\"app_version\" =~ /^$app_version$/ AND \"device_name\" =~ /^$reference_device$/ AND $timeFilter )  group by \"contributor\"\n",
+          "query": "SELECT last(\"size\") as Size , \"contributor\" as \"File Name\",  \"owner\" as Owner FROM \"app_size\" WHERE (\"type\" = 'large_file' AND \"app_version\" =~ /^$app_version$/ AND \"device_name\" =~ /^$reference_device$/ AND $timeFilter )  group by \"contributor\"\n",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "table"
@@ -507,21 +506,21 @@
       {
         "current": {
           "selected": false,
-          "text": "1.0",
-          "value": "1.0"
+          "text": "1.0.2",
+          "value": "1.0.2"
         },
         "datasource": {
           "type": "influxdb",
           "uid": "m2unCvxIk"
         },
-        "definition": "select DISTINCT(\"app_version\") from (select * from \"apk\") ",
+        "definition": "select DISTINCT(\"app_version\") from (select * from \"app_size\") ",
         "hide": 0,
         "includeAll": false,
         "label": "App Version",
         "multi": false,
         "name": "app_version",
         "options": [],
-        "query": "select DISTINCT(\"app_version\") from (select * from \"apk\") ",
+        "query": "select DISTINCT(\"app_version\") from (select * from \"app_size\") ",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -531,21 +530,21 @@
       {
         "current": {
           "selected": false,
-          "text": "default_device",
-          "value": "default_device"
+          "text": "device-1",
+          "value": "device-1"
         },
         "datasource": {
           "type": "influxdb",
           "uid": "m2unCvxIk"
         },
-        "definition": "select DISTINCT(\"device_name\") from (select * from \"apk\") ",
+        "definition": "select DISTINCT(\"device_name\") from (select * from \"app_size\") ",
         "hide": 0,
         "includeAll": false,
         "label": "Reference Device",
         "multi": false,
         "name": "reference_device",
         "options": [],
-        "query": "select DISTINCT(\"device_name\") from (select * from \"apk\") ",
+        "query": "select DISTINCT(\"device_name\") from (select * from \"app_size\") ",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -562,14 +561,14 @@
           "type": "influxdb",
           "uid": "m2unCvxIk"
         },
-        "definition": "select DISTINCT(\"owner\") from (select * from \"module\")",
+        "definition": "select DISTINCT(\"owner\") from (select * from \"app_size\") where \"owner\" != 'NA'",
         "hide": 0,
         "includeAll": false,
         "label": "Team name",
         "multi": false,
         "name": "tf_name",
         "options": [],
-        "query": "select DISTINCT(\"owner\") from (select * from \"module\")",
+        "query": "select DISTINCT(\"owner\") from (select * from \"app_size\") where \"owner\" != 'NA'",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -586,6 +585,6 @@
   "timezone": "",
   "title": "App Download Size Breakdown",
   "uid": "FBZO0xxSk",
-  "version": 42,
+  "version": 51,
   "weekStart": ""
 }

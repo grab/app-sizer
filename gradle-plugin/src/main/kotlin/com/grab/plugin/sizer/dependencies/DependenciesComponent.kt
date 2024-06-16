@@ -1,6 +1,5 @@
 package com.grab.plugin.sizer.dependencies
 
-import com.android.build.gradle.api.BaseVariant
 import com.grab.plugin.sizer.utils.PluginLogger
 import com.grab.sizer.utils.Logger
 import dagger.Binds
@@ -41,17 +40,17 @@ internal interface DependenciesComponent {
 @Module
 internal interface DependenciesModule {
     @Binds
-    fun DefaultArchiveExtractor.bindArchiveExtractor(): ArchiveExtractor
+    fun bindArchiveExtractor(extractor: DefaultArchiveExtractor): ArchiveExtractor
 
     @Binds
-    fun DefaultConfigurationExtractor.bindConfigurationExtractor(): ConfigurationExtractor
+    fun bindConfigurationExtractor(extractor: DefaultConfigurationExtractor): ConfigurationExtractor
 
     @Binds
-    fun DefaultDependencyExtractor.bindDependencyExtractor(): DependencyExtractor
+    fun bindDependencyExtractor(extractor: DefaultDependencyExtractor): DependencyExtractor
 
     @Binds
-    fun DefaultVariantExtractor.bindVariantExtractor(): VariantExtractor
+    fun bindVariantExtractor(extractor: DefaultVariantExtractor): VariantExtractor
 
     @Binds
-    fun PluginLogger.bindLogger(): Logger
+    fun bindLogger(logger: PluginLogger): Logger
 }

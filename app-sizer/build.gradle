@@ -1,5 +1,5 @@
 plugins {
-    id "com.grab.sizer.build"
+    id 'com.grab.sizer.build'
 }
 
 dependencies {
@@ -16,7 +16,6 @@ dependencies {
     implementation libs.gson
 
     kapt libs.dagger.compiler
-
     testImplementation libs.kotlin.test
 }
 

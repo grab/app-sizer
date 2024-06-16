@@ -1,6 +1,6 @@
 plugins {
-    id 'java-gradle-plugin'
-    id "org.gradle.kotlin.kotlin-dsl" version "2.3.3"
+    `java-gradle-plugin`
+    `kotlin-dsl`
 }
 
 
@@ -20,15 +20,15 @@ repositories {
 }
 
 dependencies {
-    implementation libs.kotlin.gradle.plugin
-    implementation libs.mobile.publish
+    implementation (libs.kotlin.gradle.plugin)
+    implementation (libs.mobile.publish)
 }
 
 gradlePlugin {
     plugins {
-        sizerKotlinBuildPlugin {
-            id = 'com.grab.sizer.build'
-            implementationClass = 'com.grab.sizer.buildplugins.AppSizerConfigPlugin'
+        register("sizerKotlinBuildPlugin"){
+            id = "com.grab.sizer.build"
+            implementationClass = "com.grab.sizer.buildplugins.AppSizerConfigPlugin"
         }
     }
 }
