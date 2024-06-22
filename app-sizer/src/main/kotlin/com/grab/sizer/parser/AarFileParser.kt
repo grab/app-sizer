@@ -33,16 +33,13 @@ class DefaultAarFileParser @Inject constructor(private val jarParser: JarStreamP
             val jars = mutableSetOf<JarFileInfo>()
             while (entries.hasMoreElements()) {
                 val entry = entries.nextElement()
-                var fileInfo = RawFileInfo(
+                val fileInfo = RawFileInfo(
                     path = entry.getPath(),
                     compressedSize = entry.compressedSize,
                     size = entry.size,
                     downloadSize = -1,
                 )
-                // Replace "jni" with "lib" to ensure the path matches with native lib in apk file
-                if (fileInfo.type == FileType.NATIVE_LIB) {
-                    fileInfo = fileInfo.copy(path = fileInfo.path.replace("jni", "lib"))
-                }
+
                 when (fileInfo.type) {
                     FileType.RESOURCE -> resources.add(fileInfo)
                     FileType.ASSET -> assets.add(fileInfo)

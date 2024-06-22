@@ -4,6 +4,7 @@ import com.grab.sizer.analyzer.model.RawFileInfo
 import com.grab.sizer.parser.AarFileInfo
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.JarFileInfo
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -12,15 +13,17 @@ import javax.inject.Inject
 internal class NativeLibComponentMapper @Inject constructor() : ComponentMapper {
     override fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): ComponentMapperResult {
         val apkLibs = apks.flatMap { apk -> apk.nativeLibs }
+            .map { it.trimPath() }
+
         val libraryMap = mutableMapOf<RawFileInfo, String>().apply {
             aars.forEach { aar ->
                 aar.nativeLibs.forEach { file ->
-                    put(file, aar.path)
+                    put(file.trimPath(), aar.path)
                 }
             }
             jars.forEach { jar ->
                 jar.nativeLibs.forEach { file ->
-                    put(file, jar.path)
+                    put(file.trimPath(), jar.path)
                 }
             }
         }
@@ -39,6 +42,21 @@ internal class NativeLibComponentMapper @Inject constructor() : ComponentMapper 
         return ComponentMapperResult(
             contributors = contributors,
             noOwnerData = noOwnerNativeLib
+        )
+    }
+
+    /**
+     * There are different between APK and AAR native file path.
+     * This method will remove the pre-fix path for the so file, to ensure the mapping working as expected
+     * Example,
+     * APK: /lib/armeabi-v7a/sample.so -> armeabi-v7a/sample.so
+     * AAR: /jni/armeabi-v7a/sample.so -> armeabi-v7a/sample.so
+     */
+    private fun RawFileInfo.trimPath() : RawFileInfo{
+        val file = File(path)
+        val parent = File(path).parentFile.name
+        return copy(
+            path = "/$parent/${file.name}"
         )
     }
 }
