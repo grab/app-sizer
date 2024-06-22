@@ -20,16 +20,16 @@ class AppSizerConfigPlugin : Plugin<Project> {
 
         project.the<MobilePublishExtension>().apply {
             groupId = "com.grab"
-            version = if (System.getenv("CI") != null) "SNAPSHOT-05" else "SNAPSHOT"
+            version = if (System.getenv("CI") != null) "SNAPSHOT-07" else "SNAPSHOT"
         }
 
         project.tasks.withType(KotlinCompile::class.java).forEach {
-            it.kotlinOptions.jvmTarget = "17"
+            it.kotlinOptions.jvmTarget = "11"
         }
 
         project.tasks.withType(JavaCompile::class.java).configureEach {
-            sourceCompatibility = JavaVersion.VERSION_17.toString()
-            targetCompatibility = JavaVersion.VERSION_17.toString()
+            sourceCompatibility = JavaVersion.VERSION_11.toString()
+            targetCompatibility = JavaVersion.VERSION_11.toString()
         }
     }
 }

@@ -14,6 +14,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import java.io.File
+import java.util.*
 
 private const val DEFAULT_DEVICE_SPEC = """
     {
@@ -162,6 +163,12 @@ internal abstract class GenerateApkTask : DefaultTask() {
             return task
         }
     }
+}
+
+internal fun String.capitalize(): String = replaceFirstChar {
+    if (it.isLowerCase()) it.titlecase(
+        Locale.getDefault()
+    ) else it.toString()
 }
 
 private fun SigningConfig.toInternalSigningConfig(): InternalSigningConfig = InternalSigningConfig(
