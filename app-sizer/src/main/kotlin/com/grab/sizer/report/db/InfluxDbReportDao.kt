@@ -125,10 +125,14 @@ class InfluxDbReportDao @Inject constructor(
 
     override fun addReport(report: Report) {
         val pointsBuilder = BatchPoints.builder()
-        report.rows.forEach { row ->
+        report.rows.forEachIndexed{ index, row ->
             val point = Point.measurement(config.reportTableName ?: DEFAULT_TABLE)
                 .apply {
-                    time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                    /**
+                     *  A small hack (add index to time) to prevent InfluxDb remove duplicate
+                     *  (similar time + tags rows will be removed)
+                     **/
+                    time(System.currentTimeMillis() + index, TimeUnit.MILLISECONDS)
                     row.fields.forEach { field ->
                         when (field) {
                             is DefaultField -> {
