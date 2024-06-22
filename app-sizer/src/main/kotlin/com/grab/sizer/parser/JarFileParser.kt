@@ -36,15 +36,6 @@ class DefaultJarFileParser @Inject constructor() : JarFileParser {
                     downloadSize = -1
                 )
                 when (fileInfo.type) {
-                    FileType.NATIVE_LIB -> {
-                        // Todo: revisit to only replace the folder, not the file name
-                        // This approach will not work if the lib name contain "jni"
-                        val fileInfoCorrectName = fileInfo.copy(
-                            path = fileInfo.path.replace("jni", "lib")
-                        )
-                        nativeLibs.add(fileInfoCorrectName)
-                    }
-
                     FileType.CLASS -> classes.add(entry.toClass())
                     else -> others.add(fileInfo)
                 }
