@@ -27,6 +27,7 @@ report:
     url: "http://localhost:8086"
     username: "root"
     password: "root"
+    report-table-name: "app_size"
     retention-policy:
       name: "app_sizer"
       duration: "360d"

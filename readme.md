@@ -8,7 +8,7 @@ App Sizer is a tool designed to analyze the download size of Android application
   *The app download size in Android refers to the amount of data a user needs to download from an app store (typically Google Play Store) to install an application on their Android device*
 
 <p align="center">
-<img src="images/dashboard.gif" width="90%">
+<img src="docs/images/dashboard.gif" width="90%">
 </p>
 ## Key Features
 
@@ -100,7 +100,7 @@ To run analysis, execute
 ./gradlew app:appSizeAnalysisRelease --no-configure-on-demand
 ```
 
-For plugin configuration options, see [Plugin Configuration](plugin.md).
+For plugin configuration options, see [Plugin Configuration](docs/plugin.md).
 
 ## Cli tool
 To generate the command line binary file, execute
@@ -113,7 +113,7 @@ To run analysis using the command line tool, execute
 java -jar clt-all.jar --config-file ./path/to/config/app-size-settings.yml
 ```
 
-For command line configuration options, see [Commandline Configuration](cli.md).
+For command line configuration options, see [Commandline Configuration](docs/cli.md).
 
 ## License
 

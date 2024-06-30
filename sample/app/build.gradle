@@ -109,7 +109,9 @@ appSizeAnalysis {
                 replicationFactor = 2
                 setAsDefault = true
             }
-        } **/
+        }
+        **/
+
         local{
             outputDirectory = project.layout.buildDirectory.dir("app-sizer")
         }

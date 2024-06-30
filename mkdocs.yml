@@ -22,9 +22,9 @@ theme:
 nav:
     -   Overview: index.md
     -   Configuration:
-            -   Gradle Plugin Extension: plugin_extension.md
-            -   Commandline Tool Configuration: cli_configuration.md
-            -   Gradle Tasks: gradle_tasks.md
+            -   Gradle Plugin Extension: plugin.md
+            -   Commandline Tool Configuration: cli.md
+            -   Docker: docker.md
 plugins:
     - search
 
