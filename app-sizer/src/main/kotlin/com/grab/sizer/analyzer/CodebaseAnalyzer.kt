@@ -8,7 +8,6 @@ import com.grab.sizer.parser.getAars
 import com.grab.sizer.parser.getJars
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.Row
-import com.grab.sizer.report.dexDownloadRatio
 import javax.inject.Inject
 
 
@@ -56,9 +55,8 @@ internal class CodebaseAnalyzer @Inject constructor(
 
     private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
         val teams: List<Team> = contributors.toTeams(teamMapping)
-        val dexCompressedRatio = apks.dexDownloadRatio()
-        val sortedTeamsReport = teams.sort(dexCompressedRatio)
-            .map { it.toReportRow(dexCompressedRatio) }
+        val sortedTeamsReport = teams.sort()
+            .map { it.toReportRow() }
         return Report(
             id = METRICS_ID_CODEBASE,
             name = METRICS_ID_CODEBASE,
@@ -66,8 +64,8 @@ internal class CodebaseAnalyzer @Inject constructor(
         )
     }
 
-    private fun Team.toReportRow(dexCompressedRatio: Double): Row = createRow(
+    private fun Team.toReportRow(): Row = createRow(
         name,
-        getDownloadSize(dexCompressedRatio),
+        getDownloadSize(),
     )
 }

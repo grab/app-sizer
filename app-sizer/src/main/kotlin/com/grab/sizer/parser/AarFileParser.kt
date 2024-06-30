@@ -35,7 +35,6 @@ class DefaultAarFileParser @Inject constructor(private val jarParser: JarStreamP
                 val entry = entries.nextElement()
                 val fileInfo = RawFileInfo(
                     path = entry.getPath(),
-                    compressedSize = entry.compressedSize,
                     size = entry.size,
                     downloadSize = -1,
                 )

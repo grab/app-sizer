@@ -7,7 +7,6 @@ internal data class ReportItem(
     val name: String = "",
     val extraInfo: String = "",
     val owner: String? = null,
-    val classesSize: Long = 0L,
     val classesDownloadSize: Long = 0L,
     val nativeLibDownloadSize: Long = 0L,
     val resourceDownloadSize: Long = 0L,

@@ -57,7 +57,6 @@ internal class DefaultApkFileParser @Inject constructor(
                 val fileInfo = RawFileInfo(
                     path = path,
                     downloadSize = downloadSize,
-                    compressedSize = entry.compressedSize,
                     size = rawSize
                 )
 

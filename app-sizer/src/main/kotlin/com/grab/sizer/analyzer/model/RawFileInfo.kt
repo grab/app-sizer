@@ -14,13 +14,11 @@ enum class FileType {
  * Represents a file/class within a jar, aar or apk file and provides its various sizes.
  *
  * @property name The name of the file/class.
- * @property compressedSize The size of the file when compressed in the aar/jar file.
  * @property downloadSize The size of the file in the binary that is downloadable from Google Play.(zipped APKs)
  * @property size The original size of the file.
  */
 interface FileInfo {
     val name: String
-    val compressedSize: Long
     val downloadSize: Long
     val size: Long
 }
@@ -30,13 +28,11 @@ interface FileInfo {
  *
  * @property path             The path to the raw file within the aar/jar file.
  * @property downloadSize     The size of the file in the downloadable binary from Google Play.
- * @property compressedSize   The size of the file when compressed, typically in aar/jar format.
  * @property size             The original, uncompressed size of the file.
  */
 data class RawFileInfo(
     val path: String,
     override val downloadSize: Long,
-    override val compressedSize: Long,
     override val size: Long
 ) : FileInfo {
     val type: FileType

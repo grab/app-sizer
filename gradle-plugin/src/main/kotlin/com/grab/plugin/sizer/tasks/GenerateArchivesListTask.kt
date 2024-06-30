@@ -40,8 +40,7 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
          * Todo: Update this task to make it cacheable
          * If there is any dependencies updated, the task cache should be invalidated
          */
-        // Mark this task as non-cacheable task
-        outputs.upToDateWhen { false }
+        outputs.upToDateWhen { false } // Mark this task as non-cacheable task
 
         archiveDepFile.convention {
             project.layout.buildDirectory.file("sizer/dep/${variantInput.get().name}/dependencies.json").get().asFile

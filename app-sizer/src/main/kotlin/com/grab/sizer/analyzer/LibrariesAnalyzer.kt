@@ -5,7 +5,6 @@ import com.grab.sizer.analyzer.model.Contributor
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.Report
-import com.grab.sizer.report.dexDownloadRatio
 import java.io.File
 import javax.inject.Inject
 
@@ -32,9 +31,8 @@ internal class LibrariesAnalyzer @Inject constructor(
     }
 
     private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
-        val dexCompressedRatio = apks.dexDownloadRatio()
-        val contributorList = contributors.sortedBy { it.getDownloadSize(dexCompressedRatio) }
-        val listOfReport = reportPerLibrary(dexCompressedRatio, contributorList)
+        val contributorList = contributors.sortedBy { it.getDownloadSize() }
+        val listOfReport = reportPerLibrary(contributorList)
         return Report(
             id = LIBRARY_METRICS_ID,
             name = LIBRARY_METRICS_ID,
@@ -42,19 +40,18 @@ internal class LibrariesAnalyzer @Inject constructor(
         )
     }
 
-    private fun Contributor.toReportItem(dexCompressedRatio: Double): ReportItem = ReportItem(
+    private fun Contributor.toReportItem(): ReportItem = ReportItem(
         name = File(path).nameWithoutExtension,
         extraInfo = path.substring(path.indexOf("files-2.1/") + 9),
         id = File(path).nameWithoutExtension,
-        totalDownloadSize = getDownloadSize(dexCompressedRatio),
-        classesDownloadSize = getClassDownloadSize(dexCompressedRatio),
-        classesSize = classSize,
+        totalDownloadSize = getDownloadSize(),
+        classesDownloadSize = classDownloadSize,
         nativeLibDownloadSize = nativeLibDownloadSize,
         resourceDownloadSize = resourcesDownloadSize,
         assetDownloadSize = assetsDownloadSize,
         otherDownloadSize = othersDownloadSize,
     )
 
-    private fun reportPerLibrary(dexCompressedRatio: Double, data: List<Contributor>): List<ReportItem> =
-        data.map { it.toReportItem(dexCompressedRatio) }
+    private fun reportPerLibrary(data: List<Contributor>): List<ReportItem> =
+        data.map { it.toReportItem() }
 }

@@ -12,7 +12,7 @@ class DummyClass50 {
         method8()
         method9()
         method10()
-        return DummyClass51().method1()
+        return "BB"
     }
 
     fun method2(): String {
