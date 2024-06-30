@@ -34,7 +34,6 @@ class DefaultJarStreamParser @Inject constructor() : JarStreamParser {
             while (entry != null) {
                 val fileInfo = RawFileInfo(
                     path = entry.getPath(),
-                    compressedSize = entry.compressedSize,
                     size = entry.size,
                     downloadSize = -1
                 )
@@ -62,7 +61,6 @@ internal fun ZipEntry.toClass(): ClassFileInfo {
          * Example: "/com/grab/sample/dummy/DummyClass1.class" -> "com.grab.sample.dummy.DummyClass1"
          */
         name = name.replace('/', '.').removeSuffix(".class"),
-        compressedSize = compressedSize,
         size = size
     )
 }

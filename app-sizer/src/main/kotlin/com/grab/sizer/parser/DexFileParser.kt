@@ -49,12 +49,16 @@ internal class DefaultDexFileParser @Inject constructor(
         val classes = dexBackedDexFile.classes
             .map { classDef -> fromDex(classDef, proguardMap) }
             .toSet()
+
         val path = entry.getPath()
+        val dexDownloadSize = apkSizeInfo.downloadFileSizeMap[path] ?: 0
+        val dexClassesSize = classes.sumOf { it.size }
+        val ratio = dexDownloadSize.toDouble() / dexClassesSize
         return DexFileInfo(
             name = path,
-            downloadSize = apkSizeInfo.downloadFileSizeMap[path] ?: 0,
+            downloadSize = dexDownloadSize,
             size = apkSizeInfo.rawFileSizeMap[path] ?: 0,
-            classes = classes,
+            classes = classes.map { it.copy(downloadSize = (it.size * ratio).toLong()) }.toSet()
         )
     }
 

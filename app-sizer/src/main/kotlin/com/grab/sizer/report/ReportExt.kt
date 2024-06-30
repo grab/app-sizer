@@ -3,13 +3,12 @@ package com.grab.sizer.report
 import com.grab.sizer.analyzer.ReportItem
 import com.grab.sizer.parser.ApkFileInfo
 
-internal fun Set<ApkFileInfo>.apksSizeReport(dexCompressedRatio: Double): ReportItem {
+internal fun Set<ApkFileInfo>.apksSizeReport(): ReportItem {
     val resourceDownloadSize = flatMap { it.resources }.sumOf { it.downloadSize }
     val nativeLibDownloadSize = flatMap { it.nativeLibs }.sumOf { it.downloadSize }
     val assetDownloadSize = flatMap { it.assets }.sumOf { it.downloadSize }
     val otherDownloadSize = flatMap { it.others }.sumOf { it.downloadSize }
-    val classesSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
-    val classDownloadSize = (classesSize * dexCompressedRatio).toLong()
+    val classDownloadSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.downloadSize }
     val total =
         resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + classDownloadSize
 
@@ -21,19 +20,17 @@ internal fun Set<ApkFileInfo>.apksSizeReport(dexCompressedRatio: Double): Report
         nativeLibDownloadSize = nativeLibDownloadSize,
         assetDownloadSize = assetDownloadSize,
         otherDownloadSize = otherDownloadSize,
-        classesSize = classesSize,
         classesDownloadSize = classDownloadSize,
         extraInfo = "Apk breakdown by component sizer"
     )
 }
 
-internal fun Set<ApkFileInfo>.toReportField(dexCompressedRatio: Double): List<Field> {
+internal fun Set<ApkFileInfo>.toReportField(): List<Field> {
     val resourceDownloadSize = flatMap { it.resources }.sumOf { it.downloadSize }
     val nativeLibDownloadSize = flatMap { it.nativeLibs }.sumOf { it.downloadSize }
     val assetDownloadSize = flatMap { it.assets }.sumOf { it.downloadSize }
     val otherDownloadSize = flatMap { it.others }.sumOf { it.downloadSize }
-    val classesSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
-    val classDownloadSize = (classesSize * dexCompressedRatio).toLong()
+    val classDownloadSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.downloadSize }
     val total =
         resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + classDownloadSize
     return listOf(
@@ -46,11 +43,4 @@ internal fun Set<ApkFileInfo>.toReportField(dexCompressedRatio: Double): List<Fi
             value = total
         )
     )
-}
-
-
-internal fun Set<ApkFileInfo>.dexDownloadRatio(): Double {
-    val dexDownloadSize = flatMap { it.dexes }.sumOf { it.downloadSize }
-    val dexClassesSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
-    return dexDownloadSize.toDouble() / dexClassesSize
 }

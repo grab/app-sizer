@@ -24,7 +24,7 @@ data class InfluxDBConfig(
     val username: String?,
     val password: String?,
     val reportTableName: String?,
-    val databaseRetentionPolicy: DatabaseRetentionPolicy
+    val databaseRetentionPolicy: DatabaseRetentionPolicy?
 ) : Serializable
 
 data class DatabaseRetentionPolicy(
@@ -84,19 +84,19 @@ class InfluxDbReportDao @Inject constructor(
             )
         )
 
-        val retentionPolicy = influxDBConfig.databaseRetentionPolicy
-
-        influxDB.query(
-            Query(
-                """CREATE RETENTION POLICY ${retentionPolicy.name} 
+        influxDBConfig.databaseRetentionPolicy?.run {
+            influxDB.query(
+                Query(
+                    """CREATE RETENTION POLICY $name 
                     |ON ${influxDBConfig.dbName} 
-                    |DURATION ${retentionPolicy.duration} 
-                    |REPLICATION ${retentionPolicy.replicationFactor} 
-                    |SHARD DURATION ${retentionPolicy.shardDuration} 
-                    |${if (retentionPolicy.isDefault) "DEFAULT" else ""}
+                    |DURATION $duration 
+                    |REPLICATION $replicationFactor 
+                    |SHARD DURATION $shardDuration 
+                    |${if (isDefault) "DEFAULT" else ""}
                     |""".trimMargin()
+                )
             )
-        )
+        }
     }
 
     private fun describeDatabases(): List<String> {
@@ -125,7 +125,7 @@ class InfluxDbReportDao @Inject constructor(
 
     override fun addReport(report: Report) {
         val pointsBuilder = BatchPoints.builder()
-        report.rows.forEachIndexed{ index, row ->
+        report.rows.forEachIndexed { index, row ->
             val point = Point.measurement(config.reportTableName ?: DEFAULT_TABLE)
                 .apply {
                     /**

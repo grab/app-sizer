@@ -32,26 +32,11 @@ data class Contributor(
     val othersDownloadSize: Long by lazy { others.sumOf { other -> other.downloadSize } }
 
     // Calculates the sum of the sizes of all classes
-    val classSize: Long by lazy { classes.sumOf { clazz -> clazz.size } }
+    val classDownloadSize: Long by lazy { classes.sumOf { clazz -> clazz.downloadSize } }
 
-    /**
-     * Calculates the download size of all classes by using a given ratio.
-     *
-     * @param downloadSizeRatio the ratio to multiply with the size of each class.
-     * @return the total downloadable size of all classes.
-     */
-    fun getClassDownloadSize(downloadSizeRatio: Double): Long = (classSize * downloadSizeRatio).toLong()
-
-    /**
-     * Calculates the total downloadable size of all component types (assets, resources, native libraries, classes, others).
-     *
-     * @param downloadSizeRatio the ratio to calculate downloadable size for classes.
-     * @return the total downloadable size of all components.
-     */
-    fun getDownloadSize(downloadSizeRatio: Double): Long =
-        resourcesDownloadSize + nativeLibDownloadSize + assetsDownloadSize + othersDownloadSize + getClassDownloadSize(
-            downloadSizeRatio
-        )
+    // Calculates the total downloadable size of all component types (assets, resources, native libraries, classes, others).
+    fun getDownloadSize(): Long =
+        resourcesDownloadSize + nativeLibDownloadSize + assetsDownloadSize + othersDownloadSize + classDownloadSize
 
     override fun equals(other: Any?): Boolean {
         if (other is Contributor) {

@@ -1,16 +1,16 @@
 package com.grab.plugin.sizer.configuration
 
-import com.grab.sizer.report.db.DatabaseRetentionPolicy
 import groovy.lang.Closure
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
+import org.gradle.kotlin.dsl.property
 import javax.inject.Inject
 
 open class MetricExtension @Inject constructor(project: Project) {
-    var influxDBExtension: InfluxDBExtension =
+    val influxDBExtension: InfluxDBExtension =
         project.objects.newInstance(InfluxDBExtension::class.java, project.objects)
 
     val localExtension: LocalExtension = project.objects.newInstance(LocalExtension::class.java, project)
@@ -38,21 +38,20 @@ open class MetricExtension @Inject constructor(project: Project) {
 }
 
 open class RetentionPolicyExtension @Inject constructor(objects: ObjectFactory) {
-    private val default = DatabaseRetentionPolicy.createDefault()
-    var name: Property<String> = objects.property(String::class.java).convention(default.name)
-    var duration: Property<String> = objects.property(String::class.java).convention(default.duration)
-    var shardDuration: Property<String> = objects.property(String::class.java).convention(default.shardDuration)
-    var replicationFactor: Property<Int> = objects.property(Int::class.java).convention(default.replicationFactor)
-    var isDefault: Property<Boolean> = objects.property(Boolean::class.java).convention(default.isDefault)
+    val name: Property<String> = objects.property<String>()
+    val duration: Property<String> = objects.property<String>()
+    val shardDuration: Property<String> = objects.property<String>()
+    val replicationFactor: Property<Int> = objects.property<Int>()
+    val setAsDefault: Property<Boolean> = objects.property<Boolean>().convention(false)
 }
 
-open class InfluxDBExtension @Inject constructor(objects: ObjectFactory) {
-    var dbName: Property<String> = objects.property(String::class.java)
-    var url: Property<String> = objects.property(String::class.java)
-    var username: Property<String> = objects.property(String::class.java)
-    var password: Property<String> = objects.property(String::class.java)
-    var reportTableName: Property<String> = objects.property(String::class.java)
-    var retentionPolicy: RetentionPolicyExtension = objects.newInstance(RetentionPolicyExtension::class.java, objects)
+open class InfluxDBExtension @Inject constructor(private val objects: ObjectFactory) {
+    val dbName: Property<String> = objects.property<String>()
+    val url: Property<String> = objects.property<String>()
+    val username: Property<String> = objects.property<String>()
+    val password: Property<String> = objects.property<String>()
+    val reportTableName: Property<String> = objects.property<String>()
+    val retentionPolicy: RetentionPolicyExtension = objects.newInstance(RetentionPolicyExtension::class.java)
 
     fun retentionPolicy(closure: Closure<*>) {
         closure.delegate = retentionPolicy
@@ -60,11 +59,11 @@ open class InfluxDBExtension @Inject constructor(objects: ObjectFactory) {
     }
 
     fun retentionPolicy(block: RetentionPolicyExtension.() -> Unit) {
-        block(retentionPolicy)
+        retentionPolicy.block()
     }
 }
 
 
 open class LocalExtension @Inject constructor(project: Project) {
-    var outputDirectory: DirectoryProperty = project.objects.directoryProperty()
+    val outputDirectory: DirectoryProperty = project.objects.directoryProperty()
 }

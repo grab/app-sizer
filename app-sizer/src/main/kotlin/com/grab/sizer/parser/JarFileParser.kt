@@ -31,7 +31,6 @@ class DefaultJarFileParser @Inject constructor() : JarFileParser {
                 val entry = entries.nextElement()
                 val fileInfo = RawFileInfo(
                     path = entry.getPath(),
-                    compressedSize = entry.compressedSize,
                     size = entry.size,
                     downloadSize = -1
                 )

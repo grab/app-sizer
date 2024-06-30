@@ -8,7 +8,7 @@ import java.io.File
 import javax.inject.Inject
 
 open class ApkGeneratorExtension @Inject constructor(objects: ObjectFactory) {
-    var bundleToolFile: RegularFileProperty = objects.fileProperty()
-    var deviceSpecs: ListProperty<File> = objects.listProperty(File::class.java)
+    val bundleToolFile: RegularFileProperty = objects.fileProperty()
+    val deviceSpecs: ListProperty<File> = objects.listProperty(File::class.java)
 }
 

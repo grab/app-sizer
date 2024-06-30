@@ -132,9 +132,9 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
                     this.influxDBConfig.set(pluginExtension.metrics.influxDBExtension.toInfluxDBConfig())
                 }
                 this.customProperties.set(pluginExtension.metrics.customAttributes)
-                if(pluginExtension.metrics.localExtension.outputDirectory.isPresent){
+                if (pluginExtension.metrics.localExtension.outputDirectory.isPresent) {
                     this.outputDirectory.set(pluginExtension.metrics.localExtension.outputDirectory)
-                }else{
+                } else {
                     this.outputDirectory.set(project.layout.buildDirectory.dir("sizer/reports/${variant.name}"))
                 }
 
@@ -154,7 +154,7 @@ private fun InfluxDBExtension.toInfluxDBConfig(): InfluxDBConfig = InfluxDBConfi
     username = username.orNull,
     password = password.orNull,
     reportTableName = if (reportTableName.isPresent) reportTableName.get() else null,
-    databaseRetentionPolicy = retentionPolicy.toDatabaseRetentionPolicy()
+    databaseRetentionPolicy = if (retentionPolicy.name.isPresent) retentionPolicy.toDatabaseRetentionPolicy() else null
 )
 
 private fun RetentionPolicyExtension.toDatabaseRetentionPolicy(): DatabaseRetentionPolicy = DatabaseRetentionPolicy(
@@ -162,5 +162,5 @@ private fun RetentionPolicyExtension.toDatabaseRetentionPolicy(): DatabaseRetent
     duration = duration.get(),
     shardDuration = shardDuration.get(),
     replicationFactor = replicationFactor.get(),
-    isDefault = isDefault.get()
+    isDefault = setAsDefault.get()
 )

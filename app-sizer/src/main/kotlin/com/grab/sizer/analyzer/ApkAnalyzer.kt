@@ -4,7 +4,10 @@ import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.Contributor
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
-import com.grab.sizer.report.*
+import com.grab.sizer.report.Report
+import com.grab.sizer.report.Row
+import com.grab.sizer.report.apksSizeReport
+import com.grab.sizer.report.toReportField
 import java.io.File
 import javax.inject.Inject
 
@@ -38,12 +41,11 @@ internal class ApkAnalyzer @Inject constructor(
     }
 
     private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
-        val dexCompressedRatio = apks.dexDownloadRatio()
-        val contributorList = contributors.sortedBy { it.getDownloadSize(dexCompressedRatio) }
-        val apkReportRow = createApkReportRow(apks, dexCompressedRatio)
-        val totalLibsReport = totalLibrariesReport(dexCompressedRatio, contributorList)
+        val contributorList = contributors.sortedBy { it.getDownloadSize() }
+        val apkReportRow = createApkReportRow(apks)
+        val totalLibsReport = totalLibrariesReport(contributorList)
         val libComponentReport = libComponentReport(totalLibsReport)
-        val apkReport = apks.apksSizeReport(dexCompressedRatio)
+        val apkReport = apks.apksSizeReport()
         val codeBaseReports = codeBaseComponentReport(codeBaseReport(totalLibsReport, apkReport))
         val listOfReport = listOf(apkReportRow) + codeBaseReports + libComponentReport
 
@@ -55,10 +57,9 @@ internal class ApkAnalyzer @Inject constructor(
     }
 
     private fun createApkReportRow(
-        apks: Set<ApkFileInfo>,
-        dexCompressedRatio: Double
+        apks: Set<ApkFileInfo>
     ) = Row(
-        fields = apks.toReportField(dexCompressedRatio),
+        fields = apks.toReportField(),
         name = "Apk"
     )
 
@@ -74,16 +75,14 @@ internal class ApkAnalyzer @Inject constructor(
         nativeLibDownloadSize = apkReport.nativeLibDownloadSize - totalLibsReport.nativeLibDownloadSize,
         assetDownloadSize = apkReport.assetDownloadSize - totalLibsReport.assetDownloadSize,
         classesDownloadSize = apkReport.classesDownloadSize - totalLibsReport.classesDownloadSize,
-        classesSize = apkReport.classesSize - totalLibsReport.classesSize
     )
 
-    private fun Contributor.toReportItem(dexCompressedRatio: Double): ReportItem = ReportItem(
+    private fun Contributor.toReportItem(): ReportItem = ReportItem(
         name = File(path).nameWithoutExtension,
         extraInfo = path.substring(path.indexOf("files-2.1/") + 9),
         id = File(path).nameWithoutExtension,
-        totalDownloadSize = getDownloadSize(dexCompressedRatio),
-        classesDownloadSize = getClassDownloadSize(dexCompressedRatio),
-        classesSize = classSize,
+        totalDownloadSize = getDownloadSize(),
+        classesDownloadSize = classDownloadSize,
         nativeLibDownloadSize = nativeLibDownloadSize,
         resourceDownloadSize = resourcesDownloadSize,
         assetDownloadSize = assetsDownloadSize,
@@ -125,7 +124,7 @@ internal class ApkAnalyzer @Inject constructor(
         ),
     )
 
-    private fun totalLibrariesReport(dexCompressedRatio: Double, data: List<Contributor>): ReportItem {
+    private fun totalLibrariesReport(data: List<Contributor>): ReportItem {
         return data.reduce { pre, cur ->
             pre.copy(
                 resources = pre.resources + cur.resources,
@@ -134,7 +133,7 @@ internal class ApkAnalyzer @Inject constructor(
                 classes = pre.classes + cur.classes,
                 others = pre.others + cur.others
             )
-        }.toReportItem(dexCompressedRatio)
+        }.toReportItem()
             .copy(
                 name = "All libraries",
                 extraInfo = "Sum up all libraries values",

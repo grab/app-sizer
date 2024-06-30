@@ -4,7 +4,6 @@ import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.Row
-import com.grab.sizer.report.dexDownloadRatio
 import javax.inject.Inject
 
 /**
@@ -25,21 +24,19 @@ internal class BasicApkAnalyzer @Inject constructor(
     override fun process(): Report {
         val androidBinaryInfo = dataParser.apks
         return Report(
-            rows = androidBinaryInfo.createApkReportRows(androidBinaryInfo.dexDownloadRatio()),
+            rows = androidBinaryInfo.createApkReportRows(),
             id = METRICS_ID_BASIC,
             name = METRICS_ID_BASIC,
         )
     }
 
-    private fun Set<ApkFileInfo>.createApkReportRows(dexCompressedRatio: Double): List<Row> {
+    private fun Set<ApkFileInfo>.createApkReportRows(): List<Row> {
         val resourceDownloadSize = flatMap { it.resources }.sumOf { it.downloadSize }
         val nativeLibDownloadSize = flatMap { it.nativeLibs }.sumOf { it.downloadSize }
         val assetDownloadSize = flatMap { it.assets }.sumOf { it.downloadSize }
         val otherDownloadSize = flatMap { it.others }.sumOf { it.downloadSize }
         val dexDownloadFile = flatMap { it.dexes }.sumOf { it.downloadSize }
-
-        val classesSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
-        val classDownloadSize = (classesSize * dexCompressedRatio).toLong()
+        val classDownloadSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.downloadSize }
         val total =
             resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + classDownloadSize
 

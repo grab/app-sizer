@@ -8,7 +8,6 @@ import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.Row
-import com.grab.sizer.report.dexDownloadRatio
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
@@ -36,7 +35,6 @@ internal class LibContentAnalyzer @Inject constructor(
     }
 
     private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
-        val dexCompressedRatio = apks.dexDownloadRatio()
         val library = contributors.find { File(it.path).nameWithoutExtension == libName }
             ?: throw RuntimeException("Can not find the $libName")
         val resourceRows = library.resources.toReportRows("Resource")
@@ -45,7 +43,6 @@ internal class LibContentAnalyzer @Inject constructor(
         val otherRows = library.others.toReportRows("Other")
         // todo : calculating the download sizer from the analytic process
         val classRows = library.classes
-            .map { clazz -> clazz.copy(downloadSize = (clazz.size * dexCompressedRatio).toLong()) }
             .toReportRows("Class")
         return Report(
             id = LIB_CONTENT_METRICS_ID,

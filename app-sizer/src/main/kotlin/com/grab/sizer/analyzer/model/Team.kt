@@ -1,8 +1,8 @@
 package com.grab.sizer.analyzer.model
 
-import com.grab.sizer.analyzer.toModules
-import com.grab.sizer.analyzer.TeamMapping
 import com.grab.sizer.analyzer.ReportItem
+import com.grab.sizer.analyzer.TeamMapping
+import com.grab.sizer.analyzer.toModules
 
 data class Team(
     val name: String,
@@ -12,8 +12,8 @@ data class Team(
     val nativeLibDownloadSize: Long by lazy { modules.sumOf { contributor -> contributor.nativeLibDownloadSize } }
     val assetsDownloadSize: Long by lazy { modules.sumOf { contributor -> contributor.assetsDownloadSize } }
     val othersDownloadSize: Long by lazy { modules.sumOf { contributor -> contributor.othersDownloadSize } }
-    val classSize: Long by lazy { modules.sumOf { contributor -> contributor.classSize } }
-    fun getDownloadSize(downloadSizeRatio: Double): Long = modules.sumOf { it.getDownloadSize(downloadSizeRatio) }
+    val classDownloadSize: Long by lazy { modules.sumOf { contributor -> contributor.classDownloadSize } }
+    fun getDownloadSize(): Long = modules.sumOf { it.getDownloadSize() }
 }
 
 data class Module(
@@ -24,14 +24,10 @@ data class Module(
     val nativeLibDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.nativeLibDownloadSize } }
     val assetsDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.assetsDownloadSize } }
     val othersDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.othersDownloadSize } }
-    val classSize: Long by lazy { contributors.sumOf { contributor -> contributor.classSize } }
+    val classDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.classDownloadSize } }
 
-    fun getClassDownloadSize(downloadSizeRatio: Double): Long = (classSize * downloadSizeRatio).toLong()
-
-    fun getDownloadSize(downloadSizeRatio: Double): Long =
-        resourcesDownloadSize + nativeLibDownloadSize + assetsDownloadSize + othersDownloadSize + getClassDownloadSize(
-            downloadSizeRatio
-        )
+    fun getDownloadSize(): Long =
+        resourcesDownloadSize + nativeLibDownloadSize + assetsDownloadSize + othersDownloadSize + classDownloadSize
 }
 
 internal fun Set<Contributor>.toTeams(teamMapping: TeamMapping): List<Team> {
@@ -43,10 +39,10 @@ internal fun Set<Contributor>.toTeams(teamMapping: TeamMapping): List<Team> {
     }.map { Team(it.key, it.value) }
 }
 
-internal fun List<Team>.sort(dexCompressedRatio: Double): List<Team> {
+internal fun List<Team>.sort(): List<Team> {
     return sortedWith { o1, o2 ->
-        val size1 = o1.getDownloadSize(dexCompressedRatio)
-        val size2 = o2.getDownloadSize(dexCompressedRatio)
+        val size1 = o1.getDownloadSize()
+        val size2 = o2.getDownloadSize()
         if (size1 > size2) -1
         else if (size1 < size2) 1
         else 0
@@ -67,15 +63,14 @@ internal fun Set<Contributor>.moduleToContributors(): Map<String, List<Contribut
         }
 }
 
-internal fun Module.toReportItem(dexCompressedRatio: Double, moduleToTeamMap: Map<String, String>): ReportItem =
+internal fun Module.toReportItem(moduleToTeamMap: Map<String, String>): ReportItem =
     ReportItem(
         name = name,
         id = name,
         owner = moduleToTeamMap[name],
         extraInfo = "Sum up all codebase for $name",
-        totalDownloadSize = getDownloadSize(dexCompressedRatio),
-        classesSize = classSize,
-        classesDownloadSize = getClassDownloadSize(dexCompressedRatio),
+        totalDownloadSize = getDownloadSize(),
+        classesDownloadSize = classDownloadSize,
         nativeLibDownloadSize = nativeLibDownloadSize,
         resourceDownloadSize = resourcesDownloadSize,
         assetDownloadSize = assetsDownloadSize,
