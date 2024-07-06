@@ -199,8 +199,9 @@ appSizeAnalysis {
 ```
 
 ## Task Graph
+
 <p align="center">
-<img src="images/task-graph.png" width="100%">
+<img src="images/task-graph.png" width="80%">
 </p>
 
 ## Troubleshooting
