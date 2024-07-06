@@ -149,7 +149,7 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
 }
 
 private fun InfluxDBExtension.toInfluxDBConfig(): InfluxDBConfig = InfluxDBConfig(
-    dbName = dbName.get(),
+    dbName = if (dbName.isPresent) dbName.get() else null,
     url = url.get(),
     username = username.orNull,
     password = password.orNull,

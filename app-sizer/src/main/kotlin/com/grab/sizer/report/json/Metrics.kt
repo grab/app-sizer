@@ -3,8 +3,6 @@ package com.grab.sizer.report.json
 import com.google.gson.annotations.SerializedName
 
 data class Metrics(
-    @SerializedName("datadog_name")
-    val datadogName: String,
     @SerializedName("name")
     val name: String,
     @SerializedName("fields")

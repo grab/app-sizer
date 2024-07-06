@@ -47,8 +47,7 @@ class JsonReportWriter @Inject constructor(
             fields = fields.toMetricsFields() + customProperties.toCommonFields(),
             tags = fields.toMetricsTags() + projectInfo.toCommonTags(),
             timestamp = System.currentTimeMillis(),
-            name = metricsId,
-            datadogName = metricsId
+            name = metricsId
         )
     )
 

@@ -16,16 +16,19 @@ import javax.inject.Inject
 
 private const val SHOW_DATABASE_COMMAND = "SHOW DATABASES"
 private const val DEFAULT_TABLE = "app_size"
+private const val DEFAULT_DATABASE = "sizer"
 
 
 data class InfluxDBConfig(
-    val dbName: String,
+    private val dbName: String?,
     val url: String,
     val username: String?,
     val password: String?,
     val reportTableName: String?,
     val databaseRetentionPolicy: DatabaseRetentionPolicy?
-) : Serializable
+) : Serializable {
+    val databaseName: String = dbName ?: DEFAULT_DATABASE
+}
 
 data class DatabaseRetentionPolicy(
     val name: String,
@@ -68,19 +71,19 @@ class InfluxDbReportDao @Inject constructor(
 ) : ReportDao {
     init {
 
-        if (databaseExists(config.dbName)) {
-            influxDB.setDatabase(config.dbName)
+        if (databaseExists(config.databaseName)) {
+            influxDB.setDatabase(config.databaseName)
         } else {
             createDatabase(config)
-            influxDB.setDatabase(config.dbName)
+            influxDB.setDatabase(config.databaseName)
         }
     }
 
     private fun createDatabase(influxDBConfig: InfluxDBConfig) {
-        Preconditions.checkNonEmptyString(influxDBConfig.dbName, "name")
+        Preconditions.checkNonEmptyString(influxDBConfig.databaseName, "name")
         influxDB.query(
             Query(
-                "CREATE DATABASE ${influxDBConfig.dbName}"
+                "CREATE DATABASE ${influxDBConfig.databaseName}"
             )
         )
 
@@ -88,7 +91,7 @@ class InfluxDbReportDao @Inject constructor(
             influxDB.query(
                 Query(
                     """CREATE RETENTION POLICY $name 
-                    |ON ${influxDBConfig.dbName} 
+                    |ON ${influxDBConfig.databaseName} 
                     |DURATION $duration 
                     |REPLICATION $replicationFactor 
                     |SHARD DURATION $shardDuration 

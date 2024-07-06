@@ -112,9 +112,6 @@ appSizeAnalysis {
         }
         **/
 
-        local{
-            outputDirectory = project.layout.buildDirectory.dir("app-sizer")
-        }
         customAttributes.putAll(
                 ["pipeline_id": "1001"]
         )
