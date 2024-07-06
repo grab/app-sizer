@@ -15,9 +15,9 @@ data class ReportConfig(
 }
 
 data class InfluxDbConfig(
-    @JsonProperty("db-name") val dbName: String,
     @JsonProperty("retention-policy") val retentionPolicy: RetentionPolicy?,
     @JsonProperty("report-table-name") val reportTableName: String?,
+    @JsonProperty("db-name") val dbName: String?,
     val url: String,
     val username: String,
     val password: String,

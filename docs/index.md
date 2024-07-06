@@ -1,17 +1,15 @@
 # App Sizer
 
-See the [project website][app-sizer] for documentation and APIs.
-
 ## Overview
 App Sizer is a tool designed to analyze the download size of Android applications. By providing detailed insights into the composition of your app's binary, App Sizer helps developers identify areas for size reduction, ultimately improving user acquisition and retention rates.
- 
-  *The app download size in Android refers to the amount of data a user needs to download from an app store (typically Google Play Store) to install an application on their Android device*
+
+*The app download size in Android refers to the amount of data a user needs to download from an app store (typically Google Play Store) to install an application on their Android device*
 
 <p align="center">
-<img src="images/dashboard.gif" width="90%">
+<img src="./images/dashboard.gif" width="90%">
 </p>
-## Key Features
 
+## Key Features
 App Sizer offers comprehensive analysis including:
 1. Total app download size
 2. Detailed size breakdown
@@ -20,9 +18,9 @@ App Sizer offers comprehensive analysis including:
 5. Size contribution by libraries
 6. List of large files
 
- Report are generated based on the provided device configuration.  
+Reports are generated based on the provided Android device specifications. Our [blogpost][blog-post] introduce the tool features
 
-## Integration Options
+## Quick Start
 
 App Sizer provides two flexible integration methods:
 
@@ -31,47 +29,7 @@ App Sizer provides two flexible integration methods:
 
   *Note: The command-line option was the original implementation and remains supported for broader compatibility.*
 
-## Report Types
-
-App Sizer currently supports three types of reports:
-
-* Markdown table for convenient local analysis.
-* InfluxDB database (1.x) - suitable for CI tracking and enabling the creation of customized dashboards. 
-* JSON data for compatibility with other platforms.
-
-We are actively working on expanding our database support to accommodate a wider range of database platform.
-
-## Components
-* [Gradle Plugin][gradle-plugin]
-* [Command line tool][commandline-tool]
-* [InfluxDb & Grafana Docker][grafana-docker]
-
-
-## How it works
-App Sizer functions as a mapping tool to generate the report. It takes APK, AAR, and JAR files as inputs.
-1. **Input parsing**:
-  - The tool parses the APK down to file and class levels. It calculates the contribution of each component to the total app download size.
-  - Similarly, App Sizer parses AAR and JAR files.
-2. **Mapping and Report Generation**:
-  - The tool then maps the APK components to their corresponding elements in the AAR and JAR files.
-  - Based on this analysis and other metadata, App Sizer generates comprehensive reports detailing size contributions.
-
-## Limitation
-* Class size: It's challenging to calculate the download size of a class from the APK. 
-Instead, we can obtain a relative [size of the class definition][class-size] (termed 'raw size'), and the Dex file download size. 
-From this, we derive a relative value for the class's download size:
-```text
-class's download size = class raw file * (dex download size / all classes' raw size).
-```
-It's interesting that the tool was built independently, but the same approach also being applied to the other tool in the community 
-
-* **resources.arsc**: is a file in an Android APK which contains precompiled resources, such as binary XML (like strings, arrays, and other value types defined in XML), into a binary format for more efficient access and use by the app on a device.
-It is not analysed during analytics and is grouped under "others". Hence, for a small Android project, this value might disproportionately impact the data, creating the illusion of an inefficient tool.
-
-
-
-
-## Gradle Plugin Integration
+### Gradle Plugin Integration
 In root `build.gradle`:
 
 ```groovy
@@ -100,9 +58,9 @@ To run analysis, execute
 ./gradlew app:appSizeAnalysisRelease --no-configure-on-demand
 ```
 
-For plugin configuration options, see [Plugin Configuration](plugin.md).
+For plugin configuration options, see [Plugin Configuration][plugin_doc].
 
-## Cli tool
+### Cli Tool Integration
 To generate the command line binary file, execute
 ```text
 ./gradlew clt:shadowJar
@@ -113,7 +71,37 @@ To run analysis using the command line tool, execute
 java -jar clt-all.jar --config-file ./path/to/config/app-size-settings.yml
 ```
 
-For command line configuration options, see [Commandline Configuration](cli.md).
+For command line configuration options, see [Commandline Configuration][cli_doc].
+
+## Report Types
+
+App Sizer currently supports three types of reports:
+
+* InfluxDB database (1.x) - suitable for CI tracking and enabling the creation of customized dashboards. For InfluxDB and Grafana setup, see our [Docker Setup Guide][grafana-docker].
+* Markdown table for convenient local analysis.
+* JSON data for compatibility with other platforms.
+
+For more detail on reports, see [Report Detail][report_doc]
+
+## How it works
+App Sizer functions as a mapping tool to generate the report. It takes APK, AAR, and JAR files as inputs.
+1. **Input parsing**:
+- The tool parses the APK down to file and class levels. It calculates the contribution of each component to the total app download size.
+- Similarly, App Sizer parses AAR and JAR files.
+2. **Mapping and Report Generation**:
+- The tool then maps the APK components to their corresponding elements in the AAR and JAR files.
+- Based on this analysis and other metadata, App Sizer generates comprehensive reports detailing size contributions.
+
+## Limitations
+
+App Sizer approximates class download sizes due to Dex structure complexity, and may not accurately attribute sizes for inline functions or uncategorized files. Results should be interpreted as close estimates, best used for identifying trends and relative size comparisons rather than exact measurements.
+
+For more details on limitations, see the [Limitation][limitation_doc].
+
+## Components
+* [Gradle Plugin][gradle-plugin]
+* [Command line tool][commandline-tool]
+* [InfluxDb & Grafana Docker][grafana-docker]
 
 ## License
 
@@ -133,9 +121,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
+[report_doc]: ./report.md
+[plugin_doc]: ./plugin.md
+[cli_doc]: ./cli.md
+[limitation_doc]:./limitation.md
+[gradle-plugin]: ../gradle-plugin
+[commandline-tool]: ../clt
+[grafana-docker]: ../docker
+[blog-post]: https://engineering.grab.com/project-bonsai
 
-[app-sizer]: TBA
-[gradle-plugin]: TBA
-[commandline-tool]: TBA
-[grafana-docker]: TBA
-[class-size]: https://github.com/JesusFreke/smali/blob/master/dexlib2/src/main/java/org/jf/dexlib2/dexbacked/DexBackedClassDef.java#L505
+
+

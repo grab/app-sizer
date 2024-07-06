@@ -3,7 +3,7 @@ App Sizer provide the app sizer gradle plugin as the option to seamlessly integr
 
 ## Getting Started
 
-1. Add the plugin to your root `build.gradle`:
+1. Add the plugin to your root `build.gradle`
 
 ```groovy
 buildscript {
@@ -16,7 +16,7 @@ buildscript {
 }
 ```
 
-2. Apply the plugin in your app module's `build.gradle`:
+2. Apply the plugin in your app module's `build.gradle`
 
 ```groovy
 apply plugin: "com.grab.app-sizer"
@@ -26,7 +26,7 @@ appSizeAnalysis {
 }
 ```
 
-3. Run the analysis:
+3. Run the analysis
 
 ```bash
 ./gradlew app:appSizeAnalysisRelease --no-configure-on-demand
@@ -137,10 +137,10 @@ appSizeAnalysis {
 }
 ```
 
-| Property | Description                                                  |
-|----------|--------------------------------------------------------------|
-| `local.outputDirectory` | Directory to save markdown and JSON reports |
-| `customAttributes` | Map of additional attributes to include in every report row. |
+| Property | Description                                                                       |
+|----------|-----------------------------------------------------------------------------------|
+| `local.outputDirectory` | Directory to save markdown and JSON reports (default is `app/build/sizer/reports`)|
+| `customAttributes` | Map of additional attributes to include in every report row.                      |
 
 #### InfluxDB Configuration
 
@@ -197,6 +197,11 @@ appSizeAnalysis {
     }
 }
 ```
+
+## Task Graph
+<p align="center">
+<img src="images/task-graph.png" width="100%">
+</p>
 
 ## Troubleshooting
 
