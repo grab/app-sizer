@@ -13,8 +13,9 @@ repositories {
     maven {
         setUrl("https://artifacts.gitlab.myteksi.net/artifactory/mobile--android")
         credentials {
-            username = "svc.eng.gfinmobile"
-            password = "cmVmdGtuOjAxOjE3NDU2NTU0MTE6aUpQVjFseTRLd1RDNTU4TnZMYjZCQzJaVGFY"
+
+            username = System.getenv("READ_USER")
+            password = System.getenv("READ_PASSWORD")
         }
     }
 }

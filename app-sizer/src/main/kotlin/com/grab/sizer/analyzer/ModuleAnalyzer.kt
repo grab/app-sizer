@@ -2,7 +2,6 @@ package com.grab.sizer.analyzer
 
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.*
-import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.parser.getAars
 import com.grab.sizer.parser.getJars
@@ -48,21 +47,19 @@ internal class ModuleAnalyzer @Inject constructor(
             dataParser.moduleAars,
             dataParser.moduleJars
         )
-        return generateReport(dataParser.apks, processedData.contributors + appModule)
+        return generateReport(processedData.contributors + appModule)
     }
 
-    private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
-        contributors.toModules()
-            .run {
-                val sortedTeamsReport = sortedBy { it.getDownloadSize() }
-                    .map { it.toReportItem(teamMapping.moduleToTeamMap) }
-                return Report(
-                    id = METRICS_ID_MODULES,
-                    name = METRICS_ID_MODULES,
-                    rows = toReportRows(sortedTeamsReport),
-                )
-            }
-    }
+    private fun generateReport(contributors: Set<Contributor>): Report = contributors.toModules()
+        .run {
+            val sortedTeamsReport = sortedBy { it.getDownloadSize() }
+                .map { it.toReportItem(teamMapping.moduleToTeamMap) }
+            return Report(
+                id = METRICS_ID_MODULES,
+                name = METRICS_ID_MODULES,
+                rows = toReportRows(sortedTeamsReport),
+            )
+        }
 
     private fun toReportRows(reportItems: List<ReportItem>) =
         reportItems.map { reportItem ->

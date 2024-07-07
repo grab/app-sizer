@@ -17,10 +17,11 @@ class AppSizerConfigPlugin : Plugin<Project> {
         project.plugins.apply("org.jetbrains.kotlin.jvm")
         project.plugins.apply("org.jetbrains.kotlin.kapt")
         project.plugins.apply("com.grab.mobile-publish")
-
+        val toolVersion = if (System.getenv("CI") != null) "SNAPSHOT-08" else "SNAPSHOT-08"
+        project.version = toolVersion
         project.the<MobilePublishExtension>().apply {
             groupId = "com.grab"
-            version = if (System.getenv("CI") != null) "SNAPSHOT-07" else "SNAPSHOT"
+            version = toolVersion
         }
 
         project.tasks.withType(KotlinCompile::class.java).forEach {

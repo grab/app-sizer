@@ -50,7 +50,7 @@ JSON reports offer compatibility with other platforms and tools. The report is s
 
 ### JSON Structure
 
-The JSON report is an array of objects, where each object represents a measurement. Here's a sample of the JSON structure:
+Here's a sample of the JSON structure:
 
 ```json
 [

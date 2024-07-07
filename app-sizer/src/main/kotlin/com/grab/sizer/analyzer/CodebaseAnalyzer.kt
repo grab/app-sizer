@@ -50,10 +50,10 @@ internal class CodebaseAnalyzer @Inject constructor(
                 dataParser.moduleAars,
                 dataParser.moduleJars
             )
-        return generateReport(dataParser.apks, modulesData.contributors + appModule)
+        return generateReport(modulesData.contributors + appModule)
     }
 
-    private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
+    private fun generateReport(contributors: Set<Contributor>): Report {
         val teams: List<Team> = contributors.toTeams(teamMapping)
         val sortedTeamsReport = teams.sort()
             .map { it.toReportRow() }

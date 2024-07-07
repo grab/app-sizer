@@ -25,7 +25,7 @@ class AppSizer(
             analyzerMap
                 .filterKeys { it != AnalyticsOption.LIB_CONTENT }
                 .map { (key, analyzer) -> key to analyzer.process() }
-                .onEach { (option, report) ->
+                .onEach { (_, report) ->
                     reportWriters.forEach { reportWriter ->
                         reportWriter.write(
                             report

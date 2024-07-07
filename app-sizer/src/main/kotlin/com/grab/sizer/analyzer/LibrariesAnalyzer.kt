@@ -27,10 +27,10 @@ internal class LibrariesAnalyzer @Inject constructor(
             dataParser.libAars,
             dataParser.libJars
         )
-        return generateReport(dataParser.apks, processedData.contributors)
+        return generateReport(processedData.contributors)
     }
 
-    private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
+    private fun generateReport(contributors: Set<Contributor>): Report {
         val contributorList = contributors.sortedBy { it.getDownloadSize() }
         val listOfReport = reportPerLibrary(contributorList)
         return Report(
