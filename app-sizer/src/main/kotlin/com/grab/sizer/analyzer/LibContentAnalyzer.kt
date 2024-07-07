@@ -31,10 +31,10 @@ internal class LibContentAnalyzer @Inject constructor(
             dataParser.libAars,
             dataParser.libJars
         )
-        return generateReport(dataParser.apks, processedData.contributors)
+        return generateReport(processedData.contributors)
     }
 
-    private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
+    private fun generateReport(contributors: Set<Contributor>): Report {
         val library = contributors.find { File(it.path).nameWithoutExtension == libName }
             ?: throw RuntimeException("Can not find the $libName")
         val resourceRows = library.resources.toReportRows("Resource")

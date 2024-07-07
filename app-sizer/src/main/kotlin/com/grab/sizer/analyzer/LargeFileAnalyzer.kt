@@ -53,10 +53,10 @@ internal class LargeFileAnalyzer @Inject constructor(
             dataParser.moduleJars
         )
 
-        return generateReport(dataParser.apks, processedData.contributors + appModule)
+        return generateReport(processedData.contributors + appModule)
     }
 
-    private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
+    private fun generateReport(contributors: Set<Contributor>): Report {
         return contributors.filterLargeFileContributors()
             .toTeams(teamMapping)
             .run {
