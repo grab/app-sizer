@@ -3,6 +3,9 @@ package com.grab.sizer.analyzer.model
 import com.grab.sizer.analyzer.ReportItem
 import com.grab.sizer.analyzer.TeamMapping
 import com.grab.sizer.analyzer.toModules
+import java.io.File
+
+private const val BUILD_FOLDER_PATH = "/build/"
 
 data class Team(
     val name: String,
@@ -49,18 +52,34 @@ internal fun List<Team>.sort(): List<Team> {
     }
 }
 
-internal fun Set<Contributor>.moduleToContributors(): Map<String, List<Contributor>> {
+internal fun Set<Contributor>.toMapOfModuleToContributors(): Map<String, List<Contributor>> {
     return asSequence()
-        .map { it.path to it }
-        .map {
-            val segments = it.first.removeRange(it.first.indexOf("/build/"), it.first.length).split("/")
-            val moduleName = segments[segments.size - 1]
-            moduleName to it.second
+        .map { contributor -> contributor.path to contributor }
+        .map { entry ->
+            val path = entry.first
+            val moduleName = if (path.contains(BUILD_FOLDER_PATH)) {
+                getModuleNameFromPath(path)
+            } else {
+                /**
+                 * If the aar/jar file does not belong to a module, just get the file name instead
+                 */
+                getFileNameFromPath(path)
+            }
+            moduleName to entry.second
         }
         .groupBy { it.first }
         .mapValues { item ->
             item.value.map { it.second }
         }
+}
+
+private fun getModuleNameFromPath(path: String): String {
+    val segments = path.removeRange(path.indexOf(BUILD_FOLDER_PATH), path.length).split("/")
+    return segments[segments.size - 1]
+}
+
+private fun getFileNameFromPath(path: String): String {
+    return path.substringAfterLast(File.separator).substringBeforeLast(".")
 }
 
 internal fun Module.toReportItem(moduleToTeamMap: Map<String, String>): ReportItem =

@@ -23,13 +23,13 @@ internal interface ComponentMapperModule {
 
     @Binds
     @IntoMap
-    @ClassKey(AssetsComponentMapper::class)
-    fun bindAssetsAnalyzer(mapper: AssetsComponentMapper): ComponentMapper
+    @ClassKey(AssetComponentMapper::class)
+    fun bindAssetsAnalyzer(mapper: AssetComponentMapper): ComponentMapper
 
     @Binds
     @IntoMap
-    @ClassKey(ClassesComponentMapper::class)
-    fun bindClassesAnalyzer(mapper: ClassesComponentMapper): ComponentMapper
+    @ClassKey(ClassComponentMapper::class)
+    fun bindClassesAnalyzer(mapper: ClassComponentMapper): ComponentMapper
 
     @Binds
     @IntoMap

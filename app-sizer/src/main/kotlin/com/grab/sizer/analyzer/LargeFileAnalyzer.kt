@@ -2,31 +2,31 @@ package com.grab.sizer.analyzer
 
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.*
-import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.parser.getAars
 import com.grab.sizer.parser.getJars
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.Row
-import com.grab.sizer.utils.InputProvider
 import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * A specific implementation of the Analyzer interface with a focus on identifying large files in the project.
  * This class handles [com.grab.sizer.AnalyticsOption.LARGE_FILE] and generates a report listing large files
- * along with their corresponding modules and owners.
+ * along with their corresponding modules and owners. (Haven't supported library)
  * Files are considered 'large' if their download size exceeds a user-configurable threshold.
  *
  * @property apkComponentProcessor Responsible for processing APK, AAR, or JAR files to compile a list of contributors.
  * @property dataParser Parse APK, AAR, or JAR files.
  * @property teamMapping Handles the bi-directional mapping between modules and teams.
- * @property inputProvider Provides the input used for analysis, such as threshold value for large file identification.
+ * @property largeFileThreshold threshold value for large file identification.
  */
 internal class LargeFileAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
     private val teamMapping: TeamMapping,
-    private val inputProvider: InputProvider
+    @Named("largeFileThreshold")
+    private val largeFileThreshold: Long
 ) : Analyzer {
     override fun process(): Report {
         /**
@@ -66,8 +66,8 @@ internal class LargeFileAnalyzer @Inject constructor(
     }
 
     private fun Set<Contributor>.filterLargeFileContributors(): Set<Contributor> = map {
-        val resources = it.resources.filter { file -> file.size >= inputProvider.provideLargeFileThreshold() }.toSet()
-        val assets = it.assets.filter { file -> file.size >= inputProvider.provideLargeFileThreshold() }.toSet()
+        val resources = it.resources.filter { file -> file.downloadSize >= largeFileThreshold }.toSet()
+        val assets = it.assets.filter { file -> file.downloadSize >= largeFileThreshold }.toSet()
         return@map it.copy(resources = resources, assets = assets)
     }.filter { it.resources.isNotEmpty() || it.assets.isNotEmpty() }
         .toSet()
@@ -98,7 +98,7 @@ internal class LargeFileAnalyzer @Inject constructor(
                             value = res.downloadSize,
                             owner = pair.first.name,
                             tag = module.name,
-                            rowName = pair.first.name
+                            rowName = fileName
                         )
                     }
             }

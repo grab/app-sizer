@@ -3,12 +3,13 @@ package com.grab.sizer.analyzer.mapper
 import com.grab.sizer.analyzer.model.FileInfo
 import com.grab.sizer.parser.AarFileInfo
 import com.grab.sizer.parser.ApkFileInfo
+import com.grab.sizer.parser.BinaryFileInfo
 import com.grab.sizer.parser.JarFileInfo
 
 /**
  * Type alias for a map containing input files (aar/jar) and the set of files associated with each input.
  */
-internal typealias RawContributors = Map<String, Set<FileInfo>>
+internal typealias RawContributors = Map<BinaryFileInfo, Set<FileInfo>>
 
 
 /**
@@ -32,12 +33,11 @@ internal interface ComponentMapper {
      * Maps files from the provided APKs to AARs and JARs
      * Outputs a ComponentMapperResult with mapped contributors and files that can not find an owner.
      *
-     * @param apks The set of APK files to analyze.
      * @param aars The set of AAR files to analyze.
      * @param jars The set of JAR files to analyze.
      * @return a ComponentMapperResult which contains a map of aar/jar file to its own set of FileInfo.
      */
-    fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): ComponentMapperResult
+    fun Set<ApkFileInfo>.mapTo(aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): ComponentMapperResult
 }
 
 

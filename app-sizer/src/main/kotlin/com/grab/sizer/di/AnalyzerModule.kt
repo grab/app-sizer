@@ -11,7 +11,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import org.xmlpull.v1.XmlPullParserFactory
+import javax.inject.Named
 import javax.inject.Scope
 
 @Scope
@@ -26,10 +26,6 @@ object AnalyzerModule {
 
     @Provides
     @AppScope
-    fun provideXmlPullParserFactory(): XmlPullParserFactory = XmlPullParserFactory.newInstance()
-
-    @Provides
-    @AppScope
     fun provideGson() = Gson()
 
     @Provides
@@ -41,6 +37,10 @@ object AnalyzerModule {
         return if (ownerMapping == null) DummyTeamMapping()
         else YmlTeamMapping(ownerMapping)
     }
+
+    @Provides
+    @Named("largeFileThreshold")
+    fun provideLargeFileThreshold(inputProvider: InputProvider): Long = inputProvider.provideLargeFileThreshold()
 }
 
 

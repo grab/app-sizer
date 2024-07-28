@@ -9,8 +9,6 @@ import com.grab.sizer.analyzer.model.RawFileInfo
  * size, download size, and the set of resources, native libraries, assets, others, and dex files it contains.
  *
  * @property name The name of the APK file.
- * @property size The size of the APK file.
- * @property downloadSize The size of the file when downloaded.
  * @property resources A set of resources contained in the APK file.
  * @property nativeLibs A set of native libraries contained in the APK file.
  * @property assets A set of assets files contained in the APK file.
@@ -19,8 +17,6 @@ import com.grab.sizer.analyzer.model.RawFileInfo
  */
 data class ApkFileInfo(
     val name: String,
-    val size: Long,
-    val downloadSize: Long,
     val resources: Set<RawFileInfo>,
     val nativeLibs: Set<RawFileInfo>,
     val assets: Set<RawFileInfo>,

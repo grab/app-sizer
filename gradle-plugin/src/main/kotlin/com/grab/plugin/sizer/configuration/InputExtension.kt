@@ -8,13 +8,13 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import javax.inject.Inject
 
-private const val DEFAULT_LARGE_FILE = 10240 // 10kb
+private const val DEFAULT_LARGE_FILE = 10240L // 10kb
 
 open class InputExtension @Inject constructor(objects: ObjectFactory) {
     val apk: ApkGeneratorExtension = objects.newInstance(ApkGeneratorExtension::class.java, objects)
     val teamMappingFile: RegularFileProperty = objects.fileProperty()
     var variantFilter: Action<VariantFilter>? = null
-    var largeFileThreshold: Int = DEFAULT_LARGE_FILE
+    var largeFileThreshold: Long = DEFAULT_LARGE_FILE
     var enableMatchDebugVariant = false
 
 

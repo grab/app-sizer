@@ -11,7 +11,6 @@ apkanalyzer = "30.0.2"
 common = "27.0.2"
 jackson-module-kotlin = "2.14.2"
 jackson-dataformat-yaml = "2.14.2"
-kxml2 = "2.3.0"
 guava = "31.1-jre"
 gson = "2.10.1"
 influxdbClient = "2.21"
@@ -35,7 +34,6 @@ android-tools-apkanalyzer = { module = "com.android.tools.apkparser:apkanalyzer"
 android-tools-common = { module = "com.android.tools:common", version.ref = "common" }
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-module-kotlin" }
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson-dataformat-yaml" }
-kxml2 = { module = "net.sf.kxml:kxml2", version.ref = "kxml2" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 org-influxdb-client = { module = "org.influxdb:influxdb-java", version.ref = "influxdbClient" }
