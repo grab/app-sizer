@@ -11,7 +11,7 @@ private const val EXT_JAR = "jar"
 class PluginInputProvider(
     private val archiveDependencyStore: ArchiveDependencyStore,
     private val apksDirectory: File,
-    private val largeFileThreshold: Int,
+    private val largeFileThreshold: Long,
     private val teamMappingFile: File? = null,
     private val r8MappingFile: File? = null,
 ) : InputProvider {
@@ -37,7 +37,7 @@ class PluginInputProvider(
 
     override fun provideTeamMappingFile(): File? = teamMappingFile
 
-    override fun provideLargeFileThreshold(): Int = largeFileThreshold
+    override fun provideLargeFileThreshold(): Long = largeFileThreshold
 }
 
 

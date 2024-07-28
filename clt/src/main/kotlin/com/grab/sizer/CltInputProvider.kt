@@ -61,7 +61,7 @@ class CltInputProvider constructor(
 
     override fun provideTeamMappingFile(): File? = config.projectInput.ownerMappingFile
 
-    override fun provideLargeFileThreshold(): Int = config.projectInput.largeFileThreshold
+    override fun provideLargeFileThreshold(): Long = config.projectInput.largeFileThreshold
 }
 
 

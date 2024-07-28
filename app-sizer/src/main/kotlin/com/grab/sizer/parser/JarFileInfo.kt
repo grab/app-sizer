@@ -8,9 +8,15 @@ import com.grab.sizer.analyzer.model.RawFileInfo
  * It contains details like the classes, path to the file, native libs and others
  */
 data class JarFileInfo(
-    val name: String,
-    val path : String,
+    override val name: String,
+    override val path: String,
     val classes: Set<ClassFileInfo>,
     val nativeLibs: Set<RawFileInfo>,
     val others: Set<RawFileInfo> = emptySet()
-)
+) : BinaryFileInfo {
+    override fun hashCode(): Int = path.hashCode()
+    override fun equals(other: Any?): Boolean {
+        if (other !is JarFileInfo) return false
+        return path == other.path
+    }
+}

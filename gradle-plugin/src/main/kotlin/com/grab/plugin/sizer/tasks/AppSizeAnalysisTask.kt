@@ -60,7 +60,7 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
 
     @get:Input
     @get:Optional
-    abstract val largeFileThreshold: Property<Int>
+    abstract val largeFileThreshold: Property<Long>
 
     @get:Input
     @get:Optional

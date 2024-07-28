@@ -10,7 +10,6 @@ dependencies {
     implementation libs.android.tools.common
     implementation libs.jackson.module.kotlin
     implementation libs.jackson.dataformat.yaml
-    implementation libs.kxml2
     implementation libs.guava
     implementation libs.google.dagger
     implementation libs.gson

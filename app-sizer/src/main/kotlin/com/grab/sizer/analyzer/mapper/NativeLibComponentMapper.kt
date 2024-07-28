@@ -3,6 +3,7 @@ package com.grab.sizer.analyzer.mapper
 import com.grab.sizer.analyzer.model.RawFileInfo
 import com.grab.sizer.parser.AarFileInfo
 import com.grab.sizer.parser.ApkFileInfo
+import com.grab.sizer.parser.BinaryFileInfo
 import com.grab.sizer.parser.JarFileInfo
 import java.io.File
 import javax.inject.Inject
@@ -11,30 +12,32 @@ import javax.inject.Inject
  * Analyzes, maps and creates a ComponentMapperResult focusing on native libraries.
  */
 internal class NativeLibComponentMapper @Inject constructor() : ComponentMapper {
-    override fun analyze(apks: Set<ApkFileInfo>, aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): ComponentMapperResult {
-        val apkLibs = apks.flatMap { apk -> apk.nativeLibs }
-            .map { it.trimPath() }
+    override fun Set<ApkFileInfo>.mapTo(
+        aars: Set<AarFileInfo>,
+        jars: Set<JarFileInfo>
+    ): ComponentMapperResult {
+        val apkLibs = flatMap { apk -> apk.nativeLibs }
 
-        val libraryMap = mutableMapOf<RawFileInfo, String>().apply {
+        val libraryMap = mutableMapOf<RawFileInfo, BinaryFileInfo>().apply {
             aars.forEach { aar ->
                 aar.nativeLibs.forEach { file ->
-                    put(file.trimPath(), aar.path)
+                    put(file.trimPath(), aar)
                 }
             }
             jars.forEach { jar ->
                 jar.nativeLibs.forEach { file ->
-                    put(file.trimPath(), jar.path)
+                    put(file.trimPath(), jar)
                 }
             }
         }
         val noOwnerNativeLib = mutableSetOf<RawFileInfo>()
-        val contributors = mutableMapOf<String, MutableSet<RawFileInfo>>().apply {
+        val contributors = mutableMapOf<BinaryFileInfo, MutableSet<RawFileInfo>>().apply {
             apkLibs.forEach { nativeLib ->
-                val libName = libraryMap[nativeLib]
-                if (libName != null) {
-                    putIfAbsent(libName, mutableSetOf())
-                    get(libName)?.add(nativeLib)
-                }else{
+                val lib = libraryMap[nativeLib.trimPath()]
+                if (lib != null) {
+                    putIfAbsent(lib, mutableSetOf())
+                    get(lib)?.add(nativeLib)
+                } else {
                     noOwnerNativeLib.add(nativeLib)
                 }
             }
@@ -52,7 +55,7 @@ internal class NativeLibComponentMapper @Inject constructor() : ComponentMapper 
      * APK: /lib/armeabi-v7a/sample.so -> armeabi-v7a/sample.so
      * AAR: /jni/armeabi-v7a/sample.so -> armeabi-v7a/sample.so
      */
-    private fun RawFileInfo.trimPath() : RawFileInfo{
+    private fun RawFileInfo.trimPath(): RawFileInfo {
         val file = File(path)
         val parent = File(path).parentFile.name
         return copy(

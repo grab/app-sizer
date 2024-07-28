@@ -84,8 +84,6 @@ internal class DefaultApkFileParser @Inject constructor(
                 nativeLibs = nativeLibs,
                 others = others,
                 dexes = dexes,
-                size = apkSizeInfo.size,
-                downloadSize = apkSizeInfo.downloadSize
             )
         }
     }

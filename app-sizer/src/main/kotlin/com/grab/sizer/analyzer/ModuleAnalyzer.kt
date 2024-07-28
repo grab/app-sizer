@@ -66,13 +66,13 @@ internal class ModuleAnalyzer @Inject constructor(
             createRow(
                 name = reportItem.id,
                 value = reportItem.totalDownloadSize,
-                owner = reportItem.owner ?: "",
+                owner = reportItem.owner ?: "NA",
                 rowName = reportItem.name
             )
         }
 }
 
-internal fun Set<Contributor>.toModules(): List<Module> = moduleToContributors().map {
+internal fun Set<Contributor>.toModules(): List<Module> = toMapOfModuleToContributors().map {
     Module(
         it.key,
         it.value

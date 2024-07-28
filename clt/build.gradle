@@ -21,7 +21,6 @@ dependencies {
     implementation libs.clikt
     implementation libs.jackson.module.kotlin
     implementation libs.jackson.dataformat.yaml
-    implementation libs.kxml2
     implementation libs.gson
     testImplementation libs.junit
 }

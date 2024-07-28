@@ -1,13 +1,14 @@
 package com.grab.sizer.analyzer.mapper
 
-import com.grab.sizer.parser.AarFileInfo
-import com.grab.sizer.parser.ApkFileInfo
-import com.grab.sizer.di.AnalyzerClass
-import com.grab.sizer.parser.JarFileInfo
 import com.grab.sizer.analyzer.model.Contributor
 import com.grab.sizer.analyzer.model.FileInfo
 import com.grab.sizer.analyzer.model.castToClass
 import com.grab.sizer.analyzer.model.castToRawFile
+import com.grab.sizer.di.AnalyzerClass
+import com.grab.sizer.parser.AarFileInfo
+import com.grab.sizer.parser.ApkFileInfo
+import com.grab.sizer.parser.BinaryFileInfo
+import com.grab.sizer.parser.JarFileInfo
 import javax.inject.Inject
 
 
@@ -53,8 +54,12 @@ internal class DefaultApkComponentProcessor @Inject constructor(private val mapp
         aars: Set<AarFileInfo>,
         jars: Set<JarFileInfo>
     ): ComponentProcessorResult {
-        val rawContributorMap = mappers.mapValues { it.value.analyze(apks, aars, jars) }
-        val contributors = mutableMapOf<String, Contributor>().apply {
+        val rawContributorMap = mappers.mapValues {
+            with(it.value) {
+                apks.mapTo(aars, jars)
+            }
+        }
+        val contributors = mutableMapOf<BinaryFileInfo, Contributor>().apply {
             createAssetContributors(rawContributorMap)
             createResourceContributors(rawContributorMap)
             createNativeLibsContributors(rawContributorMap)
@@ -63,10 +68,10 @@ internal class DefaultApkComponentProcessor @Inject constructor(private val mapp
         }.values.toSet()
         return ComponentProcessorResult(
             contributors = contributors,
-            noOwnerAssets = rawContributorMap.getNoOwnerData(AssetsComponentMapper::class.java),
+            noOwnerAssets = rawContributorMap.getNoOwnerData(AssetComponentMapper::class.java),
             noOwnerResources = rawContributorMap.getNoOwnerData(ResourceComponentMapper::class.java),
             noOwnerNativeLibs = rawContributorMap.getNoOwnerData(NativeLibComponentMapper::class.java),
-            noOwnerClasses = rawContributorMap.getNoOwnerData(ClassesComponentMapper::class.java),
+            noOwnerClasses = rawContributorMap.getNoOwnerData(ClassComponentMapper::class.java),
             noOwnerOthers = rawContributorMap.getNoOwnerData(OtherComponentMapper::class.java),
         )
     }
@@ -74,58 +79,58 @@ internal class DefaultApkComponentProcessor @Inject constructor(private val mapp
     private fun Map<AnalyzerClass, ComponentMapperResult>.getNoOwnerData(clazz: Class<*>): Set<FileInfo> =
         get(clazz)?.noOwnerData ?: emptySet()
 
-    private fun MutableMap<String, Contributor>.createAssetContributors(rawContributorMap: Map<AnalyzerClass, ComponentMapperResult>) {
-        rawContributorMap[AssetsComponentMapper::class.java]?.contributors?.forEach { rawEntry ->
-            val libName = rawEntry.key
+    private fun MutableMap<BinaryFileInfo, Contributor>.createAssetContributors(rawContributorMap: Map<AnalyzerClass, ComponentMapperResult>) {
+        rawContributorMap[AssetComponentMapper::class.java]?.contributors?.forEach { rawEntry ->
+            val lib = rawEntry.key
             val assets = rawEntry.value
-            var contributor = get(libName)
+            var contributor = get(lib)
             contributor = contributor?.copy(assets = assets.castToRawFile())
-                ?: Contributor(path = libName, assets = assets.castToRawFile())
-            put(libName, contributor)
+                ?: Contributor(path = lib.path, assets = assets.castToRawFile())
+            put(lib, contributor)
         }
     }
 
-    private fun MutableMap<String, Contributor>.createResourceContributors(rawContributorMap: Map<AnalyzerClass, ComponentMapperResult>) {
+    private fun MutableMap<BinaryFileInfo, Contributor>.createResourceContributors(rawContributorMap: Map<AnalyzerClass, ComponentMapperResult>) {
         rawContributorMap[ResourceComponentMapper::class.java]?.contributors?.forEach { rawEntry ->
-            val libName = rawEntry.key
+            val lib = rawEntry.key
             val data = rawEntry.value
-            var contributor = get(libName)
+            var contributor = get(lib)
             contributor = contributor?.copy(resources = data.castToRawFile())
-                ?: Contributor(path = libName, resources = data.castToRawFile())
-            put(libName, contributor)
+                ?: Contributor(path = lib.path, resources = data.castToRawFile())
+            put(lib, contributor)
         }
     }
 
-    private fun MutableMap<String, Contributor>.createNativeLibsContributors(rawContributorMap: Map<AnalyzerClass, ComponentMapperResult>) {
+    private fun MutableMap<BinaryFileInfo, Contributor>.createNativeLibsContributors(rawContributorMap: Map<AnalyzerClass, ComponentMapperResult>) {
         rawContributorMap[NativeLibComponentMapper::class.java]?.contributors?.forEach { rawEntry ->
-            val libName = rawEntry.key
+            val lib = rawEntry.key
             val data = rawEntry.value
-            var contributor = get(libName)
+            var contributor = get(lib)
             contributor = contributor?.copy(nativeLibs = data.castToRawFile())
-                ?: Contributor(path = libName, nativeLibs = data.castToRawFile())
-            put(libName, contributor)
+                ?: Contributor(path = lib.path, nativeLibs = data.castToRawFile())
+            put(lib, contributor)
         }
     }
 
-    private fun MutableMap<String, Contributor>.createOtherContributors(rawContributorMap: Map<AnalyzerClass, ComponentMapperResult>) {
+    private fun MutableMap<BinaryFileInfo, Contributor>.createOtherContributors(rawContributorMap: Map<AnalyzerClass, ComponentMapperResult>) {
         rawContributorMap[OtherComponentMapper::class.java]?.contributors?.forEach { rawEntry ->
-            val libName = rawEntry.key
+            val lib = rawEntry.key
             val data = rawEntry.value
-            var contributor = get(libName)
+            var contributor = get(lib)
             contributor = contributor?.copy(others = data.castToRawFile())
-                ?: Contributor(path = libName, others = data.castToRawFile())
-            put(libName, contributor)
+                ?: Contributor(path = lib.path, others = data.castToRawFile())
+            put(lib, contributor)
         }
     }
 
-    private fun MutableMap<String, Contributor>.createClassContributors(rawContributorMap: Map<AnalyzerClass, ComponentMapperResult>) {
-        rawContributorMap[ClassesComponentMapper::class.java]?.contributors?.forEach { rawEntry ->
-            val libName = rawEntry.key
+    private fun MutableMap<BinaryFileInfo, Contributor>.createClassContributors(rawContributorMap: Map<AnalyzerClass, ComponentMapperResult>) {
+        rawContributorMap[ClassComponentMapper::class.java]?.contributors?.forEach { rawEntry ->
+            val lib = rawEntry.key
             val data = rawEntry.value
-            var contributor = get(libName)
+            var contributor = get(lib)
             contributor = contributor?.copy(classes = data.castToClass())
-                ?: Contributor(path = libName, classes = data.castToClass())
-            put(libName, contributor)
+                ?: Contributor(path = lib.path, classes = data.castToClass())
+            put(lib, contributor)
         }
     }
 }
