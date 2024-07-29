@@ -39,6 +39,7 @@ gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 org-influxdb-client = { module = "org.influxdb:influxdb-java", version.ref = "influxdbClient" }
 mobile-publish = { module = "com.grab:mobile-publish", version.ref = "mobile-publish" }
 
+
 # Tests
 junit = { module = "junit:junit", version.ref = "junit" }
 
