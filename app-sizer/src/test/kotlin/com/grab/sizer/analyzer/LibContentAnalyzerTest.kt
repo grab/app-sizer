@@ -21,7 +21,58 @@ class LibContentAnalyzerTest {
         assertEquals(expectedProject1Report, report)
     }
 
-    val expectedProject1Report = Report(
+    @Test
+    fun testLibContentAnalyzerShouldReportCorrectNumberOfItems() {
+        val report = analyzer.process()
+        assertEquals("Should report 2 items in the library", 2, report.rows.size.toLong())
+    }
+
+    @Test
+    fun testLibContentAnalyzerShouldReportCorrectItemNames() {
+        val report = analyzer.process()
+        val itemNames = report.rows.map { it.name }.toSet()
+        val expectedNames = setOf("asset_resource_1.xml", "com.grab.test.HelloWorld")
+        assertEquals("Should report the correct item names", expectedNames, itemNames)
+    }
+
+    @Test
+    fun testLibContentAnalyzerShouldReportCorrectItemTypes() {
+        val report = analyzer.process()
+        val assetItem = report.rows.find { it.name == "asset_resource_1.xml" }
+        val classItem = report.rows.find { it.name == "com.grab.test.HelloWorld" }
+
+        assertEquals(
+            "asset_resource_1.xml should be tagged as Asset",
+            "Asset",
+            assetItem?.fields?.find { it.name == FIELD_KEY_TAG }?.value
+        )
+        assertEquals(
+            "com.grab.test.HelloWorld should be tagged as Class",
+            "Class",
+            classItem?.fields?.find { it.name == FIELD_KEY_TAG }?.value
+        )
+    }
+
+    @Test
+    fun testLibContentAnalyzerShouldReportCorrectItemSizes() {
+        val report = analyzer.process()
+        val assetItem = report.rows.find { it.name == "asset_resource_1.xml" }
+        val classItem = report.rows.find { it.name == "com.grab.test.HelloWorld" }
+
+        assertEquals(
+            "asset_resource_1.xml should have size 10",
+            10L,
+            assetItem?.fields?.find { it.name == FIELD_KEY_SIZE }?.value
+        )
+        assertEquals(
+            "com.grab.test.HelloWorld should have size 5",
+            5L,
+            classItem?.fields?.find { it.name == FIELD_KEY_SIZE }?.value
+        )
+    }
+
+
+    private val expectedProject1Report = Report(
         id = "library_content",
         name = "library_content",
         rows = listOf(

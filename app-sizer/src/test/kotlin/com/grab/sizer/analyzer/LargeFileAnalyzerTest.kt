@@ -1,9 +1,11 @@
 package com.grab.sizer.analyzer
 
-import com.google.gson.Gson
 import com.grab.sizer.report.*
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
+
+private const val THRESHOLD = 20L
 
 class LargeFileAnalyzerTest {
     private val mapperComponent = MapperComponent()
@@ -12,7 +14,7 @@ class LargeFileAnalyzerTest {
         apkComponentProcessor = mapperComponent.apkComponentProcessor,
         dataParser = project1Data.fakeDataPasser,
         teamMapping = project1Data.teamMapping,
-        largeFileThreshold = 20
+        largeFileThreshold = THRESHOLD
     )
 
     @Test
@@ -20,6 +22,55 @@ class LargeFileAnalyzerTest {
         val report = analyzer.process()
         assertEquals(expectedProject1Report, report)
     }
+
+    @Test
+    fun testLargeFileAnalyzerShouldReportCorrectNumberOfLargeFiles() {
+        val report = analyzer.process()
+        assertEquals("Should report 4 large files", 4, report.rows.size.toLong())
+    }
+
+    @Test
+    fun testLargeFileAnalyzerShouldReportCorrectFileNames() {
+        val report = analyzer.process()
+        val fileNames = report.rows.map { it.name }.toSet()
+        val expectedFileNames =
+            setOf("test_font.xml", "asset_resource_2.xml", "test_animator.xml", "asset_resource_3.xml")
+        assertEquals("Should report the correct file names", expectedFileNames, fileNames)
+    }
+
+    @Test
+    fun testLargeFileAnalyzerShouldReportCorrectTeamOwnership() {
+        val report = analyzer.process()
+        val team1Files =
+            report.rows.filter { it.fields.find { field -> field.name == FIELD_KEY_OWNER }?.value == "team1" }
+        val team2Files =
+            report.rows.filter { it.fields.find { field -> field.name == FIELD_KEY_OWNER }?.value == "team2" }
+
+        assertEquals("Team1 should own 2 large files", 2, team1Files.size.toLong())
+        assertEquals("Team2 should own 2 large files", 2, team2Files.size.toLong())
+    }
+
+    @Test
+    fun testLargeFileAnalyzerShouldReportCorrectModuleTags() {
+        val report = analyzer.process()
+        val moduleAar1Files =
+            report.rows.filter { it.fields.find { field -> field.name == FIELD_KEY_TAG }?.value == "moduleAar1" }
+        val moduleAar2Files =
+            report.rows.filter { it.fields.find { field -> field.name == FIELD_KEY_TAG }?.value == "moduleAar2" }
+
+        assertEquals("ModuleAar1 should contain 2 large files", 2, moduleAar1Files.size.toLong())
+        assertEquals("ModuleAar2 should contain 2 large files", 2, moduleAar2Files.size.toLong())
+    }
+
+    @Test
+    fun testLargeFileAnalyzerShouldReportFileSizeLargerOrEqualToThreshold() {
+        val report = analyzer.process()
+        report.rows.forEach { row ->
+            val size = row.fields.find { it.name == FIELD_KEY_SIZE }?.value as? Long
+            assertTrue("All reported files should be at least 20 bytes", size != null && size >= THRESHOLD)
+        }
+    }
+
 
     private val expectedProject1Report = Report(
         id = "large_file",

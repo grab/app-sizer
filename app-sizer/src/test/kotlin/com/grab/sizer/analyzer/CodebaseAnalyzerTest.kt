@@ -5,34 +5,44 @@ import com.grab.sizer.parser.JarFileInfo
 import com.grab.sizer.report.*
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class CodebaseAnalyzerTest {
     private val mapperComponent = MapperComponent()
+    private val project1Data = Project1Data()
+    private val project1Analyzer = CodebaseAnalyzer(
+        apkComponentProcessor = mapperComponent.apkComponentProcessor,
+        dataParser = project1Data.fakeDataPasser,
+        teamMapping = project1Data.teamMapping
+    )
 
     @Test
     fun testCodebaseAnalyzerWithProject1Data() {
-        val project1Data = Project1Data()
-        val apkAnalyzer = CodebaseAnalyzer(
-            apkComponentProcessor = mapperComponent.apkComponentProcessor,
-            dataParser = project1Data.fakeDataPasser,
-            teamMapping = project1Data.teamMapping
-        )
-
-        val report = apkAnalyzer.process()
+        val report = project1Analyzer.process()
         assertEquals(expectedProject1Report, report)
     }
 
-    @Test
-    fun testCodebaseAnalyzerShouldHandleModuleAarNotBelongToBuildFolder() {
-        val project2Data = Project2Data()
-        val apkAnalyzer = CodebaseAnalyzer(
-            apkComponentProcessor = mapperComponent.apkComponentProcessor,
-            dataParser = project2Data.fakeDataPasser,
-            teamMapping = project2Data.teamMapping
-        )
 
-        val report = apkAnalyzer.process()
-        assertEquals(expectedProject2Report, report)
+    @Test
+    fun testProject1ReportShouldContainCorrectNumberOfTeams() {
+        val report = project1Analyzer.process()
+        assertEquals(2, report.rows.size, "Project1 report should contain exactly 2 teams")
+    }
+
+    @Test
+    fun testProject1ReportShouldContainTeam1WithCorrectSize() {
+        val report = project1Analyzer.process()
+        val team1Row = report.rows.find { it.name == "team1" }
+        assertNotNull(team1Row, "Project1 report should contain team1")
+        assertEquals(103L, team1Row.fields.find { it.name == FIELD_KEY_SIZE }?.value)
+    }
+
+    @Test
+    fun testProject1ReportShouldContainTeam2WithCorrectSize() {
+        val report = project1Analyzer.process()
+        val team2Row = report.rows.find { it.name == "team2" }
+        assertNotNull(team2Row, "Project1 report should contain team2")
+        assertEquals(107L, team2Row.fields.find { it.name == FIELD_KEY_SIZE }?.value)
     }
 
     private val expectedProject1Report = Report(
@@ -60,6 +70,19 @@ class CodebaseAnalyzerTest {
         )
     )
 
+    @Test
+    fun testCodebaseAnalyzerShouldHandleModuleAarNotBelongToBuildFolder() {
+        val project2Data = Project2Data()
+        val apkAnalyzer = CodebaseAnalyzer(
+            apkComponentProcessor = mapperComponent.apkComponentProcessor,
+            dataParser = project2Data.fakeDataPasser,
+            teamMapping = project2Data.teamMapping
+        )
+
+        val report = apkAnalyzer.process()
+        assertEquals(expectedProject2Report, report)
+    }
+
     private val expectedProject2Report = Report(
         id = "team",
         name = "team",
@@ -84,9 +107,7 @@ class CodebaseAnalyzerTest {
             )
         )
     )
-
 }
-
 
 class Project2Data : Project1Data() {
     override val moduleAar1: AarFileInfo

@@ -19,6 +19,82 @@ class ModuleAnalyzerTest {
         assertEquals(expectedProject1Report, report)
     }
 
+
+    @Test
+    fun testModuleAnalyzerShouldReportCorrectNumberOfModules() {
+        val report = analyzer.process()
+        assertEquals("Should report 5 modules", 5, report.rows.size)
+    }
+
+    @Test
+    fun testModuleAnalyzerShouldReportCorrectModuleNames() {
+        val report = analyzer.process()
+        val moduleNames = report.rows.map { it.name }.toSet()
+        val expectedNames = setOf("moduleJar1", "moduleJar2", "app", "moduleAar2", "moduleAar1")
+        assertEquals("Should report the correct module names", expectedNames, moduleNames)
+    }
+
+    @Test
+    fun testModuleAnalyzerShouldReportCorrectModuleSizes() {
+        val report = analyzer.process()
+        assertEquals(
+            "moduleJar1 should have size 13",
+            13L,
+            report.rows.find { it.name == "moduleJar1" }?.fields?.find { it.name == FIELD_KEY_SIZE }?.value
+        )
+        assertEquals(
+            "moduleJar2 should have size 18",
+            18L,
+            report.rows.find { it.name == "moduleJar2" }?.fields?.find { it.name == FIELD_KEY_SIZE }?.value
+        )
+        assertEquals(
+            "app should have size 20",
+            20L,
+            report.rows.find { it.name == "app" }?.fields?.find { it.name == FIELD_KEY_SIZE }?.value
+        )
+        assertEquals(
+            "moduleAar2 should have size 89",
+            89L,
+            report.rows.find { it.name == "moduleAar2" }?.fields?.find { it.name == FIELD_KEY_SIZE }?.value
+        )
+        assertEquals(
+            "moduleAar1 should have size 90",
+            90L,
+            report.rows.find { it.name == "moduleAar1" }?.fields?.find { it.name == FIELD_KEY_SIZE }?.value
+        )
+    }
+
+    @Test
+    fun testModuleAnalyzerShouldReportCorrectTeamOwnership() {
+        val report = analyzer.process()
+        assertEquals(
+            "moduleJar1 should be owned by team1",
+            "team1",
+            report.rows.find { it.name == "moduleJar1" }?.fields?.find { it.name == FIELD_KEY_OWNER }?.value
+        )
+        assertEquals(
+            "moduleJar2 should be owned by team2",
+            "team2",
+            report.rows.find { it.name == "moduleJar2" }?.fields?.find { it.name == FIELD_KEY_OWNER }?.value
+        )
+        assertEquals(
+            "app should have no team ownership",
+            "NA",
+            report.rows.find { it.name == "app" }?.fields?.find { it.name == FIELD_KEY_OWNER }?.value
+        )
+        assertEquals(
+            "moduleAar2 should be owned by team2",
+            "team2",
+            report.rows.find { it.name == "moduleAar2" }?.fields?.find { it.name == FIELD_KEY_OWNER }?.value
+        )
+        assertEquals(
+            "moduleAar1 should be owned by team1",
+            "team1",
+            report.rows.find { it.name == "moduleAar1" }?.fields?.find { it.name == FIELD_KEY_OWNER }?.value
+        )
+    }
+
+
     @Test
     fun testModuleAnalyzerShouldHandleModuleAarNotBelongToBuildFolder() {
         val project2Data = Project2Data()
