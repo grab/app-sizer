@@ -12,10 +12,7 @@ stages:
 build:
   stage: build
   script:
-    - free -h
-    - ./gradlew gradle-plugin:assemble
-  tags:
-    - xlarge
+    - ./gradlew assemble
   artifacts:
     paths:
       - gradle-plugin/build/libs/*.jar
@@ -24,15 +21,11 @@ build:
 
 test:
   stage: test
-  tags:
-    - xlarge
   script:
     - ./gradlew test
 
 build_sample_app:
   stage: test
-  tags:
-    - xlarge
   script:
     - cd ./sample
     - ./gradlew app:appSizeAnalysisProRelease --stacktrace -Dorg.gradle.debug=false --no-daemon
@@ -41,7 +34,5 @@ publish_artifact:
   stage: build
   rules:
     - if: $RELEASE == "publish"
-  tags:
-    - xlarge
   script:
     - ./gradlew artifactoryPublish

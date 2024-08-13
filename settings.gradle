@@ -4,21 +4,6 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
         google()
-        maven {
-            url "https://artifacts.gitlab.myteksi.net/artifactory/mobile--android"
-            credentials {
-                username = System.getenv('READ_USER')
-                password = System.getenv('READ_PASSWORD')
-            }
-        }
-    }
-    plugins {
-        id 'org.jetbrains.kotlin.jvm' version '1.8.20'
-        id 'org.jetbrains.kotlin.kapt' version '1.8.20'
-        id 'com.github.johnrengelman.shadow' version '7.0.0'
-        id "org.gradle.kotlin.kotlin-dsl" version "4.4.0"
-        id "com.grab.mobile-publish" version "0.1.60"
-        id "com.jfrog.artifactory" version "4.24.20"
     }
 }
 

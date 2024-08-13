@@ -1,0 +1,28 @@
+plugins {
+    id 'java-gradle-plugin'
+    alias(libs.plugins.kotlin.dsl)
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly libs.kotlin.gradle.plugin
+    compileOnly libs.android.gradle.plugin
+}
+
+gradlePlugin {
+    plugins {
+        androidLibConfigPlugin {
+            id = 'com.sample.android.library'
+            implementationClass = 'com.grab.sample.buildplugin.AndroidLibraryConfigPlugin'
+        }
+
+        kotlinLibConfigPlugin {
+            id = 'com.sample.kotlin.library'
+            implementationClass = 'com.grab.sample.buildplugin.KotlinLibraryConfigPlugin'
+        }
+    }
+}

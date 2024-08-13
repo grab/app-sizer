@@ -5,7 +5,7 @@ import org.gradle.api.Project
 
 private const val PLUGIN_EXTENSION = "appSizeAnalysis"
 
-class AppSizePlugin : Plugin<Project> {
+class AppSizerPlugin : Plugin<Project> {
     override fun apply(project: Project) =
         TaskManager(
             project,

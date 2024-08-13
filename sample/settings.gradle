@@ -1,5 +1,6 @@
 
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         gradlePluginPortal()
         google()
@@ -10,7 +11,7 @@ pluginManagement {
 
 includeBuild("../") {
     dependencySubstitution {
-        substitute module("com.grab:app-sizer") using project(":gradle-plugin")
+        substitute module("com.grab.sizer:app-sizer-plugin") using project(":gradle-plugin")
     }
 }
 

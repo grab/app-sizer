@@ -1,21 +1,20 @@
 [versions]
 gradle-plugin-publish = "0.14.0"
-android-gradle-plugin = "7.2.2"
-kotlin = "1.9.10"
-kotlin-dsl = "4.2.1"
-dagger = "2.46"
+android-gradle-plugin = "8.5.1"
+kotlin = "1.9.22"
+kotlin-dsl = "4.3.1"
+dagger = "2.48"
 dexlib2 = "2.5.2"
-clikt = "3.5.2"
-bundletool = "1.14.0"
-apkanalyzer = "30.0.2"
-common = "27.0.2"
-jackson-module-kotlin = "2.14.2"
-jackson-dataformat-yaml = "2.14.2"
-guava = "31.1-jre"
+clikt = "4.4.0"
+bundletool = "1.14.1"
+apkanalyzer = "31.5.1"
+common = "31.5.1"
+jackson-module-kotlin = "2.17.2"
+jackson-dataformat-yaml = "2.17.2"
+guava = "33.2.1-jre"
 gson = "2.10.1"
-influxdbClient = "2.21"
+influxdbClient = "2.24"
 shadow-jar = "7.0.0"
-mobile-publish = "0.1.60"
 
 # Tests
 junit = "4.13.2"
@@ -23,8 +22,8 @@ junit = "4.13.2"
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android-gradle-plugin" }
 android-gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "android-gradle-plugin" }
-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 google-dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
 org-smali-dexlib2 = { module = "org.smali:dexlib2", version.ref = "dexlib2" }
@@ -37,8 +36,6 @@ jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-d
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 org-influxdb-client = { module = "org.influxdb:influxdb-java", version.ref = "influxdbClient" }
-mobile-publish = { module = "com.grab:mobile-publish", version.ref = "mobile-publish" }
-
 
 # Tests
 junit = { module = "junit:junit", version.ref = "junit" }
@@ -48,5 +45,4 @@ kotlin-dsl = { id = "org.gradle.kotlin.kotlin-dsl", version.ref = "kotlin-dsl" }
 gradle-plugin-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-plugin-publish" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
-android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 johnrengelman-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow-jar" }

@@ -81,6 +81,8 @@ App Sizer currently supports three types of reports:
 * Markdown table for convenient local analysis.
 * JSON data for compatibility with other platforms.
 
+*The Markdown & Json reports are saved as [option]-report.md in the configured output folder (default: app/build/sizer/reports)*
+
 For more detail on reports, see [Report Detail][report_doc]
 
 ## How it works
@@ -102,6 +104,10 @@ For more details on limitations, see the [Limitation][limitation_doc].
 * [Gradle Plugin][gradle-plugin]
 * [Command line tool][commandline-tool]
 * [InfluxDb & Grafana Docker][grafana-docker]
+
+## Contributing
+
+If you find any issues or have suggestions for improvements, please open an issue or submit a pull request to the App Sizer repository.
 
 ## License
 

@@ -13,7 +13,6 @@ repositories {
     maven {
         setUrl("https://artifacts.gitlab.myteksi.net/artifactory/mobile--android")
         credentials {
-
             username = System.getenv("READ_USER")
             password = System.getenv("READ_PASSWORD")
         }
@@ -22,14 +21,13 @@ repositories {
 
 dependencies {
     implementation (libs.kotlin.gradle.plugin)
-    implementation (libs.mobile.publish)
 }
 
 gradlePlugin {
     plugins {
         register("sizerKotlinBuildPlugin"){
-            id = "com.grab.sizer.build"
-            implementationClass = "com.grab.sizer.buildplugins.AppSizerConfigPlugin"
+            id = "com.grab.sizer.kotlin"
+            implementationClass = "com.grab.sizer.buildplugin.AppSizerConfigPlugin"
         }
     }
 }
