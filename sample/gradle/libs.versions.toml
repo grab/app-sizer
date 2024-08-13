@@ -1,0 +1,31 @@
+[versions]
+app-sizer-version = "SNAPSHOT"
+android-gradle-plugin = "8.5.1"
+kotlin-dsl = "4.3.1"
+coreKtx = "1.13.1"
+kotlin = "1.9.22"
+appcompat = "1.7.0"
+navigation = "2.7.7"
+
+# Tests
+junit = "4.13.2"
+# -----------------
+
+
+[libraries]
+android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android-gradle-plugin" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+androidx-navigation-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
+androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
+app-sizer-plugin = { module = "com.grab.sizer:app-sizer-plugin", version.ref = "app-sizer-version" }
+# Tests
+junit = { module = "junit:junit", version.ref = "junit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
+kotlin-dsl = { id = "org.gradle.kotlin.kotlin-dsl", version.ref = "kotlin-dsl" }
+android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

@@ -3,10 +3,12 @@ buildscript {
         google()
         mavenCentral()
     }
-
-    dependencies {
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.24.20"
-    }
 }
 
+
+plugins {
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.kapt) apply false
+    alias(libs.plugins.johnrengelman.shadow) apply false
+}
 

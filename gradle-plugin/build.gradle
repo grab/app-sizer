@@ -8,7 +8,7 @@
  */
 
 plugins {
-    id "com.grab.sizer.build"
+    id "com.grab.sizer.kotlin"
     id 'java-gradle-plugin'
     alias(libs.plugins.kotlin.dsl)
 }
@@ -21,17 +21,17 @@ dependencies {
     implementation libs.google.dagger
     implementation libs.gson
     kapt libs.dagger.compiler
+
+    testImplementation libs.junit
 }
 
 gradlePlugin {
     plugins {
-        sizeAnalysis {
+        appSizerPlugin {
             id = 'com.grab.app-sizer'
-            implementationClass = 'com.grab.plugin.sizer.AppSizePlugin'
+            implementationClass = 'com.grab.plugin.sizer.AppSizerPlugin'
             displayName = "app-sizer-plugin"
         }
     }
 }
-
-ext.artifactId = "app-sizer-plugin"
 

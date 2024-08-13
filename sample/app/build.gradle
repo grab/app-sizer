@@ -1,9 +1,7 @@
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
 }
-
-apply from: "${rootProject.projectDir}/gradle-scripts/flavors.gradle"
 
 android {
     namespace 'com.grab.android.sample'
@@ -13,15 +11,15 @@ android {
         applicationId "com.grab.android.sample"
         archivesBaseName = "sample-bundle-file"
         minSdk 21
-        targetSdk 32
-        versionCode 9
-        versionName "1.0.9"
+        targetSdk 33
+        versionCode 1
+        versionName "0.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         debug {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
 
@@ -55,24 +53,35 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            // Other release configs
         }
     }
 
-    with flavorConfig
+
+    flavorDimensions += "version"
+    productFlavors {
+        // flavor for production
+        pro {
+            dimension = "version"
+            applicationIdSuffix = ".pro"
+            versionNameSuffix = "-pro"
+        }
+        // flavor for early access
+        gea {
+            dimension "service"
+            applicationIdSuffix = ".gea"
+            versionNameSuffix = "-gea"
+        }
+    }
 }
+
 
 dependencies {
     implementation project(":android-module-level1")
     implementation project(":kotlin-module")
-
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.6.0'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
-
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation libs.androidx.appcompat
+    implementation libs.androidx.navigation.ktx
+    implementation libs.androidx.navigation.fragment.ktx
+    testImplementation libs.junit
 }
 
 apply plugin: "com.grab.app-sizer"
@@ -95,6 +104,7 @@ appSizeAnalysis {
         teamMappingFile = file("${rootProject.rootDir}/module-owner.yml")
     }
     metrics {
+        /** Enable this block if you have an InfluxDb locally **/
         /**
         influxDB {
             dbName = "sizer"
@@ -109,12 +119,9 @@ appSizeAnalysis {
                 replicationFactor = 2
                 setAsDefault = true
             }
-        }
-        **/
-
+        }**/
         customAttributes.putAll(
                 ["pipeline_id": "1001"]
         )
-
     }
 }

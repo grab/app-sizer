@@ -2,14 +2,14 @@ project-input:
   libraries-directory: "./build/gradle-cache/caches/modules-2/files-2.1"
   modules-directory: "./"
   modules-dir-is-project-root: true
-  r8-mapping-file: "./app/build/outputs/mapping/proDebug/mapping.txt"
+  r8-mapping-file: "./app/build/outputs/mapping/proRelease/mapping.txt"
   owner-mapping-file: "./module-owner.yml"
   version: "1.0.1"
   large-file-threshold: 10
   project-name: "sample"
 apk-generation:
   bundle-tool: "./binary/bundletool-all-1.15.4.jar"
-  app-bundle-file: "./app/build/outputs/bundle/proDebug/sample-bundle-file-pro-debug.aab"
+  app-bundle-file: "./app/build/outputs/bundle/proRelease/sample-bundle-file-pro-release.aab"
   device-specs:
     - "./app-size-config/device-1.json"
     - "./app-size-config/device-2.json"
