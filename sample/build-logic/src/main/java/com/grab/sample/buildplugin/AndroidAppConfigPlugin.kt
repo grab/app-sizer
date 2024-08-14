@@ -6,10 +6,12 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.File
 
-const val COMPILE_SDK = 34
-const val JVM_TARGET = "11"
+internal const val COMPILE_SDK = 34
+internal const val JVM_TARGET = "17"
+internal val JAVA_VERSION = JavaVersion.VERSION_17
+internal const val MIN_SDK = 21
+internal const val TARGET_SDK = 33
 
 class AndroidAppConfigPlugin : Plugin<Project> {
     override fun apply(project: Project) {
@@ -18,67 +20,18 @@ class AndroidAppConfigPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.android")
 
             extensions.configure<ApplicationExtension> {
-                namespace = "com.grab.android.sample"
                 compileSdk = COMPILE_SDK
 
                 defaultConfig {
                     applicationId = "com.grab.android.sample"
-                    minSdk = 21
-                    targetSdk = 33
-                    versionCode = 1
-                    versionName = "0.0.1"
-                    setProperty("archivesBaseName", "sample-bundle-file")
+                    minSdk = MIN_SDK
+                    targetSdk = TARGET_SDK
                 }
-
-                buildTypes {
-                    debug {
-                        isMinifyEnabled = true
-                        proguardFiles(
-                            getDefaultProguardFile("proguard-android-optimize.txt"),
-                            "proguard-rules.pro"
-                        )
-                    }
-                    release {
-                        isMinifyEnabled = true
-                        proguardFiles(
-                            getDefaultProguardFile("proguard-android-optimize.txt"),
-                            "proguard-rules.pro"
-                        )
-                    }
-                }
+                JAVA_VERSION
 
                 compileOptions {
-                    sourceCompatibility = JavaVersion.VERSION_11
-                    targetCompatibility = JavaVersion.VERSION_11
-                }
-
-                buildFeatures {
-                    viewBinding = true
-                }
-
-                signingConfigs {
-                    create("release") {
-                        storeFile = File("$rootDir/buildsystem/sample-release.keystore")
-                        storePassword = "12345678"
-                        keyAlias = "key0"
-                        keyPassword = "12345678"
-                    }
-                }
-
-                buildTypes {
-                    release {
-                        signingConfig = signingConfigs.getByName("release")
-                    }
-                }
-
-                flavorDimensions += "service"
-                productFlavors {
-                    create("pro") {
-                        dimension = "service"
-                    }
-                    create("gea") {
-                        dimension = "service"
-                    }
+                    sourceCompatibility = JAVA_VERSION
+                    targetCompatibility = JAVA_VERSION
                 }
             }
 

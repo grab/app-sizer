@@ -1,17 +1,12 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    id 'com.sample.android.application'
 }
 
 android {
     namespace 'com.grab.android.sample'
-    compileSdk 34
-
     defaultConfig {
         applicationId "com.grab.android.sample"
         archivesBaseName = "sample-bundle-file"
-        minSdk 21
-        targetSdk 33
         versionCode 1
         versionName "0.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -27,13 +22,6 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = '11'
     }
     buildFeatures {
         viewBinding true
@@ -106,20 +94,20 @@ appSizeAnalysis {
     metrics {
         /** Enable this block if you have an InfluxDb locally **/
         /**
-        influxDB {
-            dbName = "sizer"
-            reportTableName = "app_size"
-            url = "http://localhost:8086"
-            username = "root"
-            password = "root"
-            retentionPolicy {
-                name = "app_sizer"
-                duration = "360d"
-                shardDuration = "0m"
-                replicationFactor = 2
-                setAsDefault = true
-            }
-        }**/
+         influxDB {
+         dbName = "sizer"
+         reportTableName = "app_size"
+         url = "http://localhost:8086"
+         username = "root"
+         password = "root"
+         retentionPolicy {
+         name = "app_sizer"
+         duration = "360d"
+         shardDuration = "0m"
+         replicationFactor = 2
+         setAsDefault = true
+         }
+         }**/
         customAttributes.putAll(
                 ["pipeline_id": "1001"]
         )
