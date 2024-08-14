@@ -1,6 +1,5 @@
 package com.grab.sample.buildplugin
 
-import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
@@ -16,17 +15,17 @@ class KotlinLibraryConfigPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.jvm")
 
             extensions.getByType<JavaPluginExtension>().apply {
-                sourceCompatibility = JavaVersion.VERSION_11
-                targetCompatibility = JavaVersion.VERSION_11
+                sourceCompatibility = JAVA_VERSION
+                targetCompatibility = JAVA_VERSION
             }
 
             extensions.getByType<KotlinJvmProjectExtension>().apply {
-                jvmToolchain(11)
+                jvmToolchain(JAVA_VERSION.toString().toInt())
             }
 
             tasks.withType<KotlinCompile>().configureEach {
                 kotlinOptions {
-                    jvmTarget = "11"
+                    jvmTarget = JVM_TARGET
                 }
             }
         }

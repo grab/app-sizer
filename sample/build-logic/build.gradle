@@ -15,6 +15,10 @@ dependencies {
 
 gradlePlugin {
     plugins {
+        androidAppConfigPlugin {
+            id = 'com.sample.android.application'
+            implementationClass = 'com.grab.sample.buildplugin.AndroidAppConfigPlugin'
+        }
         androidLibConfigPlugin {
             id = 'com.sample.android.library'
             implementationClass = 'com.grab.sample.buildplugin.AndroidLibraryConfigPlugin'
