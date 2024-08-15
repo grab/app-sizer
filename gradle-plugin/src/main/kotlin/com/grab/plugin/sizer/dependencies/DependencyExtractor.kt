@@ -8,7 +8,7 @@ import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.internal.artifacts.DefaultResolvedDependency
-import org.gradle.internal.component.resolution.failure.exception.ArtifactVariantSelectionException
+import org.gradle.internal.component.AmbiguousVariantSelectionException
 import java.util.*
 import javax.inject.Inject
 
@@ -86,7 +86,7 @@ class DefaultDependencyExtractor @Inject constructor(
                         resolvedDep.allModuleArtifacts.forEach { artifact ->
                             archiveDependencyStore.add(artifact.toArchiveDependency())
                         }
-                    } catch (e: ArtifactVariantSelectionException) {
+                    } catch (e: AmbiguousVariantSelectionException) {
                         logger.log("Fetching allModuleArtifacts having issue with ${resolvedDep.name}")
                     }
                 }
