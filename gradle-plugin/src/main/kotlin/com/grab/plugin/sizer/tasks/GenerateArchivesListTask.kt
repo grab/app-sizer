@@ -59,6 +59,14 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
     @get:Input
     abstract val enableMatchDebugVariant: Property<Boolean>
 
+    /**
+     * This is a workaround, by default, this task haven't support catching yet
+     * This flag to force the task become cacheable by default. It's not recommend to enable this flag
+     */
+    @get:Input
+    abstract val archiveDepTaskCacheable: Property<Boolean>
+
+
     @get:OutputFile
     abstract val archiveDepFile: RegularFileProperty
 
@@ -67,7 +75,7 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
          * Todo: Update this task to make it cacheable
          * If there is any dependencies updated, the task cache should be invalidated
          */
-        outputs.upToDateWhen { false } // Mark this task as non-cacheable task
+        outputs.upToDateWhen { archiveDepTaskCacheable.get() } // Mark this task as non-cacheable task
 
         archiveDepFile.convention {
             project.layout.buildDirectory.file("sizer/dep/${variantInput.get().name}/dependencies.json").get().asFile
@@ -100,7 +108,8 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
             variant: BaseVariant,
             flavorMatchingFallbacks: List<String>,
             buildTypeMatchingFallbacks: List<String>,
-            enableMatchDebugVariant: Boolean
+            enableMatchDebugVariant: Boolean,
+            archiveDepTaskCacheable : Boolean
         ): TaskProvider<GenerateArchivesListTask> {
             return project.tasks.register(
                 "generateArchiveDep${variant.name.capitalize()}", GenerateArchivesListTask::class.java
@@ -109,6 +118,7 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
                 this.buildTypeMatchingFallbacks.set(buildTypeMatchingFallbacks)
                 this.flavorMatchingFallbacks.set(flavorMatchingFallbacks)
                 this.enableMatchDebugVariant.set(enableMatchDebugVariant)
+                this.archiveDepTaskCacheable.set(archiveDepTaskCacheable)
             }
         }
     }
