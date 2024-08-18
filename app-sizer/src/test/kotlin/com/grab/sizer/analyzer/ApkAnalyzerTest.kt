@@ -44,19 +44,19 @@ class ApkAnalyzerTest {
 
     @Test
     fun testApkAnalyzerWithProject1Data() {
-        val report = apkAnalyzer.process()
-        assertEquals(expectedProject1Report, report)
+        val report = apkAnalyzer.process().sort()
+        assertEquals(expectedProject1Report.sort(), report)
     }
 
     @Test
-    fun testApkAnalyzerShouldReportProperApkSize(){
+    fun testApkAnalyzerShouldReportProperApkSize() {
         val report = apkAnalyzer.process()
         val apkRow = report.rows.find { it.name == "Apk" }
         assertEquals(expectApkRow, apkRow)
     }
 
     @Test
-    fun testApkAnalyzerShouldReportProperCodebaseKotlinJavaSize(){
+    fun testApkAnalyzerShouldReportProperCodebaseKotlinJavaSize() {
         val report = apkAnalyzer.process()
         val codebaseKotlinJavaRow = report.rows.find { it.name == "codebase-kotlin-java" }
         assertEquals(expectCodebaseKotlinJavaRow, codebaseKotlinJavaRow)
@@ -116,8 +116,6 @@ class ApkAnalyzerTest {
         name = "codebase-kotlin-java",
         fields = listOf(
             TagField(name = FIELD_KEY_CONTRIBUTOR, value = "codebase-kotlin-java"),
-            TagField(name = FIELD_KEY_OWNER, value = "NA"),
-            TagField(name = FIELD_KEY_TAG, value = "NA"),
             DefaultField(name = FIELD_KEY_SIZE, value = 40L)
         )
     )
@@ -126,8 +124,6 @@ class ApkAnalyzerTest {
         name = "codebase-resources",
         fields = listOf(
             TagField(name = FIELD_KEY_CONTRIBUTOR, value = "codebase-resources"),
-            TagField(name = FIELD_KEY_OWNER, value = "NA"),
-            TagField(name = FIELD_KEY_TAG, value = "NA"),
             DefaultField(name = FIELD_KEY_SIZE, value = 40L)
         )
     )
@@ -136,8 +132,6 @@ class ApkAnalyzerTest {
         name = "codebase-assets",
         fields = listOf(
             TagField(name = FIELD_KEY_CONTRIBUTOR, value = "codebase-assets"),
-            TagField(name = FIELD_KEY_OWNER, value = "NA"),
-            TagField(name = FIELD_KEY_TAG, value = "NA"),
             DefaultField(name = FIELD_KEY_SIZE, value = 50L)
         )
     )
@@ -146,8 +140,6 @@ class ApkAnalyzerTest {
         name = "codebase-native",
         fields = listOf(
             TagField(name = FIELD_KEY_CONTRIBUTOR, value = "codebase-native"),
-            TagField(name = FIELD_KEY_OWNER, value = "NA"),
-            TagField(name = FIELD_KEY_TAG, value = "NA"),
             DefaultField(name = FIELD_KEY_SIZE, value = 80L)
         )
     )
@@ -156,8 +148,6 @@ class ApkAnalyzerTest {
         name = "others",
         fields = listOf(
             TagField(name = FIELD_KEY_CONTRIBUTOR, value = "others"),
-            TagField(name = FIELD_KEY_OWNER, value = "NA"),
-            TagField(name = FIELD_KEY_TAG, value = "NA"),
             DefaultField(name = FIELD_KEY_SIZE, value = 20L)
         )
     )
@@ -166,8 +156,6 @@ class ApkAnalyzerTest {
         name = "android-java-libraries",
         fields = listOf(
             TagField(name = FIELD_KEY_CONTRIBUTOR, value = "android-java-libraries"),
-            TagField(name = FIELD_KEY_OWNER, value = "NA"),
-            TagField(name = FIELD_KEY_TAG, value = "NA"),
             DefaultField(name = FIELD_KEY_SIZE, value = 52L)
         )
     )
@@ -176,8 +164,6 @@ class ApkAnalyzerTest {
         name = "native-libraries",
         fields = listOf(
             TagField(name = FIELD_KEY_CONTRIBUTOR, value = "native-libraries"),
-            TagField(name = FIELD_KEY_OWNER, value = "NA"),
-            TagField(name = FIELD_KEY_TAG, value = "NA"),
             DefaultField(name = FIELD_KEY_SIZE, value = 10L)
         )
     )

@@ -37,7 +37,7 @@ import kotlin.test.assertNotNull
 class CodebaseAnalyzerTest {
     private val mapperComponent = MapperComponent()
     private val project1Data = Project1Data()
-    private val project1Analyzer = CodebaseAnalyzer(
+    private val analyzer = CodebaseAnalyzer(
         apkComponentProcessor = mapperComponent.apkComponentProcessor,
         dataParser = project1Data.fakeDataPasser,
         teamMapping = project1Data.teamMapping
@@ -45,31 +45,61 @@ class CodebaseAnalyzerTest {
 
     @Test
     fun testCodebaseAnalyzerWithProject1Data() {
-        val report = project1Analyzer.process()
-        assertEquals(expectedProject1Report, report)
+        val report = analyzer.process().sort()
+        assertEquals(expectedProject1Report.sort(), report)
     }
 
-
     @Test
-    fun testProject1ReportShouldContainCorrectNumberOfTeams() {
-        val report = project1Analyzer.process()
+    fun testCodebaseAnalyzerShouldReportCorrectNumberOfTeams() {
+        val report = analyzer.process()
         assertEquals(2, report.rows.size, "Project1 report should contain exactly 2 teams")
     }
 
     @Test
-    fun testProject1ReportShouldContainTeam1WithCorrectSize() {
-        val report = project1Analyzer.process()
+    fun testCodebaseAnalyzerShouldReportCorrectTeamNames() {
+        val report = analyzer.process()
+        val teamNames = report.rows.map { it.name }.toSet()
+        val expectedTeamNames = setOf("team1", "team2")
+        assertEquals(expectedTeamNames, teamNames, "Should report the correct team names")
+    }
+
+    @Test
+    fun testCodebaseAnalyzerShouldReportCorrectTeam1Size() {
+        val report = analyzer.process()
         val team1Row = report.rows.find { it.name == "team1" }
         assertNotNull(team1Row, "Project1 report should contain team1")
         assertEquals(103L, team1Row.fields.find { it.name == FIELD_KEY_SIZE }?.value)
     }
 
     @Test
-    fun testProject1ReportShouldContainTeam2WithCorrectSize() {
-        val report = project1Analyzer.process()
+    fun testCodebaseAnalyzerShouldReportCorrectTeam2Size() {
+        val report = analyzer.process()
         val team2Row = report.rows.find { it.name == "team2" }
         assertNotNull(team2Row, "Project1 report should contain team2")
         assertEquals(107L, team2Row.fields.find { it.name == FIELD_KEY_SIZE }?.value)
+    }
+
+    @Test
+    fun testCodebaseAnalyzerShouldReportCorrectContributorFields() {
+        val report = analyzer.process()
+        report.rows.forEach { row ->
+            val contributorField = row.fields.find { it.name == FIELD_KEY_CONTRIBUTOR }
+            assertNotNull(contributorField, "Each row should have a contributor field")
+            assertEquals(row.name, contributorField.value, "Contributor should match the team name")
+        }
+    }
+
+    @Test
+    fun testCodebaseAnalyzerShouldHandleModuleAarNotBelongToBuildFolder() {
+        val project2Data = Project2Data()
+        val project2Analyzer = CodebaseAnalyzer(
+            apkComponentProcessor = mapperComponent.apkComponentProcessor,
+            dataParser = project2Data.fakeDataPasser,
+            teamMapping = project2Data.teamMapping
+        )
+
+        val report = project2Analyzer.process()
+        assertEquals(expectedProject2Report, report)
     }
 
     private val expectedProject1Report = Report(
@@ -80,8 +110,6 @@ class CodebaseAnalyzerTest {
                 name = "team2",
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "team2"),
-                    TagField(name = FIELD_KEY_OWNER, value = "NA"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 107L)
                 )
             ),
@@ -89,26 +117,11 @@ class CodebaseAnalyzerTest {
                 name = "team1",
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "team1"),
-                    TagField(name = FIELD_KEY_OWNER, value = "NA"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 103L)
                 )
             )
         )
     )
-
-    @Test
-    fun testCodebaseAnalyzerShouldHandleModuleAarNotBelongToBuildFolder() {
-        val project2Data = Project2Data()
-        val apkAnalyzer = CodebaseAnalyzer(
-            apkComponentProcessor = mapperComponent.apkComponentProcessor,
-            dataParser = project2Data.fakeDataPasser,
-            teamMapping = project2Data.teamMapping
-        )
-
-        val report = apkAnalyzer.process()
-        assertEquals(expectedProject2Report, report)
-    }
 
     private val expectedProject2Report = Report(
         id = "team",
@@ -118,8 +131,6 @@ class CodebaseAnalyzerTest {
                 name = "team2",
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "team2"),
-                    TagField(name = FIELD_KEY_OWNER, value = "NA"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 107L)
                 )
             ),
@@ -127,8 +138,6 @@ class CodebaseAnalyzerTest {
                 name = "team1",
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "team1"),
-                    TagField(name = FIELD_KEY_OWNER, value = "NA"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 103L)
                 )
             )

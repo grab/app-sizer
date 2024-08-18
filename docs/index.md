@@ -55,7 +55,7 @@ appSizeAnalysis {
 To run analysis, execute
 
 ```
-./gradlew app:appSizeAnalysisRelease --no-configure-on-demand
+./gradlew app:appSizeAnalysisRelease --no-configure-on-demand --no-configuration-cache
 ```
 
 For plugin configuration options, see [Plugin Configuration][plugin_doc].

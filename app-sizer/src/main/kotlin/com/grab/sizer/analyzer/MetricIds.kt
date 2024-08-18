@@ -28,10 +28,6 @@
 package com.grab.sizer.analyzer
 
 import com.grab.sizer.report.*
-import com.grab.sizer.report.FIELD_KEY_CONTRIBUTOR
-import com.grab.sizer.report.FIELD_KEY_OWNER
-import com.grab.sizer.report.FIELD_KEY_SIZE
-import com.grab.sizer.report.FIELD_KEY_TAG
 
 internal const val LIBRARY_METRICS_ID = "library"
 internal const val METRICS_ID_APK = "apk"
@@ -42,25 +38,49 @@ internal const val LIB_CONTENT_METRICS_ID = "library_content"
 internal const val METRICS_ID_MODULES = "module"
 internal const val NOT_AVAILABLE_VALUE = "NA"
 
+fun Report.sort(): Report {
+    return this.copy(
+        rows = this.rows.map { row ->
+            row.copy(
+                fields = row.fields.sortedBy { it.name }
+            )
+        }.sortedBy { it.name }
+    )
+}
 
-internal fun createRow(name: String, value: Long, owner: String = NOT_AVAILABLE_VALUE, tag: String = NOT_AVAILABLE_VALUE, rowName: String? = null): Row = Row(
-    fields = listOf(
+internal fun createRow(
+    name: String,
+    value: Long,
+    owner: String? = null,
+    tag: String? = null,
+    rowName: String? = null
+): Row = Row(
+    fields = mutableListOf(
         TagField(
             name = FIELD_KEY_CONTRIBUTOR,
             value = name
-        ),
-        TagField(
-            name = FIELD_KEY_OWNER,
-            value = owner
-        ),
-        TagField(
-            name = FIELD_KEY_TAG,
-            value = tag
         ),
         DefaultField(
             name = FIELD_KEY_SIZE,
             value = value
         )
-    ),
+    ).apply {
+        if (owner != null) {
+            add(
+                TagField(
+                    name = FIELD_KEY_OWNER,
+                    value = owner
+                )
+            )
+        }
+        if (tag != null) {
+            add(
+                TagField(
+                    name = FIELD_KEY_TAG,
+                    value = tag
+                )
+            )
+        }
+    },
     name = rowName ?: name
 )

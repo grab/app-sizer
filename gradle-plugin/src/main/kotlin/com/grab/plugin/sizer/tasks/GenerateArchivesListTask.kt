@@ -84,22 +84,54 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
 
     @TaskAction
     fun run() {
-        createDependenciesComponent().run {
+        if(enableMatchDebugVariant.get()){
+            /**
+             * Extracts and manages project dependencies, separating modules from external libraries.
+             *
+             * This code performs the following steps:
+             * 1. Extracts module dependencies:
+             *    - Uses createDependenciesComponent(true) to enable matching debug variants.
+             *    - This is a workaround for cases where modules cannot be compiled in release build type.
+             *    - When enabled, it fetches module AAR/JAR files from the debug variant.
+             * 2. Extracts library dependencies:
+             *    - Uses createDependenciesComponent(false) to fetch libraries from the input variant.
+             * 3. Combines and processes dependencies:
+             *    - Filters out external dependencies from modules.
+             *    - Filters to include only external dependencies for libraries.
+             *
+             * This approach ensures proper handling of both module and external library dependencies,
+             * accommodating potential build type incompatibilities.
+             */
+            val modules = createDependenciesComponent(true)
+                .dependencyExtractor()
+                .extract()
+                .filter { it !is ExternalDependency }
+            val libraries = createDependenciesComponent(false)
+                .dependencyExtractor()
+                .extract()
+                .filterIsInstance<ExternalDependency>()
+
             ArchiveDependencyManager().writeToJsonFile(
-                dependencyExtractor().extract(),
+                (modules + libraries).toHashSet(),
                 archiveDepFile.get().asFile
             )
-            logger().log("It's successful to generate the dependencies json file")
+        }else{
+            createDependenciesComponent(false).run {
+                ArchiveDependencyManager().writeToJsonFile(
+                    dependencyExtractor().extract(),
+                    archiveDepFile.get().asFile
+                )
+            }
         }
 
     }
 
-    private fun createDependenciesComponent(): DependenciesComponent = DaggerDependenciesComponent.factory().create(
+    private fun createDependenciesComponent(enableMatchDebugVariant : Boolean): DependenciesComponent = DaggerDependenciesComponent.factory().create(
         project,
         variantInput.get(),
         flavorMatchingFallbacks.get(),
         buildTypeMatchingFallbacks.get(),
-        enableMatchDebugVariant.get()
+        enableMatchDebugVariant
     )
 
     companion object {

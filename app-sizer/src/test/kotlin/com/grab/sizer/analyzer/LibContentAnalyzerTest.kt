@@ -43,9 +43,8 @@ class LibContentAnalyzerTest {
 
     @Test
     fun testLibContentAnalyzerWithProject1Data() {
-        val report = analyzer.process()
-        println(Gson().toJson(report))
-        assertEquals(expectedProject1Report, report)
+        val report = analyzer.process().sort()
+        assertEquals(expectedProject1Report.sort(), report)
     }
 
     @Test
@@ -107,7 +106,6 @@ class LibContentAnalyzerTest {
                 name = "asset_resource_1.xml",
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "asset_resource_1.xml"),
-                    TagField(name = FIELD_KEY_OWNER, value = "NA"),
                     TagField(name = FIELD_KEY_TAG, value = "Asset"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 10L)
                 )
@@ -116,7 +114,6 @@ class LibContentAnalyzerTest {
                 name = "com.grab.test.HelloWorld",
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "com.grab.test.HelloWorld"),
-                    TagField(name = FIELD_KEY_OWNER, value = "NA"),
                     TagField(name = FIELD_KEY_TAG, value = "Class"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 5L)
                 )

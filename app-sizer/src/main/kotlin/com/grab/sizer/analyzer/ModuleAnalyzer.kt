@@ -93,7 +93,7 @@ internal class ModuleAnalyzer @Inject constructor(
             createRow(
                 name = reportItem.id,
                 value = reportItem.totalDownloadSize,
-                owner = reportItem.owner ?: "NA",
+                owner = reportItem.owner ?: NOT_AVAILABLE_VALUE,
                 rowName = reportItem.name
             )
         }

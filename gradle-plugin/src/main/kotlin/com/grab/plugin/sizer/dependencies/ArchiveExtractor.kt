@@ -29,6 +29,7 @@ package com.grab.plugin.sizer.dependencies
 
 import com.grab.plugin.sizer.utils.isAndroidApplication
 import com.grab.plugin.sizer.utils.isAndroidLibrary
+import com.grab.plugin.sizer.utils.isJava
 import com.grab.plugin.sizer.utils.isKotlinJvm
 import org.gradle.api.Project
 import javax.inject.Inject
@@ -65,8 +66,15 @@ internal class DefaultArchiveExtractor @Inject constructor(
                 )
             }
 
+            project.isJava -> {
+                return JavaModuleDependency(
+                    name = project.path,
+                    pathToArtifact = matchVariant.binaryOutPut.path
+                )
+            }
+
             else -> {
-                throw IllegalArgumentException("The ${project.name} is not an Android/Kotlin module")
+                throw IllegalArgumentException("The ${project.name} is not an Android/Kotlin/Java module")
             }
         }
     }
