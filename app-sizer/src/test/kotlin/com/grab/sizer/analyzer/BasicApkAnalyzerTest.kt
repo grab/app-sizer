@@ -37,8 +37,8 @@ class BasicApkAnalyzerTest {
 
     @Test
     fun testBasicApkAnalyzerWithProject1Data() {
-        val report = apkAnalyzer.process()
-        assertEquals(expectedProject1Report, report)
+        val report = apkAnalyzer.process().sort()
+        assertEquals(expectedProject1Report.sort(), report)
     }
 
     @Test
@@ -87,8 +87,6 @@ class BasicApkAnalyzerTest {
         name = "apk",
         fields = listOf(
             TagField(name = FIELD_KEY_CONTRIBUTOR, value = "apk"),
-            TagField(name = FIELD_KEY_OWNER, value = "NA"),
-            TagField(name = FIELD_KEY_TAG, value = "NA"),
             DefaultField(name = FIELD_KEY_SIZE, value = 292L)
         )
     )
@@ -97,8 +95,6 @@ class BasicApkAnalyzerTest {
         name = "resource",
         fields = listOf(
             TagField(name = FIELD_KEY_CONTRIBUTOR, value = "resource"),
-            TagField(name = FIELD_KEY_OWNER, value = "NA"),
-            TagField(name = FIELD_KEY_TAG, value = "NA"),
             DefaultField(name = FIELD_KEY_SIZE, value = 70L)
         )
     )
@@ -107,8 +103,6 @@ class BasicApkAnalyzerTest {
         name = "native_lib",
         fields = listOf(
             TagField(name = FIELD_KEY_CONTRIBUTOR, value = "native_lib"),
-            TagField(name = FIELD_KEY_OWNER, value = "NA"),
-            TagField(name = FIELD_KEY_TAG, value = "NA"),
             DefaultField(name = FIELD_KEY_SIZE, value = 90L)
         )
     )
@@ -117,8 +111,6 @@ class BasicApkAnalyzerTest {
         name = "asset",
         fields = listOf(
             TagField(name = FIELD_KEY_CONTRIBUTOR, value = "asset"),
-            TagField(name = FIELD_KEY_OWNER, value = "NA"),
-            TagField(name = FIELD_KEY_TAG, value = "NA"),
             DefaultField(name = FIELD_KEY_SIZE, value = 60L)
         )
     )
@@ -127,8 +119,6 @@ class BasicApkAnalyzerTest {
         name = "other",
         fields = listOf(
             TagField(name = FIELD_KEY_CONTRIBUTOR, value = "other"),
-            TagField(name = FIELD_KEY_OWNER, value = "NA"),
-            TagField(name = FIELD_KEY_TAG, value = "NA"),
             DefaultField(name = FIELD_KEY_SIZE, value = 20L)
         )
     )
@@ -137,8 +127,6 @@ class BasicApkAnalyzerTest {
         name = "code",
         fields = listOf(
             TagField(name = FIELD_KEY_CONTRIBUTOR, value = "code"),
-            TagField(name = FIELD_KEY_OWNER, value = "NA"),
-            TagField(name = FIELD_KEY_TAG, value = "NA"),
             DefaultField(name = FIELD_KEY_SIZE, value = 52L)
         )
     )

@@ -42,8 +42,8 @@ class ModuleAnalyzerTest {
 
     @Test
     fun testModuleAnalyzerWithProject1Data() {
-        val report = analyzer.process()
-        assertEquals(expectedProject1Report, report)
+        val report = analyzer.process().sort()
+        assertEquals(expectedProject1Report.sort(), report)
     }
 
 
@@ -131,8 +131,8 @@ class ModuleAnalyzerTest {
             teamMapping = project2Data.teamMapping
         )
 
-        val report = analyzer.process()
-        assertEquals(expectedProject2Report, report)
+        val report = analyzer.process().sort()
+        assertEquals(expectedProject2Report.sort(), report)
     }
 
     private val expectedProject1Report = Report(
@@ -144,7 +144,6 @@ class ModuleAnalyzerTest {
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "moduleJar1"),
                     TagField(name = FIELD_KEY_OWNER, value = "team1"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 13L)
                 )
             ),
@@ -153,7 +152,6 @@ class ModuleAnalyzerTest {
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "moduleJar2"),
                     TagField(name = FIELD_KEY_OWNER, value = "team2"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 18L)
                 )
             ),
@@ -162,7 +160,6 @@ class ModuleAnalyzerTest {
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "app"),
                     TagField(name = FIELD_KEY_OWNER, value = "NA"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 20L)
                 )
             ),
@@ -171,7 +168,6 @@ class ModuleAnalyzerTest {
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "moduleAar2"),
                     TagField(name = FIELD_KEY_OWNER, value = "team2"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 89L)
                 )
             ),
@@ -180,7 +176,6 @@ class ModuleAnalyzerTest {
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "moduleAar1"),
                     TagField(name = FIELD_KEY_OWNER, value = "team1"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 90L)
                 )
             )
@@ -196,7 +191,6 @@ class ModuleAnalyzerTest {
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "moduleJar1"),
                     TagField(name = FIELD_KEY_OWNER, value = "team1"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 13L)
                 )
             ),
@@ -205,7 +199,6 @@ class ModuleAnalyzerTest {
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "moduleJar2"),
                     TagField(name = FIELD_KEY_OWNER, value = "team2"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 18L)
                 )
             ),
@@ -214,7 +207,6 @@ class ModuleAnalyzerTest {
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "app"),
                     TagField(name = FIELD_KEY_OWNER, value = "NA"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 20L)
                 )
             ),
@@ -223,7 +215,6 @@ class ModuleAnalyzerTest {
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "moduleAar2"),
                     TagField(name = FIELD_KEY_OWNER, value = "team2"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 89L)
                 )
             ),
@@ -232,7 +223,6 @@ class ModuleAnalyzerTest {
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "moduleAar1"),
                     TagField(name = FIELD_KEY_OWNER, value = "team1"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 90L)
                 )
             )

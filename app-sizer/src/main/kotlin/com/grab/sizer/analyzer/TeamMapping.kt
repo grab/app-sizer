@@ -56,6 +56,12 @@ class YmlTeamMapping(
 ) : TeamMapping {
     override val teamToModuleMap: Map<String, List<String>> by lazy {
         loadTeamToModuleMap()
+            .mapValues { entry ->
+                /**
+                 * This is a workaround to accept the module path as well
+                 */
+                entry.value.map { it.split("/").last() }
+            }
     }
     override val moduleToTeamMap: Map<String, String> by lazy {
         mutableMapOf<String, String>().apply {

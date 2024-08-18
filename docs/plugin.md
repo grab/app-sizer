@@ -29,7 +29,7 @@ appSizeAnalysis {
 3. Run the analysis
 
 ```bash
-./gradlew app:appSizeAnalysisRelease --no-configure-on-demand
+./gradlew app:appSizeAnalysisRelease --no-configure-on-demand --no-configuration-cache
 ```
 
 ## Configuration

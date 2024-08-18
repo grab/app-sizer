@@ -27,7 +27,6 @@
 
 package com.grab.sizer.report
 
-import com.grab.sizer.analyzer.NOT_AVAILABLE_VALUE
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -40,7 +39,7 @@ internal const val NAMED_OUTPUT_DIR = "output_dir"
 
 class MarkdownReportWriter @Inject constructor(
     @Named(NAMED_OUTPUT_DIR) private val outputDirectory: File,
-    private val projectInfo: ProjectInfo
+    private val projectInfo: ProjectInfo,
 ) : ReportWriter {
     override fun write(report: Report) {
         File(File(outputDirectory, projectInfo.deviceName), "${report.id}-report.md").apply {
@@ -56,18 +55,17 @@ class MarkdownReportWriter @Inject constructor(
     }
 
     private fun Row.toMarkDown(): List<String> {
-        return fields.filter { it.value != NOT_AVAILABLE_VALUE }
-            .map { field ->
-                when (field.value) {
-                    is Long -> (field.value as Long).reportSize()
-                    else -> field.value.toString()
-                }
+        return fields.map { field ->
+            when (field.value) {
+                is Long -> (field.value as Long).reportSize()
+                else -> field.value.toString()
             }
+        }
     }
 
     private fun Report.createHeader(): List<String> {
         return rows.firstOrNull()
-            ?.fields?.filter { it.value != NOT_AVAILABLE_VALUE }
+            ?.fields
             ?.map { field ->
                 field.name.replaceFirstChar {
                     if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
@@ -100,7 +98,7 @@ class MarkdownTable(private val headers: List<String>) {
     private val rows: MutableList<List<String>> = mutableListOf()
 
     fun addRow(row: List<String>) {
-        require(row.size == headers.size) { "Row has different number of columns compared to headers." }
+        require(row.size == headers.size) { "Row has different number of columns compared to headers. $headers vs $row" }
         rows.add(row)
     }
 

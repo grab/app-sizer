@@ -62,6 +62,7 @@ class DefaultJarFileParser @Inject constructor() : JarFileParser {
                     downloadSize = -1
                 )
                 when (fileInfo.type) {
+                    FileType.NATIVE_LIB ->  nativeLibs.add(fileInfo)
                     FileType.CLASS -> classes.add(entry.toClass())
                     else -> others.add(fileInfo)
                 }

@@ -41,8 +41,8 @@ class LibrariesAnalyzerTest {
 
     @Test
     fun testApkAnalyzerWithProject1Data() {
-        val report = analyzer.process()
-        assertEquals(expectedProject1Report, report)
+        val report = analyzer.process().sort()
+        assertEquals(expectedProject1Report.sort(), report)
     }
 
     @Test
@@ -79,8 +79,6 @@ class LibrariesAnalyzerTest {
                 name = "libJar",
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "libJar"),
-                    TagField(name = FIELD_KEY_OWNER, value = "NA"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 7L)
                 )
             ),
@@ -88,8 +86,6 @@ class LibrariesAnalyzerTest {
                 name = "libAar1",
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "libAar1"),
-                    TagField(name = FIELD_KEY_OWNER, value = "NA"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 15L)
                 )
             ),
@@ -97,8 +93,6 @@ class LibrariesAnalyzerTest {
                 name = "libAar2",
                 fields = listOf(
                     TagField(name = FIELD_KEY_CONTRIBUTOR, value = "libAar2"),
-                    TagField(name = FIELD_KEY_OWNER, value = "NA"),
-                    TagField(name = FIELD_KEY_TAG, value = "NA"),
                     DefaultField(name = FIELD_KEY_SIZE, value = 40L)
                 )
             )

@@ -46,8 +46,11 @@ class LargeFileAnalyzerTest {
 
     @Test
     fun testLargeFileAnalyzerWithProject1Data() {
-        val report = analyzer.process()
-        assertEquals(expectedProject1Report, report)
+        val report = analyzer.process().sort()
+        assertEquals(
+            expectedProject1Report.sort(),
+            report
+        )
     }
 
     @Test

@@ -182,7 +182,9 @@ internal abstract class GenerateApkTask : DefaultTask() {
                 deviceSpecFiles.setFrom(extension.input.apk.deviceSpecs)
                 bundleToolFile.set(extension.input.apk.bundleToolFile)
                 appBundleFile.set(
-                    bundleTask.map { (it as FinalizeBundleTask).finalBundleFile.get() }
+                    bundleTask.map {
+                        (it as FinalizeBundleTask).finalBundleFile.get()
+                    }
                 )
                 signingConfig.set(variant.signingConfig.toInternalSigningConfig())
                 variantName.set(variant.name)
