@@ -38,16 +38,6 @@ internal const val LIB_CONTENT_METRICS_ID = "library_content"
 internal const val METRICS_ID_MODULES = "module"
 internal const val NOT_AVAILABLE_VALUE = "NA"
 
-fun Report.sort(): Report {
-    return this.copy(
-        rows = this.rows.map { row ->
-            row.copy(
-                fields = row.fields.sortedBy { it.name }
-            )
-        }.sortedBy { it.name }
-    )
-}
-
 internal fun createRow(
     name: String,
     value: Long,

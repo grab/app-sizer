@@ -47,6 +47,6 @@ data class ApkFileInfo(
     val resources: Set<RawFileInfo>,
     val nativeLibs: Set<RawFileInfo>,
     val assets: Set<RawFileInfo>,
-    val others: Set<FileInfo>,
+    val others: Set<RawFileInfo>,
     val dexes: Set<DexFileInfo>
 )
