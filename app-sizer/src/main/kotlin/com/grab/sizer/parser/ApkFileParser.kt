@@ -28,7 +28,6 @@
 package com.grab.sizer.parser
 
 import com.android.tools.apk.analyzer.ApkSizeCalculator
-import com.grab.sizer.analyzer.model.FileInfo
 import com.grab.sizer.analyzer.model.FileType
 import com.grab.sizer.analyzer.model.RawFileInfo
 import com.grab.sizer.di.AppScope
@@ -73,7 +72,7 @@ internal class DefaultApkFileParser @Inject constructor(
             val resources = mutableSetOf<RawFileInfo>()
             val assets = mutableSetOf<RawFileInfo>()
             val nativeLibs = mutableSetOf<RawFileInfo>()
-            val others = mutableSetOf<FileInfo>()
+            val others = mutableSetOf<RawFileInfo>()
             val dexes = mutableSetOf<DexFileInfo>()
             while (entries.hasMoreElements()) {
                 val entry = entries.nextElement()

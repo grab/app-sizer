@@ -183,3 +183,13 @@ class ApkAnalyzerTest {
         )
     )
 }
+
+internal fun Report.sort(): Report {
+    return this.copy(
+        rows = this.rows.map { row ->
+            row.copy(
+                fields = row.fields.sortedBy { it.name }
+            )
+        }.sortedBy { it.name }
+    )
+}
