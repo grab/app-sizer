@@ -58,11 +58,9 @@ internal class TaskManager(
     private val pluginExtension: AppSizePluginExtension
 ) {
     fun configTasks() {
-        if (pluginExtension.enabled) {
-            project.rootProject.gradle.projectsEvaluated {
-                if (project.isAndroidApplication) {
-                    configAppSizeTask(project)
-                }
+        project.rootProject.gradle.projectsEvaluated {
+            if (pluginExtension.enabled && project.isAndroidApplication) {
+                configAppSizeTask(project)
             }
         }
     }
