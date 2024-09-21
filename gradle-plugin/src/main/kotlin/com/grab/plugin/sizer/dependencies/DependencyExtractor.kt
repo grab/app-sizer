@@ -102,13 +102,17 @@ class DefaultDependencyExtractor @Inject constructor(
                 try {
                     it.firstLevelModuleDependencies
                 } catch (e: ResolveException) {
-                    logger.log("Fetching firstLevelModuleDependencies having issue with $it")
+                    logger.log("Fetching firstLevelModuleDependencies having issue with $it for ${project.name}")
                     emptySet<ResolvedDependency>()
                 }
             }
-            .filterIsInstance<DefaultResolvedDependency>()
+            .filterIsInstance<ResolvedDependency>()
             .forEach { resolvedDep ->
-                if (resolvedDep.moduleVersion != INTERNAL_DEP_VERSION) {
+                /**
+                 * Haven't found a proper way to detect if the resolvedDep is a module or a library
+                 * Here is a workaround, it will not work if the library group starting with the root project name
+                 */
+                if (!resolvedDep.moduleGroup.startsWith(project.rootProject.name) && resolvedDep.moduleVersion != INTERNAL_DEP_VERSION) {
                     try {
                         resolvedDep.allModuleArtifacts.forEach { artifact ->
                             archiveDependencyStore.add(artifact.toArchiveDependency())
