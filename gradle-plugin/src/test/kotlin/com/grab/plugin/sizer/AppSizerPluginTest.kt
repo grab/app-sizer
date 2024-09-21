@@ -53,7 +53,7 @@ class AppSizerPluginTest {
 
     @Test
     fun `plugin creates extension`() {
-        val extension = project.extensions.findByName("appSizeAnalysis")
+        val extension = project.extensions.findByName("appSizer")
         assertNotNull(extension)
         assertTrue(extension is AppSizePluginExtension)
     }

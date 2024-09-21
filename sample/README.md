@@ -18,10 +18,10 @@ This sample project demonstrates two ways to use App Sizer: via the Gradle plugi
 
 ### Gradle Plugin Integration
 
-The App Sizer tool is configured in the `build.gradle` file of the `app` module. Look for the `appSizeAnalysis` block:
+The App Sizer tool is configured in the `build.gradle` file of the `app` module. Look for the `appSizer` block:
 
 ```groovy
-appSizeAnalysis {
+appSizer {
     projectInput {
         // Configuration options
     }

@@ -38,6 +38,11 @@ shadowJar {
         attributes 'Main-Class': 'com.grab.sizer.MainKt'
     }
 
+    archiveBaseName.set('clt-app-sizer')
+    archiveClassifier.set('')
+    archiveVersion.set('')
+
+
     mergeServiceFiles()
 }
 
@@ -49,6 +54,13 @@ dependencies {
     implementation libs.jackson.module.kotlin
     implementation libs.jackson.dataformat.yaml
     implementation libs.gson
+
+    /**
+     * These two libs were compileOnly in app-sizer
+     */
+    implementation libs.android.tools.bundletool
+    implementation libs.android.tools.common
+
     testImplementation libs.junit
 }
 

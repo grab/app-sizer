@@ -48,7 +48,7 @@ In the app module 's `build.gradle`
 apply plugin: "com.grab.app-sizer"
 
 // AppSizer configuration
-appSizeAnalysis {
+appSizer {
     // DSL
 }
 ```

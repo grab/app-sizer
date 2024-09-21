@@ -30,7 +30,7 @@ package com.grab.plugin.sizer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-private const val PLUGIN_EXTENSION = "appSizeAnalysis"
+private const val PLUGIN_EXTENSION = "appSizer"
 
 class AppSizerPlugin : Plugin<Project> {
     override fun apply(project: Project) =
