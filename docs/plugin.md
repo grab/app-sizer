@@ -21,7 +21,7 @@ buildscript {
 ```groovy
 apply plugin: "com.grab.app-sizer"
 
-appSizeAnalysis {
+appSizer {
     // Configuration goes here
 }
 ```
@@ -33,10 +33,10 @@ appSizeAnalysis {
 ```
 
 ## Configuration
-Use the registered `appSizeAnalysis` extension block to the app module's `build.gradle` to configure App Sizer Plugin
+Use the registered `appSizer` extension block to the app module's `build.gradle` to configure App Sizer Plugin
 
 ```groovy
-appSizeAnalysis {
+appSizer {
     enabled = true
     projectInput {
         // config the input for the plugin
@@ -52,7 +52,7 @@ appSizeAnalysis {
 Configure the input for the project:
 
 ```groovy
-appSizeAnalysis {
+appSizer {
     projectInput {
         largeFileThreshold = 10
         teamMappingFile = file("${rootProject.rootDir}/module-owner.yml")
@@ -92,7 +92,7 @@ Team2:
 Configure APK generation settings:
 
 ```groovy
-appSizeAnalysis {
+appSizer {
     projectInput {
         ...
         apk {
@@ -117,7 +117,7 @@ appSizeAnalysis {
 Configure the reporting output:
 
 ```groovy
-appSizeAnalysis {
+appSizer {
     ...
     metrics {
         influxDB {
@@ -156,7 +156,7 @@ appSizeAnalysis {
 ## Full Configuration Example
 
 ```groovy
-appSizeAnalysis {
+appSizer {
     enabled = true
     projectInput {
         apk {

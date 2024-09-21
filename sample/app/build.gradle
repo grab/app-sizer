@@ -101,7 +101,7 @@ dependencies {
 
 apply plugin: "com.grab.app-sizer"
 
-appSizeAnalysis {
+appSizer {
     enabled = true
     projectInput {
         apk {

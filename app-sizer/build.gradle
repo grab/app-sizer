@@ -30,11 +30,15 @@ plugins {
 }
 
 dependencies {
+    /**
+     * These two libs are already in the AGP
+     */
+    compileOnly libs.android.tools.bundletool
+    compileOnly libs.android.tools.common
+
     implementation libs.org.influxdb.client
     implementation libs.org.smali.dexlib2
-    implementation libs.android.tools.bundletool
     implementation libs.android.tools.apkanalyzer
-    implementation libs.android.tools.common
     implementation libs.jackson.module.kotlin
     implementation libs.jackson.dataformat.yaml
     implementation libs.guava
@@ -43,6 +47,8 @@ dependencies {
 
     kapt libs.dagger.compiler
     testImplementation libs.kotlin.test
+    testImplementation libs.android.tools.bundletool
+    testImplementation libs.android.tools.common
 }
 
 ext.artifactId = "app-sizer"
