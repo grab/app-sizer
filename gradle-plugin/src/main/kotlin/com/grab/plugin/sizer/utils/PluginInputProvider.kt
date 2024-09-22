@@ -27,9 +27,9 @@
 
 package com.grab.plugin.sizer.utils
 
-import com.android.build.gradle.api.BaseVariant
 import com.grab.plugin.sizer.dependencies.*
 import com.grab.sizer.utils.InputProvider
+import com.grab.sizer.utils.SizerInputFile
 import java.io.File
 
 private const val EXT_AAR = "aar"
@@ -42,19 +42,41 @@ class PluginInputProvider(
     private val teamMappingFile: File? = null,
     private val r8MappingFile: File? = null,
 ) : InputProvider {
-    override fun provideModuleAar(): Sequence<File> =
-        archiveDependencyStore.getModuleDependency().map { File(it.pathToArtifact) }
+    override fun provideModuleAar(): Sequence<SizerInputFile> =
+        archiveDependencyStore.getModuleDependency()
+            .map {
+                SizerInputFile(
+                    tag = it.name,
+                    file = File(it.pathToArtifact)
+                )
+            }
 
-    override fun provideModuleJar(): Sequence<File> =
-        archiveDependencyStore.getJavaModuleDependencies().map { File(it.pathToArtifact) }
+    override fun provideModuleJar(): Sequence<SizerInputFile> =
+        archiveDependencyStore.getJavaModuleDependencies()
+            .map {
+                SizerInputFile(
+                    tag = it.name,
+                    file = File(it.pathToArtifact)
+                )
+            }
 
-    override fun provideLibraryJar(): Sequence<File> = archiveDependencyStore.getExternalDependencies()
-        .map { File(it.pathToArtifact) }
-        .filter { it.extension.equals(EXT_JAR, true) }
+    override fun provideLibraryJar(): Sequence<SizerInputFile> = archiveDependencyStore.getExternalDependencies()
+        .map {
+            SizerInputFile(
+                tag = it.name,
+                file = File(it.pathToArtifact)
+            )
+        }
+        .filter { it.file.extension.equals(EXT_JAR, true) }
 
-    override fun provideLibraryAar(): Sequence<File> = archiveDependencyStore.getExternalDependencies()
-        .map { File(it.pathToArtifact) }
-        .filter { it.extension.equals(EXT_AAR, true) }
+    override fun provideLibraryAar(): Sequence<SizerInputFile> = archiveDependencyStore.getExternalDependencies()
+        .map {
+            SizerInputFile(
+                tag = it.name,
+                file = File(it.pathToArtifact)
+            )
+        }
+        .filter { it.file.extension.equals(EXT_AAR, true) }
 
     override fun provideApkFiles(): Sequence<File> {
         return apksDirectory.listFiles()?.asSequence() ?: emptySequence()

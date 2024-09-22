@@ -30,6 +30,7 @@ package com.grab.sizer
 import com.grab.sizer.config.Config
 import com.grab.sizer.utils.FileQuery
 import com.grab.sizer.utils.InputProvider
+import com.grab.sizer.utils.SizerInputFile
 import java.io.File
 
 
@@ -39,6 +40,7 @@ internal const val EXT_JAR = "jar"
 internal const val DEFAULT_JAR_DIR = "build/libs"
 internal const val GRADLE_FILE = "build.gradle"
 internal const val DEFAULT_AAR_FOLDER = "/build/outputs/aar"
+private const val BUILD_FOLDER = "build"
 
 interface FileSystem {
     fun create(parent: File, path: String): File
@@ -54,9 +56,36 @@ class CltInputProvider constructor(
     private val apksDirectory: File,
     private val fileSystem: FileSystem = DefaultFileSystem()
 ) : InputProvider {
-    override fun provideModuleAar(): Sequence<File> {
+    override fun provideModuleAar(): Sequence<SizerInputFile> {
         return modulesSource(DEFAULT_AAR_FOLDER)
             .flatMap { fileQuery.query(it, EXT_AAR) }
+            .map { file ->
+                SizerInputFile(
+                    tag = getModulePath(config.projectInput.projectRoot, file),
+                    file = file
+                )
+            }
+    }
+
+    private fun getModulePath(rootDir: File, aarFile: File): String {
+        return if(config.projectInput.modulesDirIsProjectRoot) {
+            val aarPath = aarFile.absolutePath
+            val rootPath = rootDir.absolutePath
+            val buildFolderIndex = aarPath.indexOf(File.separator + BUILD_FOLDER + File.separator)
+
+            if (buildFolderIndex != -1) {
+                val modulePathFromRoot = aarPath.substring(rootPath.length, buildFolderIndex)
+                val modulePath = modulePathFromRoot.trim(File.separatorChar).replace(File.separatorChar, ':')
+                modulePath.ifEmpty { rootDir.name }
+            }
+            else{
+                // If no "build" folder is found, return the file name without extension
+                aarFile.nameWithoutExtension
+            }
+
+        } else {
+            aarFile.nameWithoutExtension
+        }
     }
 
     private fun modulesSource(gradleDefaultFolder: String): Sequence<File> =
@@ -69,18 +98,34 @@ class CltInputProvider constructor(
             sequenceOf(config.projectInput.modulesDirectory)
 
 
-    override fun provideModuleJar(): Sequence<File> {
+    override fun provideModuleJar(): Sequence<SizerInputFile> {
         return modulesSource(DEFAULT_JAR_DIR)
             .flatMap { fileQuery.query(it, EXT_JAR) }
+            .map { file ->
+                SizerInputFile(
+                    tag = getModulePath(config.projectInput.projectRoot, file),
+                    file = file
+                )
+            }
     }
 
-    override fun provideLibraryJar(): Sequence<File> = fileQuery.query(
+    override fun provideLibraryJar(): Sequence<SizerInputFile> = fileQuery.query(
         config.projectInput.librariesDirectory, EXT_JAR
-    )
+    ).map { file ->
+        SizerInputFile(
+            tag = file.nameWithoutExtension,
+            file = file
+        )
+    }
 
-    override fun provideLibraryAar(): Sequence<File> = fileQuery.query(
+    override fun provideLibraryAar(): Sequence<SizerInputFile> = fileQuery.query(
         config.projectInput.librariesDirectory, EXT_AAR
-    )
+    ).map { file ->
+        SizerInputFile(
+            tag = file.nameWithoutExtension,
+            file = file
+        )
+    }
 
     override fun provideApkFiles(): Sequence<File> = fileQuery.query(apksDirectory, EXT_APK)
 

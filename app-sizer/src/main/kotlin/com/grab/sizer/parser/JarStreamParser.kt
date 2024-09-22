@@ -73,6 +73,7 @@ class DefaultJarStreamParser @Inject constructor() : JarStreamParser {
             return JarFileInfo(
                 name = jarEntry.getPath(),
                 path = "",
+                tag = "",
                 others = others,
                 nativeLibs = emptySet(),
                 classes = classes

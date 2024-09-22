@@ -126,7 +126,7 @@ class DefaultDependencyExtractor @Inject constructor(
 }
 
 private fun ResolvedArtifact.toArchiveDependency(): ArchiveDependency = ExternalDependency(
-    name = id.displayName,
+    name = id.componentIdentifier.toString(),
     pathToArtifact = file.path
 )
 

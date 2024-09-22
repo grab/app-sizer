@@ -67,7 +67,7 @@ internal class LargeFileAnalyzer @Inject constructor(
             )
 
         val appModule = Contributor(
-            path = "root/app/build/",
+            originalOwner = createAppInfo(),
             assets = wholeProject.noOwnerAssets.castToRawFile(),
             resources = wholeProject.noOwnerResources.castToRawFile(),
             nativeLibs = wholeProject.noOwnerNativeLibs.castToRawFile(),
@@ -124,11 +124,10 @@ internal class LargeFileAnalyzer @Inject constructor(
                             name = fileName,
                             value = res.downloadSize,
                             owner = pair.first.name,
-                            tag = module.name,
+                            tag = module.tag,
                             rowName = fileName
                         )
                     }
             }
-
         }
 }

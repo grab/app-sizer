@@ -47,28 +47,28 @@ internal class DefaultArchiveExtractor @Inject constructor(
         when {
             project.isAndroidApplication -> {
                 return AppDependency(
-                    name = project.path,
+                    name = project.pathTrimColon,
                     pathToArtifact = matchVariant.binaryOutPut.path
                 )
             }
 
             project.isAndroidLibrary -> {
                 return ModuleDependency(
-                    name = project.path,
+                    name = project.pathTrimColon,
                     pathToArtifact = matchVariant.binaryOutPut.path
                 )
             }
 
             project.isKotlinJvm -> {
                 return JavaModuleDependency(
-                    name = project.path,
+                    name = project.pathTrimColon,
                     pathToArtifact = matchVariant.binaryOutPut.path
                 )
             }
 
             project.isJava -> {
                 return JavaModuleDependency(
-                    name = project.path,
+                    name = project.pathTrimColon,
                     pathToArtifact = matchVariant.binaryOutPut.path
                 )
             }
@@ -79,3 +79,6 @@ internal class DefaultArchiveExtractor @Inject constructor(
         }
     }
 }
+
+private val Project.pathTrimColon
+    get() = path.trim(':')

@@ -32,22 +32,26 @@ import com.grab.sizer.report.ProjectInfo
 import com.grab.sizer.report.db.InfluxDBConfig
 import java.io.File
 
-
 /**
  * The InputProvider interface is used to provide all necessary inputs for the app-sizer tool to process.
  * The client of the app-sizer should provide these information details for the tool to process.
  * Currently, the interface is implemented in two modules: the command-line tool (cli) and the Gradle plugin.
  */
 interface InputProvider {
-    fun provideModuleAar(): Sequence<File>
-    fun provideModuleJar(): Sequence<File>
-    fun provideLibraryJar(): Sequence<File>
-    fun provideLibraryAar(): Sequence<File>
+    fun provideModuleAar(): Sequence<SizerInputFile>
+    fun provideModuleJar(): Sequence<SizerInputFile>
+    fun provideLibraryJar(): Sequence<SizerInputFile>
+    fun provideLibraryAar(): Sequence<SizerInputFile>
     fun provideApkFiles(): Sequence<File>
     fun provideR8MappingFile(): File?
     fun provideTeamMappingFile(): File?
     fun provideLargeFileThreshold(): Long
 }
+
+data class SizerInputFile(
+    val file: File,
+    val tag: String,
+)
 
 /**
  * The OutputProvider interface is responsible for providing all output configurations
@@ -62,3 +66,4 @@ interface OutputProvider {
     fun provideProjectInfo(): ProjectInfo
     fun provideCustomProperties(): CustomProperties
 }
+

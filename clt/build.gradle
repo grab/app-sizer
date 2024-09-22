@@ -30,7 +30,6 @@ plugins {
     id 'com.github.johnrengelman.shadow'
 }
 
-
 shadowJar {
     zip64 true
 
@@ -41,7 +40,6 @@ shadowJar {
     archiveBaseName.set('clt-app-sizer')
     archiveClassifier.set('')
     archiveVersion.set('')
-
 
     mergeServiceFiles()
 }

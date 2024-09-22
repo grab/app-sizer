@@ -112,7 +112,7 @@ internal class DefaultApkComponentProcessor @Inject constructor(private val mapp
             val assets = rawEntry.value
             var contributor = get(lib)
             contributor = contributor?.copy(assets = assets.castToRawFile())
-                ?: Contributor(path = lib.path, assets = assets.castToRawFile())
+                ?: Contributor(originalOwner = lib, assets = assets.castToRawFile())
             put(lib, contributor)
         }
     }
@@ -123,7 +123,7 @@ internal class DefaultApkComponentProcessor @Inject constructor(private val mapp
             val data = rawEntry.value
             var contributor = get(lib)
             contributor = contributor?.copy(resources = data.castToRawFile())
-                ?: Contributor(path = lib.path, resources = data.castToRawFile())
+                ?: Contributor(originalOwner = lib, resources = data.castToRawFile())
             put(lib, contributor)
         }
     }
@@ -134,7 +134,7 @@ internal class DefaultApkComponentProcessor @Inject constructor(private val mapp
             val data = rawEntry.value
             var contributor = get(lib)
             contributor = contributor?.copy(nativeLibs = data.castToRawFile())
-                ?: Contributor(path = lib.path, nativeLibs = data.castToRawFile())
+                ?: Contributor(originalOwner = lib, nativeLibs = data.castToRawFile())
             put(lib, contributor)
         }
     }
@@ -145,7 +145,7 @@ internal class DefaultApkComponentProcessor @Inject constructor(private val mapp
             val data = rawEntry.value
             var contributor = get(lib)
             contributor = contributor?.copy(others = data.castToRawFile())
-                ?: Contributor(path = lib.path, others = data.castToRawFile())
+                ?: Contributor(originalOwner = lib, others = data.castToRawFile())
             put(lib, contributor)
         }
     }
@@ -156,7 +156,7 @@ internal class DefaultApkComponentProcessor @Inject constructor(private val mapp
             val data = rawEntry.value
             var contributor = get(lib)
             contributor = contributor?.copy(classes = data.castToClass())
-                ?: Contributor(path = lib.path, classes = data.castToClass())
+                ?: Contributor(originalOwner = lib, classes = data.castToClass())
             put(lib, contributor)
         }
     }

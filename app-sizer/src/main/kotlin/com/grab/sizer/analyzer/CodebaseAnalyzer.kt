@@ -29,7 +29,7 @@ package com.grab.sizer.analyzer
 
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.*
-import com.grab.sizer.parser.ApkFileInfo
+import com.grab.sizer.parser.BinaryFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.parser.getAars
 import com.grab.sizer.parser.getJars
@@ -62,8 +62,9 @@ internal class CodebaseAnalyzer @Inject constructor(
                 dataParser.getAars(),
                 dataParser.getJars()
             )
-        val appModule = Contributor(
-            path = "root/app/build/",
+
+        val appContributor = Contributor(
+            originalOwner = createAppInfo(),
             assets = wholeProject.noOwnerAssets.castToRawFile(),
             resources = wholeProject.noOwnerResources.castToRawFile(),
             nativeLibs = wholeProject.noOwnerNativeLibs.castToRawFile(),
@@ -77,7 +78,7 @@ internal class CodebaseAnalyzer @Inject constructor(
                 dataParser.moduleAars,
                 dataParser.moduleJars
             )
-        return generateReport(modulesData.contributors + appModule)
+        return generateReport(modulesData.contributors + appContributor)
     }
 
     private fun generateReport(contributors: Set<Contributor>): Report {
@@ -95,4 +96,10 @@ internal class CodebaseAnalyzer @Inject constructor(
         name,
         getDownloadSize(),
     )
+}
+
+internal fun createAppInfo() = object : BinaryFileInfo {
+    override val name: String = "app"
+    override val path: String = "root/app/build/"
+    override val tag: String = "app"
 }

@@ -31,7 +31,22 @@ import com.grab.sizer.config.ApkGenerationConfig
 import com.grab.sizer.config.Config
 import com.grab.sizer.config.ProjectInputConfig
 import com.grab.sizer.config.ReportConfig
+import com.grab.sizer.utils.SizerInputFile
 import java.io.File
+
+internal const val APP_APK = "app.apk"
+internal const val MODULE1_AAR = "module1-debug.aar"
+internal const val MODULE2_AAR = "module2-debug.aar"
+internal const val JAVA_MODULE_JAR = "java-module.jar"
+internal const val NOT_A_MODULE_AAR = "not-a-module.aar"
+internal const val NOT_A_JAVA_MODULE_JAR = "not-a-java-module.jar"
+internal const val BUILD_GRADLE = "build.gradle"
+internal const val SECURITY_CRYPTO_SOURCES_JAR = "security-crypto-1.1.0-alpha03-sources.jar"
+internal const val SECURITY_CRYPTO_POM = "security-crypto-1.1.0-alpha03.pom"
+internal const val SECURITY_CRYPTO_AAR = "security-crypto-1.1.0-alpha03.aar"
+internal const val WORK_MULTIPROCESS_SOURCES_JAR = "work-multiprocess-2.8.0-sources.jar"
+internal const val WORK_MULTIPROCESS_AAR = "work-multiprocess-2.8.0.aar"
+internal const val WORK_MULTIPROCESS_POM = "work-multiprocess-2.8.0.pom"
 
 /**
  * This class contain a project files & folders for testing the [CltInputProvider]
@@ -54,14 +69,67 @@ class TestingProject1 : FileSystem {
     val allFiles = projectDir.getAll() + libDir.getAll()
     val config = createConfig()
 
-    val expectingAllAars = projectDir.getAll().filter { it.extension == EXT_AAR }
-    val expectingAllJars = projectDir.getAll().filter { it.extension == EXT_JAR}
+    /**
+     * When config.projectInput.modulesDirIsProjectRoot = false
+     */
+    val expectingAllAarsWhenNotAProjectRoot = projectDir.getAll()
+        .filter { it.extension == EXT_AAR }
+        .map { SizerInputFile(file = it, tag = it.nameWithoutExtension) }
 
-    val expectingModuleAars = expectingAllAars.filter { it.name != "not-a-module.aar" }
-    val expectingModuleJars = expectingAllJars.filter { it.name != "not-a-java-module.jar" }
+    /**
+     * When config.projectInput.modulesDirIsProjectRoot = false
+     */
+    val expectingAllJarsWhenNotAProjectRoot = projectDir.getAll().filter { it.extension == EXT_JAR }
+        .map { SizerInputFile(file = it, tag = it.nameWithoutExtension) }
+
+    val expectingAllAars = projectDir.getAll()
+        .filter { it.extension == EXT_AAR }
+        .map {
+            when (it.name) {
+                MODULE1_AAR -> SizerInputFile(
+                    file = it,
+                    tag = "module1"
+                )
+
+                MODULE2_AAR -> SizerInputFile(
+                    file = it,
+                    tag = "group1:module2"
+                )
+
+                else -> SizerInputFile(file = it, tag = it.nameWithoutExtension)
+            }
+        }
+
+    val expectingAllJars = projectDir.getAll().filter { it.extension == EXT_JAR }
+        .map {
+            when (it.name) {
+                JAVA_MODULE_JAR -> SizerInputFile(
+                    file = it,
+                    tag = "group1:java-module"
+                )
+
+                else -> SizerInputFile(file = it, tag = it.nameWithoutExtension)
+            }
+        }
+
+
+    val expectingModuleAars = expectingAllAars.filter { it.file.name != NOT_A_MODULE_AAR }
+    val expectingModuleJars = expectingAllJars.filter { it.file.name != NOT_A_JAVA_MODULE_JAR }
 
     val expectingLibAars = libDir.getAll().filter { it.extension == EXT_AAR }
+        .map {
+            SizerInputFile(
+                file = it,
+                tag = it.nameWithoutExtension
+            )
+        }
     val expectingLibJars = libDir.getAll().filter { it.extension == EXT_JAR }
+        .map {
+            SizerInputFile(
+                file = it,
+                tag = it.nameWithoutExtension
+            )
+        }
 
 
     private fun createConfig(): Config {
@@ -70,7 +138,7 @@ class TestingProject1 : FileSystem {
                 version = "0.0.1",
                 projectName = "testing01",
                 modulesDirectory = projectDir,
-                modulesDirIsProjectRoot = true,
+                projectRoot = projectDir,
                 librariesDirectory = libDir
             ),
             apkGeneration = ApkGenerationConfig(
@@ -93,13 +161,13 @@ class TestingProject1 : FileSystem {
                 addDirectory("security-crypto") {
                     addDirectory("1.1.0-alpha03") {
                         addDirectory("a96855861b33f9a46ca6a1556118ae592cad2014") {
-                            addFile("security-crypto-1.1.0-alpha03-sources.jar")
+                            addFile(SECURITY_CRYPTO_SOURCES_JAR)
                         }
                         addDirectory("b3c8960986915ab431476ae2072273adb4b83515") {
-                            addFile("security-crypto-1.1.0-alpha03.pom")
+                            addFile(SECURITY_CRYPTO_POM)
                         }
                         addDirectory("f54110eab7610d08d7c41c594b3a248dac488e00") {
-                            addFile("security-crypto-1.1.0-alpha03.aar")
+                            addFile(SECURITY_CRYPTO_AAR)
                         }
                     }
                 }
@@ -109,13 +177,13 @@ class TestingProject1 : FileSystem {
                 addDirectory("work-multiprocess") {
                     addDirectory("2.8.0") {
                         addDirectory("8547c508168f54ce7c2fa0c4b6c3fc8850d30f23") {
-                            addFile("work-multiprocess-2.8.0-sources.jar")
+                            addFile(WORK_MULTIPROCESS_SOURCES_JAR)
                         }
                         addDirectory("90aacad73ba44fe05b25de0c5308160c703dba0b") {
-                            addFile("work-multiprocess-2.8.0.aar")
+                            addFile(WORK_MULTIPROCESS_AAR)
                         }
                         addDirectory("77a1c6094184a05d8718a77f004aaa75fd296b") {
-                            addFile("work-multiprocess-2.8.0.pom")
+                            addFile(WORK_MULTIPROCESS_POM)
                         }
                     }
                 }
@@ -126,46 +194,46 @@ class TestingProject1 : FileSystem {
     private fun createProjectDir(): FakeFile {
         val projectParent = FakeFile(File("."), "user-folder") {
             addDirectory("root-project") {
-                addFile("build.gradle")
+                addFile(BUILD_GRADLE)
                 addDirectory("app") {
-                    addFile("build.gradle")
+                    addFile(BUILD_GRADLE)
                     addDirectory("build") {
                         addDirectory("outputs") {
                             addDirectory("apk") {
                                 addDirectory("debug") {
-                                    addFile("app.apk")
+                                    addFile(APP_APK)
                                 }
                             }
                         }
                     }
                 }
                 addDirectory("module1") {
-                    addFile("build.gradle")
+                    addFile(BUILD_GRADLE)
                     addDirectory("build") {
                         addDirectory("outputs") {
                             addDirectory("aar") {
-                                addFile("module1.aar")
+                                addFile(MODULE1_AAR)
                             }
                         }
                     }
                 }
                 addDirectory("group1") {
                     addDirectory("module2") {
-                        addFile("build.gradle")
+                        addFile(BUILD_GRADLE)
                         addDirectory("build") {
                             addDirectory("outputs") {
                                 addDirectory("aar") {
-                                    addFile("module2.aar")
+                                    addFile(MODULE2_AAR)
                                 }
                             }
                         }
                     }
 
                     addDirectory("java-module") {
-                        addFile("build.gradle")
+                        addFile(BUILD_GRADLE)
                         addDirectory("build") {
                             addDirectory("libs") {
-                                addFile("java-module.jar")
+                                addFile(JAVA_MODULE_JAR)
                             }
                         }
                     }
@@ -174,7 +242,7 @@ class TestingProject1 : FileSystem {
                         addDirectory("build") {
                             addDirectory("outputs") {
                                 addDirectory("aar") {
-                                    addFile("not-a-module.aar")
+                                    addFile(NOT_A_MODULE_AAR)
                                 }
                             }
                         }
@@ -183,12 +251,11 @@ class TestingProject1 : FileSystem {
                     addDirectory("not-java-module") {
                         addDirectory("build") {
                             addDirectory("libs") {
-                                addFile("not-a-java-module.jar")
+                                addFile(NOT_A_JAVA_MODULE_JAR)
                             }
                         }
                     }
                 }
-
             }
         }
         return projectParent.children.first()
@@ -207,6 +274,7 @@ class FakeFile(
     addChild: FakeFile.() -> Unit = {}
 ) : File(parent, path) {
     val children: MutableList<FakeFile> = mutableListOf()
+
     init {
         addChild()
     }

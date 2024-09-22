@@ -83,7 +83,8 @@ internal fun createEmptyJar(name: String = "jar", path: String = "jar/path"): Ja
     path = "$path/$name",
     classes = emptySet(),
     nativeLibs = emptySet(),
-    others = emptySet()
+    others = emptySet(),
+    tag = name
 )
 
 internal fun createEmptyAar(name: String = "aar", path: String = "aar/path"): AarFileInfo = AarFileInfo(
@@ -93,7 +94,8 @@ internal fun createEmptyAar(name: String = "aar", path: String = "aar/path"): Aa
     nativeLibs = emptySet(),
     assets = emptySet(),
     others = emptySet(),
-    jars = emptySet()
+    jars = emptySet(),
+    tag = name
 )
 
 internal fun createEmptyApkInfo(name: String = "apk1"): ApkFileInfo =

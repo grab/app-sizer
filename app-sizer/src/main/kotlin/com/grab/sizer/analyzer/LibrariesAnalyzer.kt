@@ -68,7 +68,7 @@ internal class LibrariesAnalyzer @Inject constructor(
     }
 
     private fun Contributor.toReportItem(): ReportItem = ReportItem(
-        name = File(path).nameWithoutExtension,
+        name = tag,
         extraInfo = path.substring(path.indexOf("files-2.1/") + 9),
         id = File(path).nameWithoutExtension,
         totalDownloadSize = getDownloadSize(),

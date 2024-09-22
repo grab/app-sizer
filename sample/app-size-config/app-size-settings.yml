@@ -1,7 +1,7 @@
 project-input:
   libraries-directory: "./build/gradle-cache/caches/modules-2/files-2.1"
   modules-directory: "./"
-  modules-dir-is-project-root: true
+  project-root-dir: "./"
   r8-mapping-file: "./app/build/outputs/mapping/proRelease/mapping.txt"
   owner-mapping-file: "./module-owner.yml"
   version: "1.0.1"

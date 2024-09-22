@@ -121,20 +121,21 @@ appSizer {
     metrics {
         /** Enable this block if you have an InfluxDb locally **/
         /**
-         influxDB {
-         dbName = "sizer"
-         reportTableName = "app_size"
-         url = "http://localhost:8086"
-         username = "root"
-         password = "root"
-         retentionPolicy {
-         name = "app_sizer"
-         duration = "360d"
-         shardDuration = "0m"
-         replicationFactor = 2
-         setAsDefault = true
-         }
-         }**/
+        influxDB {
+            dbName = "sizer"
+            reportTableName = "app_size"
+            url = "http://localhost:8086"
+            username = "root"
+            password = "root"
+            retentionPolicy {
+                name = "app_sizer"
+                duration = "360d"
+                shardDuration = "0m"
+                replicationFactor = 2
+                setAsDefault = true
+            }
+        }
+        **/
         customAttributes.putAll(
                 ["pipeline_id": "1001"]
         )
