@@ -39,9 +39,9 @@ class CltInputProviderTest {
 
 
     @Test
-    fun provideModuleAarShouldGetAllAarFromProjectFolderWhenModulesDirIsNotProjectRoot(){
+    fun provideModuleAarShouldGetAllAarFromProjectFolderWhenModulesDirIsNotProjectRoot() {
         val config = config.copy(
-            projectInput = config.projectInput.copy(modulesDirIsProjectRoot = false)
+            projectInput = config.projectInput.copy(projectRoot = File("./abc"))
         )
 
         val cltInputProvider = CltInputProvider(
@@ -50,8 +50,13 @@ class CltInputProviderTest {
             apksDirectory = File("FakeDir"),
             fileSystem = testingProject1
         )
-        val moduleAars = cltInputProvider.provideModuleAar().toList().sorted().toTypedArray()
-        val expectingAllAars = testingProject1.expectingAllAars.sorted().toTypedArray()
+        val moduleAars = cltInputProvider.provideModuleAar()
+            .toList()
+            .sortedBy { it.file }
+            .toTypedArray()
+        val expectingAllAars = testingProject1.expectingAllAarsWhenNotAProjectRoot
+            .sortedBy { it.file }
+            .toTypedArray()
         Assert.assertEquals(expectingAllAars.size, 3)
         Assert.assertArrayEquals(moduleAars, expectingAllAars)
     }
@@ -59,7 +64,7 @@ class CltInputProviderTest {
     @Test
     fun provideModuleJarShouldGetAllJarFromProjectFolderWhenModulesDirIsNotProjectRoot() {
         val config = config.copy(
-            projectInput = config.projectInput.copy(modulesDirIsProjectRoot = false)
+            projectInput = config.projectInput.copy(projectRoot = File("./abc"))
         )
 
         val cltInputProvider = CltInputProvider(
@@ -68,35 +73,38 @@ class CltInputProviderTest {
             apksDirectory = File("FakeDir"),
             fileSystem = testingProject1
         )
-        val moduleJars = cltInputProvider.provideModuleJar().toList().sorted().toTypedArray()
-        val expectingAllJars = testingProject1.expectingAllJars.sorted().toTypedArray()
+        val moduleJars = cltInputProvider.provideModuleJar()
+            .toList()
+            .sortedBy { it.file }
+            .toTypedArray()
+
+        val expectingAllJars = testingProject1.expectingAllJarsWhenNotAProjectRoot.sortedBy { it.file }.toTypedArray()
+
         Assert.assertEquals(expectingAllJars.size, 2)
         Assert.assertArrayEquals(moduleJars, expectingAllJars)
     }
 
     @Test
     fun provideModuleAarShouldGetCorrectAarFromProjectFolderWhenModulesDirIsProjectRoot() {
-        val config = config.copy(
-            projectInput = config.projectInput.copy(modulesDirIsProjectRoot = true)
-        )
-
         val cltInputProvider = CltInputProvider(
             fileQuery = fileQuery,
             config = config,
             apksDirectory = File("FakeDir"),
             fileSystem = testingProject1
         )
-        val moduleAars = cltInputProvider.provideModuleAar().toList().sorted().toTypedArray()
-        val expectingModuleAars = testingProject1.expectingModuleAars.sorted().toTypedArray()
+        val moduleAars = cltInputProvider.provideModuleAar()
+            .toList()
+            .sortedBy { it.file }
+            .toTypedArray()
+        val expectingModuleAars = testingProject1.expectingModuleAars
+            .sortedBy { it.tag }
+            .toTypedArray()
         Assert.assertEquals(expectingModuleAars.size, 2)
         Assert.assertArrayEquals(moduleAars, expectingModuleAars)
     }
 
     @Test
     fun provideModuleJarShouldGetCorrectJarFromProjectFolderWhenModulesDirIsProjectRoot() {
-        val config = config.copy(
-            projectInput = config.projectInput.copy(modulesDirIsProjectRoot = true)
-        )
 
         val cltInputProvider = CltInputProvider(
             fileQuery = fileQuery,
@@ -104,8 +112,13 @@ class CltInputProviderTest {
             apksDirectory = File("FakeDir"),
             fileSystem = testingProject1
         )
-        val moduleJars = cltInputProvider.provideModuleJar().toList().sorted().toTypedArray()
-        val expectingModuleJars = testingProject1.expectingModuleJars.sorted().toTypedArray()
+        val moduleJars = cltInputProvider.provideModuleJar()
+            .toList()
+            .sortedBy { it.tag }
+            .toTypedArray()
+        val expectingModuleJars = testingProject1.expectingModuleJars
+            .sortedBy { it.tag }
+            .toTypedArray()
         Assert.assertEquals(expectingModuleJars.size, 1)
         Assert.assertArrayEquals(moduleJars, expectingModuleJars)
     }
@@ -118,8 +131,12 @@ class CltInputProviderTest {
             apksDirectory = File("FakeDir"),
             fileSystem = testingProject1
         )
-        val libraryAar = cltInputProvider.provideLibraryAar().toList().sorted().toTypedArray()
-        val expectingLibAars = testingProject1.expectingLibAars.sorted().toTypedArray()
+        val libraryAar = cltInputProvider.provideLibraryAar().toList()
+            .sortedBy { it.tag }
+            .toTypedArray()
+        val expectingLibAars = testingProject1.expectingLibAars
+            .sortedBy { it.tag }
+            .toTypedArray()
         Assert.assertEquals(expectingLibAars.size, 2)
         Assert.assertArrayEquals(libraryAar, expectingLibAars)
     }
@@ -132,8 +149,13 @@ class CltInputProviderTest {
             apksDirectory = File("FakeDir"),
             fileSystem = testingProject1
         )
-        val libraryJars = cltInputProvider.provideLibraryJar().toList().sorted().toTypedArray()
-        val expectingLibJars = testingProject1.expectingLibJars.sorted().toTypedArray()
+        val libraryJars = cltInputProvider.provideLibraryJar()
+            .toList()
+            .sortedBy { it.tag }
+            .toTypedArray()
+        val expectingLibJars = testingProject1.expectingLibJars
+            .sortedBy { it.tag }
+            .toTypedArray()
         Assert.assertEquals(expectingLibJars.size, 2)
         Assert.assertArrayEquals(libraryJars, expectingLibJars)
     }

@@ -30,7 +30,7 @@ package com.grab.sizer.parser
 import com.grab.sizer.analyzer.model.FileType
 import com.grab.sizer.analyzer.model.RawFileInfo
 import com.grab.sizer.di.AppScope
-import java.io.File
+import com.grab.sizer.utils.SizerInputFile
 import java.util.zip.ZipFile
 import javax.inject.Inject
 
@@ -40,7 +40,7 @@ import javax.inject.Inject
  * This adjustment ensures the path inside the AAR file matches the path in the APK file.
  */
 interface AarFileParser {
-    fun parseAars(files : Sequence<File>): Set<AarFileInfo>
+    fun parseAars(files: Sequence<SizerInputFile>): Set<AarFileInfo>
 }
 
 /**
@@ -50,8 +50,8 @@ interface AarFileParser {
 @AppScope
 class DefaultAarFileParser @Inject constructor(private val jarParser: JarStreamParser) : AarFileParser {
 
-    private fun parse(file: File): AarFileInfo {
-        ZipFile(file).use { zipFile ->
+    private fun parse(sizerInputFile: SizerInputFile): AarFileInfo {
+        ZipFile(sizerInputFile.file).use { zipFile ->
             val entries = zipFile.entries()
             val resources = mutableSetOf<RawFileInfo>()
             val assets = mutableSetOf<RawFileInfo>()
@@ -73,12 +73,14 @@ class DefaultAarFileParser @Inject constructor(private val jarParser: JarStreamP
                     FileType.JAR -> {
                         jars.add(jarParser.parse(entry, zipFile.getInputStream(entry)))
                     }
+
                     else -> others.add(fileInfo)
                 }
             }
             return AarFileInfo(
-                name = file.name,
-                path = file.path,
+                name = sizerInputFile.file.name,
+                path = sizerInputFile.file.path,
+                tag = sizerInputFile.tag,
                 resources = resources,
                 assets = assets,
                 nativeLibs = nativeLibs,
@@ -88,7 +90,7 @@ class DefaultAarFileParser @Inject constructor(private val jarParser: JarStreamP
         }
     }
 
-    override fun parseAars(files : Sequence<File>): Set<AarFileInfo> {
+    override fun parseAars(files: Sequence<SizerInputFile>): Set<AarFileInfo> {
         return files.map { file -> parse(file) }.toSet()
     }
 }

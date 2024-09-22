@@ -52,5 +52,5 @@ dependencyResolutionManagement {
 rootProject.name = "sample"
 include ':app'
 include ':android-module-level1'
-include ':android-module-level2'
+include ':sample-group:android-module-level2'
 include ':kotlin-module'

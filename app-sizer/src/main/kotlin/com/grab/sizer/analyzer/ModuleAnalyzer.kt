@@ -61,7 +61,7 @@ internal class ModuleAnalyzer @Inject constructor(
             dataParser.getJars()
         )
         val appModule = Contributor(
-            path = "root/app/build/",
+            originalOwner = createAppInfo(),
             assets = wholeProject.noOwnerAssets.castToRawFile(),
             resources = wholeProject.noOwnerResources.castToRawFile(),
             nativeLibs = wholeProject.noOwnerNativeLibs.castToRawFile(),
@@ -97,11 +97,4 @@ internal class ModuleAnalyzer @Inject constructor(
                 rowName = reportItem.name
             )
         }
-}
-
-internal fun Set<Contributor>.toModules(): List<Module> = toMapOfModuleToContributors().map {
-    Module(
-        it.key,
-        it.value
-    )
 }

@@ -1,11 +1,11 @@
 package com.grab.sizer.parser
 
+import com.grab.sizer.utils.SizerInputFile
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import java.io.File
 import java.io.InputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -63,7 +63,8 @@ class DefaultAarFileParserTest {
     @Test
     fun parseAarsShouldCorrectlyParseJarFiles() {
         val jarEntry = "libs/example.jar"
-        mockJarParser.mockJarInfo = JarFileInfo("example.jar", "libs/example.jar", emptySet(), emptySet(), emptySet())
+        mockJarParser.mockJarInfo =
+            JarFileInfo("example.jar", "libs/example.jar", "", emptySet(), emptySet(), emptySet())
 
         val aar = createTestAar("test.aar", listOf(jarEntry))
         val result = aarFileParser.parseAars(sequenceOf(aar))
@@ -99,7 +100,8 @@ class DefaultAarFileParserTest {
             )
         )
 
-        mockJarParser.mockJarInfo = JarFileInfo("example.jar", "libs/example.jar", emptySet(), emptySet(), emptySet())
+        mockJarParser.mockJarInfo =
+            JarFileInfo("example.jar", "libs/example.jar", "", emptySet(), emptySet(), emptySet())
 
         val result = aarFileParser.parseAars(sequenceOf(aar))
 
@@ -137,6 +139,7 @@ class DefaultAarFileParserTest {
         assertEquals(1, result.size)
         val aarInfo = result.first()
         assertEquals("empty.aar", aarInfo.name)
+        assertEquals("empty", aarInfo.tag)
         assertTrue(aarInfo.resources.isEmpty())
         assertTrue(aarInfo.assets.isEmpty())
         assertTrue(aarInfo.nativeLibs.isEmpty())
@@ -144,7 +147,7 @@ class DefaultAarFileParserTest {
         assertTrue(aarInfo.others.isEmpty())
     }
 
-    private fun createTestAar(name: String, entries: List<String>): File {
+    private fun createTestAar(name: String, entries: List<String>): SizerInputFile {
         val aarFile = tempFolder.newFile(name)
         ZipOutputStream(aarFile.outputStream()).use { zos ->
             for (entry in entries) {
@@ -153,7 +156,10 @@ class DefaultAarFileParserTest {
                 zos.closeEntry()
             }
         }
-        return aarFile
+        return SizerInputFile(
+            file = aarFile,
+            tag = aarFile.nameWithoutExtension
+        )
     }
 
     private class MockJarStreamParser : JarStreamParser {

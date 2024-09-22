@@ -27,11 +27,13 @@
 
 package com.grab.sizer.analyzer.model
 
+import com.grab.sizer.parser.BinaryFileInfo
+
 /**
  * Represents a aar or a jar file, and their components (assets, resources, native libraries, classes, and others).
  * These component are files and classes, each component should provide the sizes it contributes to the apk.
  *
- * @property path the path to the aar/jar file
+ * @property originalOwner aar/jar file
  * @property assets a set of assets files
  * @property resources a set of resources files
  * @property nativeLibs a set of native libraries files (*.so files)
@@ -39,13 +41,17 @@ package com.grab.sizer.analyzer.model
  * @property others a set of other files not categorized as assets, resources, native libraries or classes.
  */
 data class Contributor(
-    val path: String,
+    val originalOwner: BinaryFileInfo,
     val assets: Set<RawFileInfo> = emptySet(),
     val resources: Set<RawFileInfo> = emptySet(),
     val nativeLibs: Set<RawFileInfo> = emptySet(),
     val classes: Set<ClassFileInfo> = emptySet(),
     val others: Set<RawFileInfo> = emptySet(),
 ) {
+    val tag : String
+        get() = originalOwner.tag
+    val path: String
+        get() = originalOwner.path
     // Calculates the sum of the download sizes of all resources
     val resourcesDownloadSize: Long by lazy { resources.sumOf { resource -> resource.downloadSize } }
 

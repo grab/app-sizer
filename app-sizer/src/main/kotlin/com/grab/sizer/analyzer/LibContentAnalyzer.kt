@@ -62,7 +62,7 @@ internal class LibContentAnalyzer @Inject constructor(
     }
 
     private fun generateReport(contributors: Set<Contributor>): Report {
-        val library = contributors.find { File(it.path).nameWithoutExtension == libName }
+        val library = contributors.find { File(it.originalOwner.path).nameWithoutExtension == libName }
             ?: throw RuntimeException("Can not find the $libName")
         val resourceRows = library.resources.toReportRows("Resource")
         val assetRows = library.assets.toReportRows("Asset")

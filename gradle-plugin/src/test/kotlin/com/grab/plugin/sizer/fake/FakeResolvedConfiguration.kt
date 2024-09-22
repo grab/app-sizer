@@ -104,7 +104,10 @@ class FakeResolvedArtifact(private val dependency: Dependency) : ResolvedArtifac
     override fun getId(): ComponentArtifactIdentifier {
         return object : ComponentArtifactIdentifier {
             override fun getComponentIdentifier(): ComponentIdentifier {
-                TODO("Not yet implemented")
+                return object :ComponentIdentifier{
+                    override fun getDisplayName(): String = dependency.name
+                    override fun toString(): String = dependency.name
+                }
             }
 
             override fun getDisplayName(): String = dependency.name

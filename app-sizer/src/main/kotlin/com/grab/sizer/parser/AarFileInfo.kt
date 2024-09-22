@@ -32,12 +32,13 @@ import com.grab.sizer.analyzer.model.RawFileInfo
 interface BinaryFileInfo {
     val name: String
     val path: String
-
+    val tag: String
 }
 
 data class AarFileInfo(
     override val name: String,
     override val path: String,
+    override val tag: String,
     val resources: Set<RawFileInfo>,
     val nativeLibs: Set<RawFileInfo>,
     val assets: Set<RawFileInfo>,

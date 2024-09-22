@@ -3,6 +3,6 @@ Platform:
 Team1:
   - android-module-level1
 Team2:
-  - android-module-level2
+  - :sample-group:android-module-level2
   - kotlin-module
 

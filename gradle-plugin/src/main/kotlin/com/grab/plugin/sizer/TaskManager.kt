@@ -148,11 +148,11 @@ internal class TaskManager(
             }
 
             project.isKotlinJvm -> {
-                task.dependsOn(project.tasks.named("assemble"))
+                task.dependsOn(project.tasks.named("jar"))
             }
 
             project.isJava -> {
-                task.dependsOn(project.tasks.named("assemble"))
+                task.dependsOn(project.tasks.named("jar"))
             }
         }
 

@@ -29,10 +29,7 @@ package com.grab.sizer.analyzer.model
 
 import com.grab.sizer.analyzer.ReportItem
 import com.grab.sizer.analyzer.TeamMapping
-import com.grab.sizer.analyzer.toModules
-import java.io.File
-
-private const val BUILD_FOLDER_PATH = "/build/"
+import com.grab.sizer.parser.BinaryFileInfo
 
 data class Team(
     val name: String,
@@ -47,9 +44,13 @@ data class Team(
 }
 
 data class Module(
-    val name: String,
+    private val owner: BinaryFileInfo,
     val contributors: List<Contributor>
 ) {
+    val tag: String
+        get() = owner.tag
+    val path: String
+        get() = owner.path
     val resourcesDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.resourcesDownloadSize } }
     val nativeLibDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.nativeLibDownloadSize } }
     val assetsDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.assetsDownloadSize } }
@@ -62,9 +63,9 @@ data class Module(
 
 internal fun Set<Contributor>.toTeams(teamMapping: TeamMapping): List<Team> {
     val modules = toModules()
-    return teamMapping.teamToModuleMap.mapValues { entry ->
-        entry.value.mapNotNull { moduleName ->
-            modules.find { it.name == moduleName }
+    return teamMapping.teamToModuleMap.mapValues { teamToModule ->
+        teamToModule.value.mapNotNull { moduleNameFromTeamMapping ->
+            modules.find { module -> module.tag == moduleNameFromTeamMapping }
         }
     }.map { Team(it.key, it.value) }
 }
@@ -79,42 +80,23 @@ internal fun List<Team>.sort(): List<Team> {
     }
 }
 
-internal fun Set<Contributor>.toMapOfModuleToContributors(): Map<String, List<Contributor>> {
+internal fun Set<Contributor>.toModules(): List<Module> {
     return asSequence()
-        .map { contributor -> contributor.path to contributor }
-        .map { entry ->
-            val path = entry.first
-            val moduleName = if (path.contains(BUILD_FOLDER_PATH)) {
-                getModuleNameFromPath(path)
-            } else {
-                /**
-                 * If the aar/jar file does not belong to a module, just get the file name instead
-                 */
-                getFileNameFromPath(path)
-            }
-            moduleName to entry.second
-        }
+        .map { contributor -> contributor.originalOwner to contributor }
         .groupBy { it.first }
         .mapValues { item ->
             item.value.map { it.second }
+        }.map {
+            Module(it.key, it.value)
         }
-}
-
-private fun getModuleNameFromPath(path: String): String {
-    val segments = path.removeRange(path.indexOf(BUILD_FOLDER_PATH), path.length).split("/")
-    return segments[segments.size - 1]
-}
-
-private fun getFileNameFromPath(path: String): String {
-    return path.substringAfterLast(File.separator).substringBeforeLast(".")
 }
 
 internal fun Module.toReportItem(moduleToTeamMap: Map<String, String>): ReportItem =
     ReportItem(
-        name = name,
-        id = name,
-        owner = moduleToTeamMap[name],
-        extraInfo = "Sum up all codebase for $name",
+        name = tag,
+        id = tag,
+        owner = moduleToTeamMap[tag],
+        extraInfo = "Sum up all codebase for $tag",
         totalDownloadSize = getDownloadSize(),
         classesDownloadSize = classDownloadSize,
         nativeLibDownloadSize = nativeLibDownloadSize,

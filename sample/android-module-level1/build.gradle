@@ -30,7 +30,7 @@ plugins {
 }
 
 dependencies {
-    implementation project(":android-module-level2")
+    implementation project(":sample-group:android-module-level2")
 }
 
 android {

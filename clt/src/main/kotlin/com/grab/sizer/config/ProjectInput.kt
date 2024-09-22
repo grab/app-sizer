@@ -42,12 +42,16 @@ data class ProjectInputConfig(
     val version: String,
     val projectName: String,
     val largeFileThreshold: Long = DEFAULT_LARGE_FILE,
-    val modulesDirIsProjectRoot: Boolean,
     val librariesDirectory: File,
     val modulesDirectory: File,
+    val projectRoot: File,
     val r8MappingFile: File? = null,
     val ownerMappingFile: File? = null,
-)
+) {
+    val modulesDirIsProjectRoot: Boolean
+        get() = modulesDirectory.path.startsWith(projectRoot.path)
+
+}
 
 class ProjectInputConfigDeserializer(vc: Class<*>? = null) : StdDeserializer<ProjectInputConfig>(vc) {
     override fun deserialize(jsonParser: JsonParser, ctxt: DeserializationContext): ProjectInputConfig =
@@ -56,11 +60,11 @@ class ProjectInputConfigDeserializer(vc: Class<*>? = null) : StdDeserializer<Pro
                 version = get("version").asText(),
                 largeFileThreshold = if (contains("large-file-threshold")) get("large-file-threshold").asLong() else DEFAULT_LARGE_FILE,
                 projectName = get("project-name").asText(),
-                modulesDirIsProjectRoot = get("modules-dir-is-project-root").asBoolean(),
                 librariesDirectory = File(get("libraries-directory").asText()),
                 modulesDirectory = File(get("modules-directory").asText()),
                 r8MappingFile = if (contains("r8-mapping-file")) File(get("r8-mapping-file").asText()) else null,
                 ownerMappingFile = if (contains("owner-mapping-file")) File(get("owner-mapping-file").asText()) else null,
+                projectRoot = File(get("project-root-dir").asText()),
             )
         }
 }

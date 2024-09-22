@@ -1,11 +1,11 @@
 package com.grab.sizer.parser
 
+import com.grab.sizer.utils.SizerInputFile
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import java.io.File
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
@@ -100,12 +100,13 @@ class DefaultJarFileParserTest {
         assertEquals(1, result.size)
         val jarInfo = result.first()
         assertEquals("empty.jar", jarInfo.name)
+        assertEquals("empty", jarInfo.tag)
         assertTrue(jarInfo.classes.isEmpty())
         assertTrue(jarInfo.nativeLibs.isEmpty())
         assertTrue(jarInfo.others.isEmpty())
     }
 
-    private fun createTestJar(name: String, entries: List<String>): File {
+    private fun createTestJar(name: String, entries: List<String>): SizerInputFile {
         val jarFile = tempFolder.newFile(name)
         ZipOutputStream(jarFile.outputStream()).use { zos ->
             for (entry in entries) {
@@ -114,6 +115,10 @@ class DefaultJarFileParserTest {
                 zos.closeEntry()
             }
         }
-        return jarFile
+        return SizerInputFile(
+            file = jarFile,
+            tag = jarFile.nameWithoutExtension
+        )
+
     }
 }

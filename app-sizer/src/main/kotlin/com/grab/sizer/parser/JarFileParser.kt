@@ -31,10 +31,9 @@ import com.grab.sizer.analyzer.model.ClassFileInfo
 import com.grab.sizer.analyzer.model.FileType
 import com.grab.sizer.analyzer.model.RawFileInfo
 import com.grab.sizer.di.AppScope
-import java.io.File
+import com.grab.sizer.utils.SizerInputFile
 import java.util.zip.ZipFile
 import javax.inject.Inject
-
 
 
 /**
@@ -43,13 +42,13 @@ import javax.inject.Inject
  * This modification facilitates mapping to native libraries in the APK file.
  */
 interface JarFileParser {
-    fun parseJars(files: Sequence<File>): Set<JarFileInfo>
+    fun parseJars(files: Sequence<SizerInputFile>): Set<JarFileInfo>
 }
 
 @AppScope
 class DefaultJarFileParser @Inject constructor() : JarFileParser {
-    private fun parse(file: File): JarFileInfo {
-        ZipFile(file).use { zipFile ->
+    private fun parse(sizerInputFile: SizerInputFile): JarFileInfo {
+        ZipFile(sizerInputFile.file).use { zipFile ->
             val entries = zipFile.entries()
             val nativeLibs = mutableSetOf<RawFileInfo>()
             val others = mutableSetOf<RawFileInfo>()
@@ -62,14 +61,15 @@ class DefaultJarFileParser @Inject constructor() : JarFileParser {
                     downloadSize = -1
                 )
                 when (fileInfo.type) {
-                    FileType.NATIVE_LIB ->  nativeLibs.add(fileInfo)
+                    FileType.NATIVE_LIB -> nativeLibs.add(fileInfo)
                     FileType.CLASS -> classes.add(entry.toClass())
                     else -> others.add(fileInfo)
                 }
             }
             return JarFileInfo(
-                name = file.name,
-                path = file.path,
+                name = sizerInputFile.file.name,
+                path = sizerInputFile.file.path,
+                tag = sizerInputFile.tag,
                 others = others,
                 nativeLibs = nativeLibs,
                 classes = classes
@@ -77,7 +77,7 @@ class DefaultJarFileParser @Inject constructor() : JarFileParser {
         }
     }
 
-    override fun parseJars(files: Sequence<File>): Set<JarFileInfo> {
+    override fun parseJars(files: Sequence<SizerInputFile>): Set<JarFileInfo> {
         return files.map { file -> parse(file) }
             .toSet()
     }
