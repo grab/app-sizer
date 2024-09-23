@@ -36,6 +36,7 @@ import com.grab.sizer.parser.JarFileInfo
 import javax.inject.Inject
 
 private const val AUTO_GENERATION_LAMBDA = "-\$\$Lambda\$"
+private const val AUTO_GENERATION_LAMBDA2 = "$"
 
 /**
  * Analyzes, maps and creates a ComponentMapperResult focusing on classes.
@@ -88,6 +89,15 @@ internal class ClassComponentMapper @Inject constructor() : ComponentMapper {
             if (newName.lastIndexOf("$") > 0)
                 newName = newName.removeRange(newName.lastIndexOf("$"), newName.length)
             return copy(name = newName)
+        }
+
+        /**
+         * Handle these cases
+         * androidx.appcompat.app.AppCompatDelegate$$ExternalSyntheticLambda0
+         * androidx.appcompat.app.AppCompatDelegateImpl$Api24Impl$$ExternalSyntheticApiModelOutline0
+         */
+        if(name.contains(AUTO_GENERATION_LAMBDA2)){
+            return copy(name = name.substring(0, name.indexOf("$")))
         }
         return this
     }

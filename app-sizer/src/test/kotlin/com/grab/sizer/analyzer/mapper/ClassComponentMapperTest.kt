@@ -42,6 +42,40 @@ class ClassComponentMapperTest {
     private val noOwnerClass = createClassFileInfo(name = "com.grab.test.TestClassNoOwner")
 
     @Test
+    fun classMapperShouldHandleGeneratedInnerLambda() {
+        val lambdaClassInApk1 = createClassFileInfo(
+            name = "androidx.appcompat.app.AppCompatDelegateImpl\$Api24Impl"
+        )
+        val lambdaClassInApk2 = createClassFileInfo(
+            name = "androidx.appcompat.app.AppCompatDelegate\$\$ExternalSyntheticLambda0"
+        )
+
+        val dex1 = createEmptyDexFileInfo().copy(
+            classes = setOf(lambdaClassInApk1, lambdaClassInApk2)
+        )
+        val apk = createEmptyApkInfo().copy(dexes = setOf(dex1))
+
+        val classInAar1 = createClassFileInfo(name = "androidx.appcompat.app.AppCompatDelegateImpl")
+        val classInAar2 = createClassFileInfo(name = "androidx.appcompat.app.AppCompatDelegate")
+        val classInAar3 = createClassFileInfo(name = "androidx.appcompat.app.AppLocalesStorageHelper")
+        val aar = createEmptyAar("aar").copy(
+            jars = setOf(
+                createEmptyJar().copy(
+                    classes = setOf(classInAar1, classInAar2, classInAar3)
+                )
+            )
+        )
+
+        val result = ClassComponentMapper().run {
+            setOf(apk).mapTo(setOf(aar), emptySet())
+        }
+        Assert.assertEquals(0, result.noOwnerData.size)
+        Assert.assertTrue(result.contributors.containsKey(aar))
+        Assert.assertEquals(true, result.contributors[aar]?.contains(lambdaClassInApk1))
+        Assert.assertEquals(true, result.contributors[aar]?.contains(lambdaClassInApk2))
+    }
+
+    @Test
     fun classMapperShouldHandleGeneratedLambdaProperly() {
         val lambdaClassInApk = createClassFileInfo(
             name = "androidx.core.widget.-\$\$Lambda\$ContentLoadingProgressBar\$aW9csiS0dCdsR2nrqov9CuXAmGo"
