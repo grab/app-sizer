@@ -285,7 +285,7 @@ internal class JarAppSizeVariant(
 
     override val runtimeConfiguration: Configuration by lazy {
         project.configurations.first {
-            it.name.contains("RuntimeClasspath", true)
+            it.name.equals("RuntimeClasspath", true)
         }
     }
 

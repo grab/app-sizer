@@ -77,7 +77,7 @@ class DefaultDependencyExtractor @Inject constructor(
         queue: Queue<Project>
     ) {
         configurationExtractor.runtimeConfigurations(project)
-            .flatMap { it.dependencies }
+            .flatMap { configuration -> configuration.dependencies }
             .filterIsInstance<ProjectDependency>()
             .map { it.dependencyProject }
             .forEach { dependencyProject ->

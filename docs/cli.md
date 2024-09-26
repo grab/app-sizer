@@ -52,7 +52,7 @@ Team1:
   - android-module-level1
   - kotlin-module
 Team2:
-  - android-module-level2
+  - sample-group:android-module-level2
 ```
 
 ### APK Generation
