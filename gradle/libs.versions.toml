@@ -9,8 +9,7 @@ clikt = "4.4.0"
 bundletool = "1.14.1"
 apkanalyzer = "31.5.1"
 common = "31.5.1"
-jackson-module-kotlin = "2.17.2"
-jackson-dataformat-yaml = "2.17.2"
+jackson = "2.15.0"
 guava = "33.2.1-jre"
 gson = "2.10.1"
 influxdbClient = "2.24"
@@ -31,8 +30,8 @@ clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
 android-tools-bundletool = { module = "com.android.tools.build:bundletool", version.ref = "bundletool" }
 android-tools-apkanalyzer = { module = "com.android.tools.apkparser:apkanalyzer", version.ref = "apkanalyzer" }
 android-tools-common = { module = "com.android.tools:common", version.ref = "common" }
-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-module-kotlin" }
-jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson-dataformat-yaml" }
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 org-influxdb-client = { module = "org.influxdb:influxdb-java", version.ref = "influxdbClient" }
