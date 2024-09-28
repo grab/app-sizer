@@ -39,13 +39,12 @@ dependencies {
     implementation libs.org.influxdb.client
     implementation libs.org.smali.dexlib2
     implementation libs.android.tools.apkanalyzer
-    implementation libs.jackson.module.kotlin
-    implementation libs.jackson.dataformat.yaml
     implementation libs.guava
     implementation libs.google.dagger
     implementation libs.gson
 
     kapt libs.dagger.compiler
+
     testImplementation libs.kotlin.test
     testImplementation libs.android.tools.bundletool
     testImplementation libs.android.tools.common

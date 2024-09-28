@@ -26,14 +26,6 @@
  */
 
 package com.grab.sizer.analyzer
-
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.Constructor
-import org.yaml.snakeyaml.nodes.MappingNode
-import org.yaml.snakeyaml.nodes.Node
-import org.yaml.snakeyaml.nodes.NodeTuple
-import org.yaml.snakeyaml.nodes.ScalarNode
-import org.yaml.snakeyaml.LoaderOptions
 import java.io.File
 
 
@@ -50,7 +42,6 @@ class DummyTeamMapping : TeamMapping {
     override val teamToModuleMap: Map<String, List<String>> = emptyMap()
     override val moduleToTeamMap: Map<String, String> = emptyMap()
 }
-
 
 
 class YmlTeamMapping(
@@ -71,20 +62,27 @@ class YmlTeamMapping(
     }
 
     private fun loadTeamToModuleMap(): Map<String, List<String>> {
-        val loaderOptions = LoaderOptions()
-        val constructor = object : Constructor(loaderOptions) {
-            override fun constructMapping(node: MappingNode?): MutableMap<Any?, Any?> {
-                val map = super.constructMapping(node)
-                return map.mapValues { (_, value) ->
-                    when (value) {
-                        null -> emptyList<String>()
-                        is List<*> -> value
-                        else -> listOf(value.toString())
+        val lines = ymlFile.readLines()
+        val result = mutableMapOf<String, MutableList<String>>()
+        var currentTeam: String? = null
+
+        for (line in lines) {
+            val trimmedLine = line.trim()
+            when {
+                trimmedLine.isEmpty() || trimmedLine.startsWith("#") -> continue // Skip empty lines and comments
+                trimmedLine.endsWith(":") -> {
+                    currentTeam = trimmedLine.dropLast(1)
+                    result[currentTeam] = mutableListOf()
+                }
+                trimmedLine.startsWith("- ") -> {
+                    currentTeam?.let {
+                        result[it]?.add(trimmedLine.removePrefix("- ").trim())
                     }
-                }.toMutableMap()
+                }
             }
         }
-        val yaml = Yaml(constructor)
-        return yaml.load(ymlFile.inputStream())
+
+        return result
     }
+
 }
