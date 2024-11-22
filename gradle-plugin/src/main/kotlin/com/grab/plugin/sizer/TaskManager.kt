@@ -82,8 +82,7 @@ internal class TaskManager(
                         variant = variant,
                         flavorMatchingFallbacks = getProductFlavor(variant)?.matchingFallbacks ?: emptyList(),
                         buildTypeMatchingFallbacks = getOriginalBuildType(variant).matchingFallbacks,
-                        enableMatchDebugVariant = pluginExtension.input.enableMatchDebugVariant,
-                        archiveDepTaskCacheable = pluginExtension.archiveDepTaskCacheable
+                        enableMatchDebugVariant = pluginExtension.input.enableMatchDebugVariant
                     )
 
                     val appSizeAnalysisTask = AppSizeAnalysisTask.registerTask(

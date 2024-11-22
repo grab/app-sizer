@@ -55,7 +55,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import java.io.File
 
-
+@CacheableTask
 internal abstract class AppSizeAnalysisTask : DefaultTask() {
 
     @get:Input
@@ -65,6 +65,7 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
     abstract val customProperties: MapProperty<String, String>
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val archiveDepJsonFile: RegularFileProperty
 
     @get:InputFiles
@@ -79,10 +80,12 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
 
     @get:InputFile
     @get:Optional
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val teamMappingFile: RegularFileProperty
 
     @get:InputFile
     @get:Optional
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val r8MappingFile: RegularFileProperty
 
     @get:Input
@@ -97,9 +100,17 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
     @get:Optional
     abstract val influxDBConfig: Property<InfluxDBConfig>
 
+    init {
+        group = "verification"
+        description = "Analyzes APK size and generates reports"
+
+        customProperties.convention(mapOf())
+        largeFileThreshold.convention(10L)
+    }
 
     @TaskAction
     fun run() {
+        validateInputs()
         apkDirectories.forEach { apkDirectory ->
             val projectInfo = ProjectInfo(
                 projectName = project.rootProject.name,
@@ -116,6 +127,11 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
             ).process(option.get())
         }
 
+    }
+
+    private fun validateInputs() {
+        require(apkDirectories.files.isNotEmpty()) { "No APK directories found" }
+        require(archiveDepJsonFile.get().asFile.exists()) { "Archive dependency file not found" }
     }
 
     private fun createInputProvider(

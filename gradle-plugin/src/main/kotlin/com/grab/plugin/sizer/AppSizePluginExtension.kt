@@ -36,11 +36,6 @@ import org.gradle.api.Project
 open class AppSizePluginExtension(val project: Project) {
     var enabled = true
 
-    /**
-     * This is a workaround, by default, the ArchiveDep task haven't supported catching yet
-     * This flag to force the task become cacheable by default. It's not recommend to enable this flag
-     */
-    var archiveDepTaskCacheable = false
     var input = project.objects.newInstance(InputExtension::class.java, project.objects)
     var metrics = project.objects.newInstance(MetricExtension::class.java, project)
 
