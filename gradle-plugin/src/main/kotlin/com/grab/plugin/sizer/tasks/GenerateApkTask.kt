@@ -36,10 +36,10 @@ import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.Directory
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.logging.LogLevel
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Optional
 import java.io.File
 import java.util.*
 
@@ -54,8 +54,10 @@ private const val DEFAULT_DEVICE_SPEC = """
 
 internal const val DEFAULT_DEVICE_NAME = "default_device"
 
+@CacheableTask
 internal abstract class GenerateApkTask : DefaultTask() {
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val bundleToolFile: RegularFileProperty
 
     @get:Input
@@ -66,15 +68,20 @@ internal abstract class GenerateApkTask : DefaultTask() {
     abstract val deviceSpecFiles: ConfigurableFileCollection
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val appBundleFile: RegularFileProperty
 
     @get:Input
+    @get:Optional
     abstract val signingConfig: Property<InternalSigningConfig>
 
     @get:OutputDirectories
     abstract val outputDirectories: ListProperty<Directory>
 
     init {
+        group = "build"
+        description = "Generates APKs from App Bundle for different device specifications"
+
         outputDirectories.convention(
             // Add the provider to ensure the deviceSpecFiles values has set
             project.provider {
@@ -106,7 +113,7 @@ internal abstract class GenerateApkTask : DefaultTask() {
                     extractApksToDirectory(tempFile, deviceSpecFile.path, outputDir)
                 } finally {
                     tempFile.delete()
-                    project.logger.log(LogLevel.INFO, "Temp files were deleted")
+                    logger.info("Temp files were deleted")
                 }
             }
         }
@@ -138,7 +145,7 @@ internal abstract class GenerateApkTask : DefaultTask() {
                 "--device-spec=${deviceSpec}",
             )
         }
-        project.logger.log(LogLevel.QUIET, "The Apks for $deviceSpec were extracted successfully")
+        logger.quiet("The Apks for $deviceSpec were extracted successfully")
     }
 
     private fun generateApksFile(apksTempFile: File, deviceSpec: String) {
@@ -160,7 +167,7 @@ internal abstract class GenerateApkTask : DefaultTask() {
                 "--overwrite"
             )
         }
-        project.logger.log(LogLevel.QUIET, "The app.apks generated successfully")
+        logger.quiet("The app.apks generated successfully")
     }
 
     private fun File.clearDirectory() {
