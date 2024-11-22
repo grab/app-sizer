@@ -65,16 +65,3 @@ jobs:
               run: |
                   cd ./sample
                   ./gradlew app:appSizeAnalysisProRelease --stacktrace -Dorg.gradle.debug=false --no-daemon
-
-    publish-artifact:
-        runs-on: ubuntu-latest
-        if: github.event.inputs.release == 'publish'
-        steps:
-            - uses: actions/checkout@v4
-            - name: Install JDK 17
-              uses: actions/setup-java@v4
-              with:
-                  distribution: "zulu"
-                  java-version: "17"
-            - name: Publish to Artifactory
-              run: ./gradlew artifactoryPublish
