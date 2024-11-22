@@ -30,7 +30,6 @@ package com.grab.plugin.sizer.tasks
 
 import com.android.build.gradle.api.BaseVariant
 import com.grab.plugin.sizer.dependencies.*
-import com.grab.sizer.utils.log
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
@@ -39,13 +38,14 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.UntrackedTask
 
 /**
  * This task is used to generate the list of the [com.grab.plugin.sizer.dependencies.ArchiveDependency] to a json file
  * The file will be consumed by the [AppSizeAnalysisTask] as the input for the list of aar/jar files
  * This task is currently non-cacheable
  */
+@UntrackedTask(because = "If there is any dependencies updated, the task cache should be invalidated")
 internal abstract class GenerateArchivesListTask : DefaultTask() {
     @get:Input
     abstract val variantInput: Property<VariantInput>
@@ -59,32 +59,30 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
     @get:Input
     abstract val enableMatchDebugVariant: Property<Boolean>
 
-    /**
-     * This is a workaround, by default, this task haven't support catching yet
-     * This flag to force the task become cacheable by default. It's not recommend to enable this flag
-     */
-    @get:Input
-    abstract val archiveDepTaskCacheable: Property<Boolean>
-
 
     @get:OutputFile
     abstract val archiveDepFile: RegularFileProperty
 
     init {
-        /**
-         * Todo: Update this task to make it cacheable
-         * If there is any dependencies updated, the task cache should be invalidated
-         */
-        outputs.upToDateWhen { archiveDepTaskCacheable.get() } // Mark this task as non-cacheable task
+        group = "build"
+        description = "Generates list of archive dependencies for app size analysis"
 
+        // Set property conventions
+        flavorMatchingFallbacks.convention(emptyList())
+        buildTypeMatchingFallbacks.convention(emptyList())
+        enableMatchDebugVariant.convention(false)
         archiveDepFile.convention {
-            project.layout.buildDirectory.file("sizer/dep/${variantInput.get().name}/dependencies.json").get().asFile
+            project.layout.buildDirectory
+                .file("sizer/dep/${variantInput.get().name}/dependencies.json")
+                .get().asFile
         }
+
     }
 
     @TaskAction
     fun run() {
-        if(enableMatchDebugVariant.get()){
+        logger.info("Starting archive dependency generation for ${variantInput.get().name}")
+        if (enableMatchDebugVariant.get()) {
             /**
              * Extracts and manages project dependencies, separating modules from external libraries.
              *
@@ -115,7 +113,8 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
                 (modules + libraries).toHashSet(),
                 archiveDepFile.get().asFile
             )
-        }else{
+
+        } else {
             createDependenciesComponent(false).run {
                 ArchiveDependencyManager().writeToJsonFile(
                     dependencyExtractor().extract(),
@@ -123,16 +122,17 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
                 )
             }
         }
-
+        logger.info("Successfully generated archive dependencies")
     }
 
-    private fun createDependenciesComponent(enableMatchDebugVariant : Boolean): DependenciesComponent = DaggerDependenciesComponent.factory().create(
-        project,
-        variantInput.get(),
-        flavorMatchingFallbacks.get(),
-        buildTypeMatchingFallbacks.get(),
-        enableMatchDebugVariant
-    )
+    private fun createDependenciesComponent(enableMatchDebugVariant: Boolean): DependenciesComponent =
+        DaggerDependenciesComponent.factory().create(
+            project,
+            variantInput.get(),
+            flavorMatchingFallbacks.get(),
+            buildTypeMatchingFallbacks.get(),
+            enableMatchDebugVariant
+        )
 
     companion object {
         fun registerTask(
@@ -141,17 +141,14 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
             flavorMatchingFallbacks: List<String>,
             buildTypeMatchingFallbacks: List<String>,
             enableMatchDebugVariant: Boolean,
-            archiveDepTaskCacheable : Boolean
-        ): TaskProvider<GenerateArchivesListTask> {
-            return project.tasks.register(
-                "generateArchiveDep${variant.name.capitalize()}", GenerateArchivesListTask::class.java
-            ) {
-                this.variantInput.set(variant.toVariantInput())
-                this.buildTypeMatchingFallbacks.set(buildTypeMatchingFallbacks)
-                this.flavorMatchingFallbacks.set(flavorMatchingFallbacks)
-                this.enableMatchDebugVariant.set(enableMatchDebugVariant)
-                this.archiveDepTaskCacheable.set(archiveDepTaskCacheable)
-            }
+        ) = project.tasks.register(
+            "generateArchiveDep${variant.name.capitalize()}",
+            GenerateArchivesListTask::class.java
+        ) {
+            this.variantInput.set(variant.toVariantInput())
+            this.buildTypeMatchingFallbacks.set(buildTypeMatchingFallbacks)
+            this.flavorMatchingFallbacks.set(flavorMatchingFallbacks)
+            this.enableMatchDebugVariant.set(enableMatchDebugVariant)
         }
     }
 }

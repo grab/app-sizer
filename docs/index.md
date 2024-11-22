@@ -60,11 +60,11 @@ To run analysis, execute
 
 For plugin configuration options, see [Plugin Configuration][plugin_doc].
 
+
 ### Cli Tool Integration
-To generate the command line binary file, execute
-```text
-./gradlew clt:shadowJar
-```
+
+1. Download the latest `clt-all.jar` from [Releases](link-to-releases)
+2. Ensure Java 11+ is installed
 
 To run analysis using the command line tool, execute
 ```text
