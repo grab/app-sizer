@@ -94,6 +94,9 @@ internal abstract class GenerateApkTask : DefaultTask() {
         )
     }
 
+
+    
+
     @TaskAction
     fun generateApk() {
         deviceSpecs.forEach { deviceSpecFile ->
