@@ -1,0 +1,50 @@
+name: Deploy Documentation
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'requirements.txt'  # Added this to trigger on requirements changes
+      - '.github/workflows/documentation.yml'
+  workflow_dispatch:  # Allow manual triggering
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'requirements.txt'  # Added this to trigger on requirements changes
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          cache: 'pip'  # Enable built-in pip caching
+
+      - name: Install dependencies
+        run: pip install -r 'requirements.txt'
+
+      - name: Build documentation
+        if: github.event_name == 'pull_request'
+        run: mkdocs build
+
+      - name: Deploy documentation
+        if: github.event_name != 'pull_request'
+        run: |
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          mkdocs gh-deploy --force --remote-branch gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

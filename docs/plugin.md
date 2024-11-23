@@ -1,5 +1,5 @@
 # App Sizer Plugin
-App Sizer provide the app sizer gradle plugin as the option to seamlessly integrates with your Android Gradle project. This option is recommended.
+App Sizer provide a gradle plugin as the option to seamlessly integrates with your Android Gradle project. This option is recommended.
 
 ## Getting Started
 
@@ -29,7 +29,7 @@ appSizer {
 3. Run the analysis
 
 ```bash
-./gradlew app:appSizeAnalysisRelease --no-configure-on-demand --no-configuration-cache
+./gradlew app:appSizeAnalysis[Release|Debug] --no-configure-on-demand --no-configuration-cache
 ```
 
 ## Configuration
@@ -121,26 +121,26 @@ appSizer {
     ...
     metrics {
         influxDB {
-            dbName = "sizer"
-            reportTableName = "app_size"
-            url = "http://localhost:8086"
-            username = "db-username"
-            password = "db-pw"
+            dbName = "[your-database-name]"
+            reportTableName = "[your-table-name]"
+            url = "[url-to-your-influxdb]"
+            username = "[your-database-username]"
+            password = "[your-database-password]"
         }
         local {
-            outputDirectory = project.layout.buildDirectory.dir("app-sizer")
+            outputDirectory = [your-output-directory] // Such as project.layout.buildDirectory.dir("app-sizer")
         }
         customAttributes.putAll(
-            ["pipeline_id": "1001"]
+            ["your-custom-attribute-key": "your-custom-attribute-value"]
         )
     }
 }
 ```
 
-| Property | Description                                                                       |
-|----------|-----------------------------------------------------------------------------------|
-| `local.outputDirectory` | Directory to save markdown and JSON reports (default is `app/build/sizer/reports`)|
-| `customAttributes` | Map of additional attributes to include in every report row.                      |
+| Property | Description                                                                           |
+|----------|---------------------------------------------------------------------------------------|
+| `local.outputDirectory` | Directory to save markdown and JSON reports (default is `app/build/sizer/reports`)    |
+| `customAttributes` | Map of additional attributes to include in every report row. Such as pipeline-id, etc |
 
 #### InfluxDB Configuration
 
@@ -201,7 +201,7 @@ appSizer {
 ## Task Graph
 
 <p align="center">
-<img src="images/task-graph.png" width="80%">
+<img src="../images/task-graph.png" width="80%">
 </p>
 
 ## Troubleshooting

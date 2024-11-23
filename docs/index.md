@@ -6,11 +6,13 @@ App Sizer is a tool designed to analyze the download size of Android application
 *The app download size in Android refers to the amount of data a user needs to download from an app store (typically Google Play Store) to install an application on their Android device*
 
 <p align="center">
-<img src="./images/dashboard.gif" width="90%">
+<img src="./images/dashboard.gif" width="95%">
 </p>
 
 ## Key Features
+
 App Sizer offers comprehensive analysis including:
+
 1. Total app download size
 2. Detailed size breakdown
 3. Size contribution by teams
@@ -34,12 +36,12 @@ In root `build.gradle`:
 
 ```groovy
 buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "com.grab:app-sizer:SNAPSHOT"
-    }
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath "com.grab:app-sizer:SNAPSHOT"
+  }
 }
 ```
 In the app module 's `build.gradle`
@@ -48,22 +50,21 @@ apply plugin: "com.grab.app-sizer"
 
 // AppSizer configuration
 appSizer {
-    // DSL
+  // DSL
 }
 ```
 
 To run analysis, execute
 
 ```
-./gradlew app:appSizeAnalysisRelease --no-configure-on-demand --no-configuration-cache
+./gradlew app:appSizeAnalysis[Release|Debug] --no-configure-on-demand --no-configuration-cache
 ```
 
 For plugin configuration options, see [Plugin Configuration][plugin_doc].
 
-
 ### Cli Tool Integration
 
-1. Download the latest `clt-all.jar` from [Releases](link-to-releases)
+1. Download our [Latest Release][latest_release_link] from GitHub
 2. Ensure Java 11+ is installed
 
 To run analysis using the command line tool, execute
@@ -77,7 +78,7 @@ For command line configuration options, see [Commandline Configuration][cli_doc]
 
 App Sizer currently supports three types of reports:
 
-* InfluxDB database (1.x) - suitable for CI tracking and enabling the creation of customized dashboards. For InfluxDB and Grafana setup, see our [Docker Setup Guide][grafana-docker].
+* InfluxDB database (1.x) - It is suitable for CI tracking and enabling the creation of customized dashboards (with visualization tools like Grafana). We provide an InfluxDB and Grafana setup; see our [Docker Setup Guide][grafana-docker].
 * Markdown table for convenient local analysis.
 * JSON data for compatibility with other platforms.
 
@@ -86,7 +87,9 @@ App Sizer currently supports three types of reports:
 For more detail on reports, see [Report Detail][report_doc]
 
 ## How it works
+
 App Sizer functions as a mapping tool to generate the report. It takes APK, AAR, and JAR files as inputs.
+
 1. **Input parsing**:
 - The tool parses the APK down to file and class levels. It calculates the contribution of each component to the total app download size.
 - Similarly, App Sizer parses AAR and JAR files.
@@ -147,6 +150,7 @@ SOFTWARE
 [commandline-tool]: ../clt
 [grafana-docker]: ../docker
 [blog-post]: https://engineering.grab.com/project-bonsai
+[latest_release_link]: https://github.com/grab/App-Sizer/releases
 
 
 
