@@ -5,21 +5,23 @@ App Sizer provides a Command Line Interface (CLI) to cater to non-Gradle build s
 
 ## Getting Started
 
-1. Generate the command line binary file:
-   ```
-   ./gradlew clt:shadowJar
-   ```
+1. Download our [Latest Release][latest_release_link] from GitHub (support Java 11+)
 
-2. Create your config file following [this template](../cli-config-template.yml).
+2. Create your config file following [this template][cli-template-link].
 
 3. Run the analysis using the command line tool:
    ```
    java -jar clt-all.jar --config-file ./path/to/config/your-config-file.yml
    ```
 
+*Note, by any reason the download Jar does not work. You could check out the repo and generate the command line binary file*
+   ```
+   ./gradlew clt:shadowJar
+   ```
+   
 ## Configuration
 
-The App Sizer CLI accepts a YAML file as configuration ([template](../cli-config-template.yml)). The file consists of three main blocks:
+The App Sizer CLI accepts a YAML file as configuration ([template][cli-template-link]). The file consists of three main blocks:
 
 ```yaml
 project-input:
@@ -129,3 +131,7 @@ report:
 
 - [Bundletool GitHub Repository](https://github.com/google/bundletool)
 - [InfluxDB Documentation](https://www.influxdata.com/time-series-platform/)
+
+
+[cli-template-link]: https://github.com/grab/App-Sizer/blob/master/cli-config-template.yml
+[latest_release_link]: https://github.com/grab/App-Sizer/releases

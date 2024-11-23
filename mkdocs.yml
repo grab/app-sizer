@@ -1,11 +1,11 @@
 site_name: App Sizer
 site_description: "App Sizer is a tool designed to analyze the download size of Android applications"
 site_author: "Grab, Inc"
-site_url: "https://github.com/grab/AppSizer"
+site_url: "https://grab.github.io/App-Sizer/"
 remote_branch: gh-pages
 
-repo_name: "grab/AppSizer"
-repo_url: "https://github.com/grab/AppSizer"
+repo_name: "App-Sizer"
+repo_url: "https://github.com/grab/App-Sizer"
 
 copyright: "Copyright 2024 Grabtaxi Holdings PTE LTE (GRAB)"
 
@@ -13,11 +13,17 @@ theme:
   name: "material"
   palette:
     primary: "cyan"
+    accent: "indigo"
   font:
     text: "Roboto"
     code: "Roboto Mono"
   features:
     - navigation.indexes
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
 
 nav:
   - Home Page: index.md
@@ -30,19 +36,39 @@ nav:
 
 plugins:
   - search
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
 
 markdown_extensions:
   - admonition
   - pymdownx.details
   - pymdownx.magiclink
-  - pymdownx.tabbed
-  - pymdownx.superfences
-  - pymdownx.highlight
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - codehilite:
       guess_lang: false
   - toc:
       permalink: true
+      toc_depth: 3
 
 # Customization
 extra_css:
-  - "css/site.css"
+  - css/site.css
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/grab/App-Sizer

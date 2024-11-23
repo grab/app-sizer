@@ -8,11 +8,9 @@ App Sizer supports three types of reports to cater to different use cases and en
 
 ## InfluxDB Database
 
-InfluxDB (1.x) is recommended for CI tracking and creating customized dashboards. It's ideal for integrating the tool into your CI pipeline to track historical reports between releases.
-
 ### Setup
 
-We provide a Docker image with InfluxDB (1.x) and Grafana pre-configured:
+We provide a Docker image with InfluxDB (1.x) and Grafana pre-configured to showcase the dashboards:
 
 ```sh
 docker run -d \
@@ -27,9 +25,10 @@ docker run -d \
 
 For more details on the Docker setup, see our [Docker guide][grafana-docker].
 
-### Dashboard
+### Grafana Dashboard
 
-A default **App Download Size Breakdown** dashboard is included in the Grafana docker instance. If you have an existing InfluxDB and Grafana setup, you can import our dashboard using this [JSON file](../grafana/dashboard-to-import.json).
+A default **App Download Size Breakdown** dashboard is included in the Grafana docker instance. If you have an existing InfluxDB and Grafana setup, you can import our dashboard using this [JSON file][json-dashboard-file].
+Our [blogpost][blog-post]  introduce the provided dashboards
 
 ## Markdown Tables
 
@@ -128,5 +127,7 @@ You can customize the reports by modifying the configuration in your Gradle plug
 [grafana-dashboard]: ../grafana/dashboard-to-import.json
 [plugin_doc]: ./plugin.md
 [cli_doc]: ./cli.md
+[json-dashboard-file]: https://github.com/grab/App-Sizer/blob/master/grafana/dashboard-to-import.json
+[blog-post]: https://engineering.grab.com/project-bonsai
 
 
