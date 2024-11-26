@@ -1,11 +1,11 @@
 site_name: App Sizer
 site_description: "App Sizer is a tool designed to analyze the download size of Android applications"
 site_author: "Grab, Inc"
-site_url: "https://grab.github.io/App-Sizer/"
+site_url: "https://grab.github.io/app-sizer/"
 remote_branch: gh-pages
 
-repo_name: "App-Sizer"
-repo_url: "https://github.com/grab/App-Sizer"
+repo_name: "app-sizer"
+repo_url: "https://github.com/grab/app-sizer"
 
 copyright: "Copyright 2024 Grabtaxi Holdings PTE LTE (GRAB)"
 
@@ -71,4 +71,4 @@ extra_css:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/grab/App-Sizer
+      link: https://github.com/grab/app-sizer

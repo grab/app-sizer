@@ -25,40 +25,19 @@
  * SOFTWARE
  */
 
-plugins {
-    id "com.grab.sizer.kotlin"
-    id 'com.github.johnrengelman.shadow'
-}
+package com.grab.sizer.utils
 
-shadowJar {
-    zip64 true
-
-    manifest {
-        attributes 'Main-Class': 'com.grab.sizer.MainKt'
+class CliLogger : Logger {
+    override fun log(tag: String, message: String) {
+        println("$tag : $message")
     }
 
-    archiveBaseName.set('clt-app-sizer')
-    archiveClassifier.set('')
-    archiveVersion.set('')
+    override fun log(tag: String, e: Exception) {
+        println("$tag :")
+        e.printStackTrace()
+    }
 
-    mergeServiceFiles()
+    override fun logDebug(tag: String, message: String) {
+        println("$tag : $message")
+    }
 }
-
-dependencies {
-    implementation project(':app-sizer')
-    implementation libs.google.dagger
-    kapt libs.dagger.compiler
-    implementation libs.clikt
-    implementation libs.jackson.module.kotlin
-    implementation libs.jackson.dataformat.yaml
-    implementation libs.gson
-
-    /**
-     * These two libs were compileOnly in app-sizer
-     */
-    implementation libs.android.tools.bundletool
-    implementation libs.android.tools.common
-
-    testImplementation libs.junit
-}
-

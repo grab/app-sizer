@@ -28,12 +28,12 @@ jobs:
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Build CLI JAR
-        run: ./gradlew clt:shadowJar
+        run: ./gradlew cli:shadowJar
 
       - name: Rename and prepare assets
         run: |
-          cd ./clt/build/libs
-          mv clt-all.jar app-sizer-cli-${{ env.VERSION }}.jar
+          cd ./cli/build/libs
+          mv cli-all.jar app-sizer-cli-${{ env.VERSION }}.jar
           sha256sum app-sizer-cli-${{ env.VERSION }}.jar > app-sizer-cli-${{ env.VERSION }}.jar.sha256
 
       - name: Upload CLI JAR
@@ -42,7 +42,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./clt/build/libs/app-sizer-cli-${{ env.VERSION }}.jar
+          asset_path: ./cli/build/libs/app-sizer-cli-${{ env.VERSION }}.jar
           asset_name: app-sizer-cli-${{ env.VERSION }}.jar
           asset_content_type: application/java-archive
 
@@ -52,7 +52,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./clt/build/libs/app-sizer-cli-${{ env.VERSION }}.jar.sha256
+          asset_path: ./cli/build/libs/app-sizer-cli-${{ env.VERSION }}.jar.sha256
           asset_name: app-sizer-cli-${{ env.VERSION }}.jar.sha256
           asset_content_type: text/plain
 

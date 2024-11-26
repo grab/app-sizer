@@ -20,7 +20,7 @@ App Sizer offers comprehensive analysis including:
 5. Size contribution by libraries
 6. List of large files
 
-Reports are generated based on the provided Android device specifications. Our [blogpost][blog-post] introduce the tool features
+Reports are generated based on the provided Android device specifications. Our [blogpost][blog_post] introduce the tool features
 
 ## Quick Start
 
@@ -69,7 +69,7 @@ For plugin configuration options, see [Plugin Configuration][plugin_doc].
 
 To run analysis using the command line tool, execute
 ```text
-java -jar clt-all.jar --config-file ./path/to/config/app-size-settings.yml
+java -jar cli-all.jar --config-file ./path/to/config/app-size-settings.yml
 ```
 
 For command line configuration options, see [Commandline Configuration][cli_doc].
@@ -91,11 +91,11 @@ For more detail on reports, see [Report Detail][report_doc]
 App Sizer functions as a mapping tool to generate the report. It takes APK, AAR, and JAR files as inputs.
 
 1. **Input parsing**:
-- The tool parses the APK down to file and class levels. It calculates the contribution of each component to the total app download size.
-- Similarly, App Sizer parses AAR and JAR files.
+   - The tool parses the APK down to file and class levels. It calculates the contribution of each component to the total app download size.
+   - Similarly, App Sizer parses AAR and JAR files.
 2. **Mapping and Report Generation**:
-- The tool then maps the APK components to their corresponding elements in the AAR and JAR files.
-- Based on this analysis and other metadata, App Sizer generates comprehensive reports detailing size contributions.
+   - The tool then maps the APK components to their corresponding elements in the AAR and JAR files.
+   - Based on this analysis and other metadata, App Sizer generates comprehensive reports detailing size contributions.
 
 ## Limitations
 
@@ -104,9 +104,9 @@ App Sizer approximates class download sizes due to Dex structure complexity, and
 For more details on limitations, see the [Limitation][limitation_doc].
 
 ## Components
-* [Gradle Plugin][gradle-plugin]
-* [Command line tool][commandline-tool]
-* [InfluxDb & Grafana Docker][grafana-docker]
+* [Gradle Plugin][gradle_plugin]
+* [Command line tool][commandline_tool]
+* [InfluxDb & Grafana Docker][grafana_docker]
 
 ## Contributing
 
@@ -145,12 +145,13 @@ SOFTWARE
 [report_doc]: ./report.md
 [plugin_doc]: ./plugin.md
 [cli_doc]: ./cli.md
+[grafana_docker_doc]: ./docker.md
 [limitation_doc]:./limitation.md
-[gradle-plugin]: ../gradle-plugin
-[commandline-tool]: ../clt
-[grafana-docker]: ../docker
-[blog-post]: https://engineering.grab.com/project-bonsai
-[latest_release_link]: https://github.com/grab/App-Sizer/releases
+[gradle_plugin]: https://github.com/grab/app-sizer/tree/master/gradle-plugin
+[commandline_tool]: https://github.com/grab/app-sizer/tree/master/cli
+[grafana_docker]: https://github.com/grab/app-sizer/tree/master/docker
+[blog_post]: https://engineering.grab.com/project-bonsai
+[latest_release_link]: https://github.com/grab/app-sizer/releases
 
 
 

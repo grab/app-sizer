@@ -23,12 +23,12 @@ docker run -d \
   mikenguyen/sizer-influx-grafana:latest
 ```
 
-For more details on the Docker setup, see our [Docker guide][grafana-docker].
+For more details on the Docker setup, see our [Docker guide][grafana_docker_doc].
 
 ### Grafana Dashboard
 
-A default **App Download Size Breakdown** dashboard is included in the Grafana docker instance. If you have an existing InfluxDB and Grafana setup, you can import our dashboard using this [JSON file][json-dashboard-file].
-Our [blogpost][blog-post]  introduce the provided dashboards
+A default **App Download Size Breakdown** dashboard is included in the Grafana docker instance. If you have an existing InfluxDB and Grafana setup, you can import our dashboard using this [JSON file][json_dashboard_file].
+Our [blogpost][blog_post]  introduce the provided dashboards
 
 ## Markdown Tables
 
@@ -123,11 +123,10 @@ You can parse this JSON data using any standard JSON library in your preferred p
 
 You can customize the reports by modifying the configuration in your Gradle plugin or CLI tool setup. For more details, refer to the [Plugin Configuration][plugin_doc] or [CLI Configuration][cli_doc] guides.
 
-[grafana-docker]: ../docker
-[grafana-dashboard]: ../grafana/dashboard-to-import.json
+[grafana_docker_doc]: ./docker.md
 [plugin_doc]: ./plugin.md
 [cli_doc]: ./cli.md
-[json-dashboard-file]: https://github.com/grab/App-Sizer/blob/master/grafana/dashboard-to-import.json
-[blog-post]: https://engineering.grab.com/project-bonsai
+[json_dashboard_file]: https://github.com/grab/app-sizer/blob/master/grafana/dashboard-to-import.json
+[blog_post]: https://engineering.grab.com/project-bonsai
 
 

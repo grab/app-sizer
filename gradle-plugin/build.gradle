@@ -58,7 +58,7 @@ dependencies {
 gradlePlugin {
     plugins {
         appSizerPlugin {
-            id = 'com.grab.app-sizer'
+            id = 'com.grab.sizer'
             implementationClass = 'com.grab.plugin.sizer.AppSizerPlugin'
             displayName = "app-sizer-plugin"
         }

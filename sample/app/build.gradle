@@ -99,7 +99,7 @@ dependencies {
     testImplementation libs.junit
 }
 
-apply plugin: "com.grab.app-sizer"
+apply plugin: "com.grab.sizer"
 
 appSizer {
     enabled = true

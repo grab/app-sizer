@@ -32,7 +32,7 @@ import org.junit.Assert
 import org.junit.Test
 import java.io.File
 
-class CltInputProviderTest {
+class CliInputProviderTest {
     private val fileQuery = DefaultFileQuery()
     private val testingProject1 = TestingProject1()
     private val config = testingProject1.config
@@ -44,13 +44,13 @@ class CltInputProviderTest {
             projectInput = config.projectInput.copy(projectRoot = File("./abc"))
         )
 
-        val cltInputProvider = CltInputProvider(
+        val cliInputProvider = CliInputProvider(
             fileQuery = fileQuery,
             config = config,
             apksDirectory = File("FakeDir"),
             fileSystem = testingProject1
         )
-        val moduleAars = cltInputProvider.provideModuleAar()
+        val moduleAars = cliInputProvider.provideModuleAar()
             .toList()
             .sortedBy { it.file }
             .toTypedArray()
@@ -67,13 +67,13 @@ class CltInputProviderTest {
             projectInput = config.projectInput.copy(projectRoot = File("./abc"))
         )
 
-        val cltInputProvider = CltInputProvider(
+        val cliInputProvider = CliInputProvider(
             fileQuery = fileQuery,
             config = config,
             apksDirectory = File("FakeDir"),
             fileSystem = testingProject1
         )
-        val moduleJars = cltInputProvider.provideModuleJar()
+        val moduleJars = cliInputProvider.provideModuleJar()
             .toList()
             .sortedBy { it.file }
             .toTypedArray()
@@ -86,13 +86,13 @@ class CltInputProviderTest {
 
     @Test
     fun provideModuleAarShouldGetCorrectAarFromProjectFolderWhenModulesDirIsProjectRoot() {
-        val cltInputProvider = CltInputProvider(
+        val cliInputProvider = CliInputProvider(
             fileQuery = fileQuery,
             config = config,
             apksDirectory = File("FakeDir"),
             fileSystem = testingProject1
         )
-        val moduleAars = cltInputProvider.provideModuleAar()
+        val moduleAars = cliInputProvider.provideModuleAar()
             .toList()
             .sortedBy { it.file }
             .toTypedArray()
@@ -106,13 +106,13 @@ class CltInputProviderTest {
     @Test
     fun provideModuleJarShouldGetCorrectJarFromProjectFolderWhenModulesDirIsProjectRoot() {
 
-        val cltInputProvider = CltInputProvider(
+        val cliInputProvider = CliInputProvider(
             fileQuery = fileQuery,
             config = config,
             apksDirectory = File("FakeDir"),
             fileSystem = testingProject1
         )
-        val moduleJars = cltInputProvider.provideModuleJar()
+        val moduleJars = cliInputProvider.provideModuleJar()
             .toList()
             .sortedBy { it.tag }
             .toTypedArray()
@@ -125,13 +125,13 @@ class CltInputProviderTest {
 
     @Test
     fun provideLibraryAarShouldGetAllAarFromFolder() {
-        val cltInputProvider = CltInputProvider(
+        val cliInputProvider = CliInputProvider(
             fileQuery = fileQuery,
             config = config,
             apksDirectory = File("FakeDir"),
             fileSystem = testingProject1
         )
-        val libraryAar = cltInputProvider.provideLibraryAar().toList()
+        val libraryAar = cliInputProvider.provideLibraryAar().toList()
             .sortedBy { it.tag }
             .toTypedArray()
         val expectingLibAars = testingProject1.expectingLibAars
@@ -143,13 +143,13 @@ class CltInputProviderTest {
 
     @Test
     fun provideLibraryJarShouldGetAllAarFromFolder() {
-        val cltInputProvider = CltInputProvider(
+        val cliInputProvider = CliInputProvider(
             fileQuery = fileQuery,
             config = config,
             apksDirectory = File("FakeDir"),
             fileSystem = testingProject1
         )
-        val libraryJars = cltInputProvider.provideLibraryJar()
+        val libraryJars = cliInputProvider.provideLibraryJar()
             .toList()
             .sortedBy { it.tag }
             .toTypedArray()

@@ -39,7 +39,7 @@ cd ..
 
 # Build the command-line tool
 echo "Building App Sizer command-line tool..."
-./gradlew clean clt:shadowJar
+./gradlew clean cli:shadowJar
 
 # Change back to the sample project directory
 echo "Changing back to sample project directory..."
@@ -51,11 +51,11 @@ echo "Building Android app bundle..."
 
 # Make the CLI tool executable
 echo "Making CLI tool executable..."
-chmod +x ../clt/build/libs/clt-app-sizer.jar
+chmod +x ../cli/build/libs/cli-app-sizer.jar
 
 # Run the App Sizer CLI tool
 echo "Running App Sizer CLI tool..."
-java -jar ../clt/build/libs/clt-app-sizer.jar --config-file "./app-size-config/app-size-settings.yml"
+java -jar ../cli/build/libs/cli-app-sizer.jar --config-file "./app-size-config/app-size-settings.yml"
 
 # Print completion message
 echo "App Sizer CLI execution completed successfully!"

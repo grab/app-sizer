@@ -35,7 +35,7 @@ import com.grab.sizer.report.db.InfluxDBConfig
 import com.grab.sizer.utils.OutputProvider
 import java.io.File
 
-class CltOutputProvider(
+class CliOutputProvider(
     private val config: Config,
     private val deviceName: String
 ) : OutputProvider {

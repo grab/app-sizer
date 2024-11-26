@@ -22,16 +22,16 @@ report:
   output-directory: "./build/app-sizer"
   custom-attributes:
     pipelineId: "100"
-  influx-db-config:
-    db-name: "sizer"
-    url: "http://localhost:8086"
-    username: "root"
-    password: "root"
-    report-table-name: "app_size"
-    retention-policy:
-      name: "app_sizer"
-      duration: "360d"
-      shard-duration: "0m"
-      replication-factor: 2
-      is-default: true
+#  influx-db-config:
+#    db-name: "sizer"
+#    url: "http://localhost:8086"
+#    username: "root"
+#    password: "root"
+#    report-table-name: "app_size"
+#    retention-policy:
+#      name: "app_sizer"
+#      duration: "360d"
+#      shard-duration: "0m"
+#      replication-factor: 2
+#      is-default: true
 

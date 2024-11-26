@@ -54,11 +54,11 @@ Configure the input for the project:
 ```groovy
 appSizer {
     projectInput {
-        largeFileThreshold = 10
-        teamMappingFile = file("${rootProject.rootDir}/module-owner.yml")
-        enableMatchDebugVariant = true
+        largeFileThreshold = [your_threshold_in_bytes]
+        teamMappingFile = file("path/to/your/module-owner.yml")
+        enableMatchDebugVariant = [true|false]
         variantFilter { variant ->
-            variant.setIgnore(variant.flavors.contains("ignore-flavor"))
+            variant.setIgnore(variant.flavors.contains("your-ignore-flavor"))
         }
         apk {
             // APK Generation
@@ -97,10 +97,10 @@ appSizer {
         ...
         apk {
             deviceSpecs = [
-                file("${rootProject.rootDir}/app-size-config/device-1.json"),
-                file("${rootProject.rootDir}/app-size-config/device-2.json")
+                file("path/to/device-1.json"),
+                file("path/to/device-2.json"),
             ]
-            bundleToolFile = file("${rootProject.rootDir}/binary/bundletool-all-1.15.4.jar")
+            bundleToolFile = file("path/to/bundletool.jar")
         }
     }
     ...

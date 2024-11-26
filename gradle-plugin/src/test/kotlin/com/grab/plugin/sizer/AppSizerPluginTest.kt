@@ -43,7 +43,7 @@ class AppSizerPluginTest {
         project = ProjectBuilder.builder()
             .build()
         project.pluginManager.apply("com.android.application")
-        project.pluginManager.apply("com.grab.app-sizer")
+        project.pluginManager.apply("com.grab.sizer")
     }
 
     @Test

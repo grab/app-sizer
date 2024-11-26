@@ -11,12 +11,12 @@ App Sizer provides a Command Line Interface (CLI) to cater to non-Gradle build s
 
 3. Run the analysis using the command line tool:
    ```
-   java -jar clt-all.jar --config-file ./path/to/config/your-config-file.yml
+   java -jar cli-all.jar --config-file ./path/to/config/your-config-file.yml
    ```
 
 *Note, by any reason the download Jar does not work. You could check out the repo and generate the command line binary file*
    ```
-   ./gradlew clt:shadowJar
+   ./gradlew cli:shadowJar
    ```
    
 ## Configuration
@@ -133,5 +133,5 @@ report:
 - [InfluxDB Documentation](https://www.influxdata.com/time-series-platform/)
 
 
-[cli-template-link]: https://github.com/grab/App-Sizer/blob/master/cli-config-template.yml
-[latest_release_link]: https://github.com/grab/App-Sizer/releases
+[cli-template-link]: https://github.com/grab/app-sizer/blob/master/cli-config-template.yml
+[latest_release_link]: https://github.com/grab/app-sizer/releases
