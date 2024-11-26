@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://grab.github.io/App-Sizer/</loc>
-         <lastmod>2024-11-25</lastmod>
+         <loc>https://grab.github.io/app-sizer/</loc>
+         <lastmod>2024-11-26</lastmod>
     </url>
     <url>
-         <loc>https://grab.github.io/App-Sizer/cli/</loc>
-         <lastmod>2024-11-25</lastmod>
+         <loc>https://grab.github.io/app-sizer/cli/</loc>
+         <lastmod>2024-11-26</lastmod>
     </url>
     <url>
-         <loc>https://grab.github.io/App-Sizer/docker/</loc>
-         <lastmod>2024-11-25</lastmod>
+         <loc>https://grab.github.io/app-sizer/docker/</loc>
+         <lastmod>2024-11-26</lastmod>
     </url>
     <url>
-         <loc>https://grab.github.io/App-Sizer/limitation/</loc>
-         <lastmod>2024-11-25</lastmod>
+         <loc>https://grab.github.io/app-sizer/limitation/</loc>
+         <lastmod>2024-11-26</lastmod>
     </url>
     <url>
-         <loc>https://grab.github.io/App-Sizer/plugin/</loc>
-         <lastmod>2024-11-25</lastmod>
+         <loc>https://grab.github.io/app-sizer/plugin/</loc>
+         <lastmod>2024-11-26</lastmod>
     </url>
     <url>
-         <loc>https://grab.github.io/App-Sizer/report/</loc>
-         <lastmod>2024-11-25</lastmod>
+         <loc>https://grab.github.io/app-sizer/report/</loc>
+         <lastmod>2024-11-26</lastmod>
     </url>
     <url>
-         <loc>https://grab.github.io/App-Sizer/task_graph/</loc>
-         <lastmod>2024-11-25</lastmod>
+         <loc>https://grab.github.io/app-sizer/task_graph/</loc>
+         <lastmod>2024-11-26</lastmod>
     </url>
 </urlset>
