@@ -33,7 +33,7 @@ jobs:
       - name: Rename and prepare assets
         run: |
           cd ./cli/build/libs
-          mv cli-all.jar app-sizer-cli-${{ env.VERSION }}.jar
+          mv cli-app-sizer.jar app-sizer-cli-${{ env.VERSION }}.jar
           sha256sum app-sizer-cli-${{ env.VERSION }}.jar > app-sizer-cli-${{ env.VERSION }}.jar.sha256
 
       - name: Upload CLI JAR
@@ -58,12 +58,45 @@ jobs:
 
   release-plugin:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
           distribution: "zulu"
           java-version: "11"
-      - name: Publish plugin to Artifactory
-        run: ./gradlew artifactoryPublish
+          cache: 'gradle'
+
+      - name: Get version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Publish to Maven Central
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          VERSION: ${{ env.VERSION }}
+        run: |
+          ./gradlew :gradle-plugin:publish \
+            -Pversion=${VERSION} \
+            --no-daemon \
+            --no-parallel \
+            --stacktrace
