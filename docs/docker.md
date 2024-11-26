@@ -27,10 +27,10 @@ The Docker image includes a pre-configured dashboard in Grafana:
 
 To use the dashboard, you either to:
 
-- **Default Configuration**: Uses database name `sizer` and measurement (table) named `app_size`. (They are default values configured in the App Sizer tool)
-- **Custom Configuration**:
-  - For a different database name: Update the [Grafana Data Sources](https://grafana.com/docs/grafana/latest/datasources/) named InfluxDB.
-  - For a different measurement name: Update all [queries](https://grafana.com/docs/grafana/latest/panels-visualizations/query-transform-data/) and [variables](https://grafana.com/docs/grafana/latest/dashboards/variables/) in the dashboard.
+1. **Default Configuration**: Uses database name `sizer` and measurement (table) named `app_size`. (They are default values configured in the App Sizer tool)
+2. **Custom Configuration**:
+   - For a different database name: Update the [Grafana Data Sources](https://grafana.com/docs/grafana/latest/datasources/) named InfluxDB.
+   - For a different measurement name: Update all [queries](https://grafana.com/docs/grafana/latest/panels-visualizations/query-transform-data/) and [variables](https://grafana.com/docs/grafana/latest/dashboards/variables/) in the dashboard.
 
 To import the dashboard into an existing setup:
 
@@ -74,7 +74,7 @@ docker run -d \
 - Default Password: `root`
 
 
-[json-dashboard-file]: https://github.com/grab/App-Sizer/blob/master/grafana/dashboard-to-import.json
+[json-dashboard-file]: https://github.com/grab/app-sizer/blob/master/grafana/dashboard-to-import.json
 [app-sizer-page]: ./index.md
 [grafana-version]: https://img.shields.io/badge/Grafana-9.0.0-brightgreen
 [influx-version]: https://img.shields.io/badge/Influx-1.8.2-brightgreen

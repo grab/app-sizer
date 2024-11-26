@@ -37,7 +37,7 @@ jobs:
                   name: build-artifacts
                   path: |
                       gradle-plugin/build/libs/*.jar
-                      clt/build/libs/*.jar
+                      cli/build/libs/*.jar
                   retention-days: 7
 
     test:

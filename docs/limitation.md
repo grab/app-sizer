@@ -6,7 +6,7 @@ App Sizer is a powerful tool, but it has some limitations that users should be a
 
 Calculating the exact download size of a class from an APK is challenging. App Sizer uses an approximation method:
 
-1. We obtain a relative [size of the class definition][class-size] (termed 'raw size').
+1. We obtain a relative [size of the class definition][class_size] (termed 'raw size').
 2. We use the Dex file download size that the class belongs to.
 3. We derive a relative value for the class's download size using the formula:
 
@@ -31,7 +31,7 @@ The `resources.arsc` file is a special file in Android APKs containing precompil
 
 ## Inline Functions and Classes
 
-The nature of [inline functions][inline-functions] and [inline value classes][inline-class] in Kotlin presents a unique challenge:
+The nature of [inline functions][inline_functions] and [inline value classes][inline_class] in Kotlin presents a unique challenge:
 
 - The size contributed by inline elements is calculated and distributed to where they are used, not where the inline methods/classes are created.
 - Build systems or optimization tools like R8 might rewrite code for efficiency, including inlining methods, which can result in similar outcomes to inline functions.
@@ -48,6 +48,6 @@ These limitations mean that App Sizer's results should be interpreted as close a
 
 Users should keep these limitations in mind when making decisions based on App Sizer's output, especially for small projects or when dealing with inline-heavy codebases.
 
-[class-size]: https://github.com/JesusFreke/smali/blob/master/dexlib2/src/main/java/org/jf/dexlib2/dexbacked/DexBackedClassDef.java#L505
-[inline-functions]: https://kotlinlang.org/docs/inline-functions.html
-[inline-class]: https://kotlinlang.org/docs/inline-classes.html
+[class_size]: https://github.com/JesusFreke/smali/blob/master/dexlib2/src/main/java/org/jf/dexlib2/dexbacked/DexBackedClassDef.java#L505
+[inline_functions]: https://kotlinlang.org/docs/inline-functions.html
+[inline_class]: https://kotlinlang.org/docs/inline-classes.html

@@ -49,7 +49,7 @@ internal const val WORK_MULTIPROCESS_AAR = "work-multiprocess-2.8.0.aar"
 internal const val WORK_MULTIPROCESS_POM = "work-multiprocess-2.8.0.pom"
 
 /**
- * This class contain a project files & folders for testing the [CltInputProvider]
+ * This class contain a project files & folders for testing the [CliInputProvider]
  * It build a project with this structure:
  * ```
  * ./user-folder/root-project

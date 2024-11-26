@@ -50,7 +50,7 @@ class DefaultFileSystem : FileSystem {
     override fun create(parent: File, path: String): File = File(parent, path)
 }
 
-class CltInputProvider constructor(
+class CliInputProvider constructor(
     private val fileQuery: FileQuery,
     private val config: Config,
     private val apksDirectory: File,

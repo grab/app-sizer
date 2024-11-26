@@ -31,7 +31,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.*
 import com.grab.sizer.config.Config
 import com.grab.sizer.config.ConfigYmlLoader
-import com.grab.sizer.utils.CltLogger
+import com.grab.sizer.utils.CliLogger
 import com.grab.sizer.utils.DefaultFileQuery
 import com.grab.sizer.utils.Logger
 import java.io.File
@@ -70,17 +70,17 @@ class AnalyzerCommand : CliktCommand() {
             .also {
                 it.validateInput()
             }
-        val logger: Logger = CltLogger()
+        val logger: Logger = CliLogger()
         DefaultApkGenerator.create(config)
             .generate(config.apkGeneration.deviceSpecs)
             .forEach { apkDirectory ->
                 AppSizer(
-                    inputProvider = CltInputProvider(
+                    inputProvider = CliInputProvider(
                         fileQuery = DefaultFileQuery(),
                         config = config,
                         apksDirectory = apkDirectory
                     ),
-                    outputProvider = CltOutputProvider(config, apkDirectory.nameWithoutExtension),
+                    outputProvider = CliOutputProvider(config, apkDirectory.nameWithoutExtension),
                     libName = libName,
                     logger = logger
                 ).process(reportOption)

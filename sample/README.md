@@ -53,7 +53,7 @@ This sample project also includes a configuration for the App Sizer CLI tool.
 
 2. To execute the CLI analysis, run the following command from the project root:
    ```
-   sh exec-clt.sh
+   sh exec-cli.sh
    ```
 
 This script will build & run the App Sizer CLI tool using the configuration specified in `app-size-settings.yml`.

@@ -17,7 +17,7 @@ build:
   artifacts:
     paths:
       - gradle-plugin/build/libs/*.jar
-      - clt/build/libs/*.jar
+      - cli/build/libs/*.jar
     expire_in: 1 week
 
 test:
