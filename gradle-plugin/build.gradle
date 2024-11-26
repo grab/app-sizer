@@ -38,7 +38,13 @@ plugins {
     id "com.grab.sizer.kotlin"
     id 'java-gradle-plugin'
     alias(libs.plugins.kotlin.dsl)
+    alias(libs.plugins.gradle.plugin.publish)
+    id 'maven-publish'
+    id 'signing'
 }
+
+group = 'com.grab.sizer'
+version = '1.0.0-SNAPSHOT'
 
 dependencies {
     compileOnly libs.android.gradle.plugin
@@ -55,13 +61,103 @@ dependencies {
     testImplementation libs.android.gradle.api
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 gradlePlugin {
+    website = 'https://grab.github.io/app-sizer/'
+    vcsUrl = 'https://github.com/grab/app-sizer.git'
+
     plugins {
         appSizerPlugin {
             id = 'com.grab.sizer'
             implementationClass = 'com.grab.plugin.sizer.AppSizerPlugin'
-            displayName = "app-sizer-plugin"
+            displayName = 'App Sizer Plugin'
+            description = 'A tool designed to analyze the download size of Android applications'
+            tags.set(['android', 'size', 'analysis', 'app-size'])
         }
     }
 }
 
+def configurePom(pom) {
+    pom.with {
+        name = 'App Sizer'
+        description = 'A tool designed to analyze the download size of Android applications'
+        url = 'https://github.com/grab/app-sizer'
+
+        licenses {
+            license {
+                name = 'MIT License'
+                url = 'https://opensource.org/licenses/MIT'
+                distribution = 'repo'
+            }
+        }
+
+        developers {
+            developer {
+                id = 'grab'
+                name = 'Grab Engineers'
+                email = 'van.minh@grab.com'
+                organization = 'Grab'
+                organizationUrl = 'https://github.com/grab'
+            }
+        }
+
+        scm {
+            connection = 'scm:git:git://github.com/grab/app-sizer.git'
+            developerConnection = 'scm:git:ssh://github.com:grab/app-sizer.git'
+            url = 'https://github.com/grab/app-sizer'
+        }
+    }
+}
+
+publishing {
+    publications.withType(MavenPublication).configureEach { publication ->
+        if (publication.name == 'pluginMaven') {
+            publication.artifactId = 'sizer-gradle-plugin'  // Set the artifact ID
+        }
+        configurePom(publication.pom)
+    }
+
+    repositories {
+        maven {
+            name = 'sonatype'
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+            credentials {
+                username = findProperty('ossrhUsername') ?: System.getenv('OSSRH_USERNAME')
+                password = findProperty('ossrhPassword') ?: System.getenv('OSSRH_PASSWORD')
+            }
+        }
+    }
+}
+
+signing {
+    def signingKey = findProperty('signingKey') ?: System.getenv('GPG_PRIVATE_KEY')
+    def signingPassword = findProperty('signingPassword') ?: System.getenv('GPG_PASSPHRASE')
+
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications
+}
+
+// Fixed task ordering
+tasks.withType(AbstractPublishToMaven).configureEach { publishTask ->
+    publishTask.mustRunAfter(tasks.withType(Sign))
+}
+
+tasks.withType(Sign).configureEach { signTask ->
+    signTask.onlyIf { !version.endsWith('SNAPSHOT') }
+    tasks.withType(AbstractPublishToMaven).forEach {
+        it.dependsOn(signTask)
+    }
+}
+
+tasks.register('publishAll') {
+    group = 'publishing'
+    description = 'Publishes all publications to all repositories'
+    dependsOn(tasks.withType(AbstractPublishToMaven))
+}
