@@ -28,15 +28,11 @@
 package com.grab.sizer.build
 
 import com.grab.sizer.gradle.ConfigurablePlugin
-import org.gradle.api.JavaVersion
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-import org.gradle.api.tasks.compile.JavaCompile
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 class BuildPlugin : ConfigurablePlugin({
     allprojects {
         group = project.findProperty("groupId")!!
         version = project.findProperty("versionName")!!
+        description = "A tool designed to analyze the download size of Android applications"
     }
 })

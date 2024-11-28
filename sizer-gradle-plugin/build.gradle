@@ -71,7 +71,7 @@ gradlePlugin {
             id = 'com.grab.sizer'
             implementationClass = 'com.grab.plugin.sizer.AppSizerPlugin'
             displayName = 'App Sizer Plugin'
-            description = 'A tool designed to analyze the download size of Android applications'
+            description = project.description
             tags.set(['android', 'size', 'analysis', 'app-size'])
         }
     }
