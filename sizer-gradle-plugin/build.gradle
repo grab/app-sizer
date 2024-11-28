@@ -33,22 +33,11 @@
  * User Manual available at https://docs.gradle.org/7.5.1/userguide/custom_plugins.html
  * This project uses @Incubating APIs which are subject to change.
  */
-buildscript {
-    apply from: "../constants.gradle"
-    dependencies {
-        classpath libs.nexus.gradle.publish.plugin
-    }
-}
-
 plugins {
-    id "com.grab.sizer.build.common"
     id "com.grab.sizer.build.kotlin"
-    id 'java-gradle-plugin'
-    alias(libs.plugins.dokka.gradle.plugin)
     alias(libs.plugins.kotlin.dsl)
     alias(libs.plugins.gradle.plugin.publish)
-    id 'maven-publish'
-    id 'signing'
+    id "maven-publish"
 }
 apply from: "gradle/publishing.gradle"
 
@@ -67,6 +56,12 @@ dependencies {
     testImplementation libs.android.gradle.api
 }
 
+pluginBundle {
+    mavenCoordinates {
+        groupId = project.group
+        artifactId = project.name
+    }
+}
 gradlePlugin {
     website = 'https://grab.github.io/app-sizer/'
     vcsUrl = 'https://github.com/grab/app-sizer.git'
@@ -80,4 +75,8 @@ gradlePlugin {
             tags.set(['android', 'size', 'analysis', 'app-size'])
         }
     }
+}
+
+tasks.withType(AbstractPublishToMaven).configureEach { publishTask ->
+    publishTask.mustRunAfter(tasks.withType(Sign))
 }

@@ -35,5 +35,8 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 class BuildPlugin : ConfigurablePlugin({
-
+    allprojects {
+        group = project.findProperty("groupId")!!
+        version = project.findProperty("versionName")!!
+    }
 })

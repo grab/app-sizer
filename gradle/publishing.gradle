@@ -35,30 +35,7 @@ artifacts {
     archives sourcesJar
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-//            named("appSizerPluginPluginMarkerMaven") { publication ->
-//                configurePom(publication)
-//            }
-
-            release(MavenPublication) { publication ->
-                groupId project.findProperty("groupId")
-                artifactId project.name
-                version project.findProperty("versionName")
-
-                from components.java
-
-                artifact sourcesJar
-                artifact javadocJar
-
-                configurePom(publication)
-            }
-        }
-    }
-}
-
-private void configurePom(MavenPublication publication) {
+def configurePom = { MavenPublication publication ->
     publication.pom {
         name = project.name
         description = project.description
@@ -66,7 +43,7 @@ private void configurePom(MavenPublication publication) {
         licenses {
             license {
                 name = "The MIT License"
-                url = "https://github.com/grab/App-Sizer/blob/master/LICENSE"
+                url = "hvttps://github.com/grab/App-Sizer/blob/master/LICENSE"
             }
         }
         developers {
@@ -85,6 +62,33 @@ private void configurePom(MavenPublication publication) {
         }
     }
 }
+
+afterEvaluate {
+    publishing {
+        publications {
+            try {
+                named("appSizerPluginPluginMarkerMaven") { publication ->
+                    print("ssss")
+                    configurePom(publication)
+                }
+            } catch (UnknownDomainObjectException ignored) {
+            }
+            release(MavenPublication) { publication ->
+                groupId project.findProperty("groupId")
+                artifactId project.name
+                version project.findProperty("versionName")
+
+                from components.java
+
+                artifact sourcesJar
+                artifact javadocJar
+
+                configurePom(publication)
+            }
+        }
+    }
+}
+
 
 afterEvaluate {
     signing {
