@@ -38,10 +38,9 @@ artifacts {
 afterEvaluate {
     publishing {
         publications {
-            // Gradle plugin marker if it exists
-            named("grazelPluginPluginMarkerMaven") { publication ->
-                configurePom(publication)
-            }
+//            named("appSizerPluginPluginMarkerMaven") { publication ->
+//                configurePom(publication)
+//            }
 
             release(MavenPublication) { publication ->
                 groupId project.findProperty("groupId")
@@ -63,7 +62,7 @@ private void configurePom(MavenPublication publication) {
     publication.pom {
         name = project.name
         description = project.description
-        url = website
+        url = 'https://github.com/grab/app-sizer'
         licenses {
             license {
                 name = "The MIT License"
@@ -72,25 +71,17 @@ private void configurePom(MavenPublication publication) {
         }
         developers {
             developer {
-                id = "MinhNguyen-nvm"
-                name = "Minh Nguyen"
-                email = "minhnguyen.gtvt@gmail.com"
-            }
-            developer {
-                id = "arunkumar9t2"
-                name = "Arunkumar"
-                email = "hi@arunkumar.dev"
-            }
-            developer {
-                id = "minkuan88"
-                name = "Min Kuan Lim"
-                email = "minkuan88@hotmail.com"
+                id = 'grab'
+                name = 'Grab Engineers'
+                email = 'van.minh@grab.com'
+                organization = 'Grab'
+                organizationUrl = 'https://github.com/grab'
             }
         }
         scm {
-            connection = "git@github.com:grab/App-Sizer.git"
-            developerConnection = "git@github.com:grab/App-Sizer.git"
-            url = website
+            connection = 'scm:git:git://github.com/grab/app-sizer.git'
+            developerConnection = 'scm:git:ssh://github.com:grab/app-sizer.git'
+            url = 'https://github.com/grab/app-sizer'
         }
     }
 }
@@ -98,9 +89,9 @@ private void configurePom(MavenPublication publication) {
 afterEvaluate {
     signing {
         useInMemoryPgpKeys(
-            rootProject.ext["signing.keyId"].toString(),
-            rootProject.ext["signing.key"].toString(),
-            rootProject.ext["signing.password"].toString(),
+                rootProject.ext["signing.keyId"].toString(),
+                rootProject.ext["signing.key"].toString(),
+                rootProject.ext["signing.password"].toString(),
         )
         sign publishing.publications
     }
