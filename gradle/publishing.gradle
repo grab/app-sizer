@@ -68,7 +68,6 @@ afterEvaluate {
         publications {
             try {
                 named("appSizerPluginPluginMarkerMaven") { publication ->
-                    print("ssss")
                     configurePom(publication)
                 }
             } catch (UnknownDomainObjectException ignored) {
