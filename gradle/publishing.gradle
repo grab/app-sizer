@@ -43,7 +43,7 @@ def configurePom = { MavenPublication publication ->
         licenses {
             license {
                 name = "The MIT License"
-                url = "hvttps://github.com/grab/App-Sizer/blob/master/LICENSE"
+                url = "https://github.com/grab/App-Sizer/blob/master/LICENSE"
             }
         }
         developers {
