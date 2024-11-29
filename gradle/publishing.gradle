@@ -50,7 +50,7 @@ def configurePom = { MavenPublication publication ->
             developer {
                 id = 'MinhNguyen-nvm'
                 name = "Minh Nguyen"
-                email = 'van.minh@grab.com'
+                email = 'minhnguyen.gtvt@gmail.com'
                 organization = 'Grab'
                 organizationUrl = 'https://github.com/grab'
             }

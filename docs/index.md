@@ -32,29 +32,32 @@ App Sizer provides two flexible integration methods:
   *Note: The command-line option was the original implementation and remains supported for broader compatibility.*
 
 ### Gradle Plugin Integration
-In root `build.gradle`:
+
+Add the plugin to your project using the Gradle plugins DSL:
+
+1. Add the plugin to your root `settings.gradle`:
 
 ```groovy
-buildscript {
-  repositories {
-    mavenCentral()
-  }
-  dependencies {
-    classpath "com.grab:app-sizer:SNAPSHOT"
-  }
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
 }
 ```
-In the app module 's `build.gradle`
-```groovy
-apply plugin: "com.grab.app-sizer"
+2. Apply and configure the plugin in your app module's build.gradle:
 
-// AppSizer configuration
+```groovy
+plugins {
+    id "com.grab.sizer" version "0.1.0-alpha01"
+}
+
 appSizer {
-  // DSL
+    // Configuration goes here
 }
 ```
 
-To run analysis, execute
+3. To run analysis:
 
 ```
 ./gradlew app:appSizeAnalysis[Release|Debug] --no-configure-on-demand --no-configuration-cache

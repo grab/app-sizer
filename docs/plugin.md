@@ -3,6 +3,33 @@ App Sizer provide a gradle plugin as the option to seamlessly integrates with yo
 
 ## Getting Started
 
+There are two ways to integrate the App Sizer plugin into your project:
+
+### Option 1: Plugins DSL (Recommended)
+
+1. Add the plugin to your root `settings.gradle`:
+
+```groovy
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+```
+
+2. Apply and configure the plugin in your app module's build.gradle:
+```groovy
+plugins {
+    id "com.grab.sizer" version "0.1.0-alpha01"
+}
+
+appSizer {
+    // Configuration goes here
+}
+```
+
+### Option 2: Legacy buildscript method
 1. Add the plugin to your root `build.gradle`
 
 ```groovy
@@ -11,7 +38,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.grab:app-sizer:SNAPSHOT"
+        classpath "com.grab.sizer:sizer-gradle-plugin:0.1.0-alpha01"
     }
 }
 ```
