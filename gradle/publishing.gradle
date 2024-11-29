@@ -48,9 +48,51 @@ def configurePom = { MavenPublication publication ->
         }
         developers {
             developer {
-                id = 'grab'
-                name = 'Grab Engineers'
+                id = 'MinhNguyen-nvm'
+                name = "Minh Nguyen"
                 email = 'van.minh@grab.com'
+                organization = 'Grab'
+                organizationUrl = 'https://github.com/grab'
+            }
+            developer {
+                id = "arunkumar9t2"
+                name = "Arunkumar"
+                email = "hi@arunkumar.dev"
+                organization = 'Grab'
+                organizationUrl = 'https://github.com/grab'
+            }
+            developer {
+                id = "minkuan88"
+                name = "Min Kuan Lim"
+                email = "minkuan88@hotmail.com"
+                organization = 'Grab'
+                organizationUrl = 'https://github.com/grab'
+            }
+            developer {
+                id = "mohammadkahelghi-grabtaxi"
+                name = "Mohammad Khaleghi"
+                email = "mohammad.khaleghi@grabtaxi.com"
+                organization = 'Grab'
+                organizationUrl = 'https://github.com/grab'
+            }
+            developer {
+                id = "stevenchao-grabtaxi"
+                name = "Steven Chao"
+                email = "steven.chao@grabtaxi.com"
+                organization = 'Grab'
+                organizationUrl = 'https://github.com/grab'
+            }
+            developer {
+                id = "arnav-grabtaxi"
+                name = "Arnav Jain"
+                email = "arnav.jain@grabtaxi.com"
+                organization = 'Grab'
+                organizationUrl = 'https://github.com/grab'
+            }
+            developer {
+                id = "adarsh-grabtaxi"
+                name = "Adarsh Srivastava"
+                email = "adarsh.srivastava@grabtaxi.com"
                 organization = 'Grab'
                 organizationUrl = 'https://github.com/grab'
             }
