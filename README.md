@@ -48,7 +48,7 @@ buildscript {
 In the app module 's `build.gradle`
 ```groovy
 plugins {
-    id "com.grab.sizer"
+    id "com.grab.sizer" version "<version>"
 }
 
 // AppSizer configuration
