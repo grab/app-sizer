@@ -31,9 +31,6 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
         google()
-        maven {
-            url = uri("https://plugins.gradle.org/m2/")
-        }
     }
 }
 
@@ -48,6 +45,6 @@ dependencyResolutionManagement {
 rootProject.name = "app-sizer"
 
 include 'app-sizer'
-include 'gradle-plugin'
+include 'sizer-gradle-plugin'
 include 'cli'
 
