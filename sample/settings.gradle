@@ -1,4 +1,3 @@
-
 /*
  * MIT License
  *
@@ -38,7 +37,7 @@ pluginManagement {
 
 includeBuild("../") {
     dependencySubstitution {
-        substitute module("com.grab.sizer:app-sizer-plugin") using project(":gradle-plugin")
+        substitute module("com.grab.sizer:app-sizer-plugin") using project(":sizer-gradle-plugin")
     }
 }
 

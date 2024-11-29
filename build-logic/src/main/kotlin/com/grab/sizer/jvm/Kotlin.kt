@@ -24,19 +24,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE
  */
-buildscript {
-    apply from: "constants.gradle"
-    dependencies {
-        classpath libs.nexus.gradle.publish.plugin
+
+package com.grab.sizer.jvm
+
+import org.gradle.api.Project
+import org.gradle.kotlin.dsl.the
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import org.gradle.api.JavaVersion
+import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.kotlin.dsl.configure
+
+fun Project.javaCommon() {
+    configure<JavaPluginExtension> {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
-plugins {
-    id "com.grab.sizer.build.common"
-    alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.kotlin.kapt) apply false
-    alias(libs.plugins.johnrengelman.shadow) apply false
-    alias(libs.plugins.gradle.plugin.publish) apply false
-    alias(libs.plugins.dokka.gradle.plugin) apply false
+internal fun Project.kotlinCommon() {
+    the<KotlinProjectExtension>().apply {
+        jvmToolchain(17)
+    }
+    tasks.withType<KotlinCompilationTask<KotlinCommonCompilerOptions>>().configureEach {
+        compilerOptions {
+            apiVersion.set(KotlinVersion.KOTLIN_1_8)
+            languageVersion.set(KotlinVersion.KOTLIN_1_8)
+            freeCompilerArgs.addAll()
+        }
+    }
 }
-apply from: "gradle/publish-root-config.gradle"
+

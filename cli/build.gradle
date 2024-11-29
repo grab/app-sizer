@@ -26,7 +26,7 @@
  */
 
 plugins {
-    id "com.grab.sizer.kotlin"
+    id "com.grab.sizer.build.kotlin"
     id 'com.github.johnrengelman.shadow'
 }
 

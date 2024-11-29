@@ -24,19 +24,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE
  */
-buildscript {
-    apply from: "constants.gradle"
-    dependencies {
-        classpath libs.nexus.gradle.publish.plugin
-    }
-}
 
-plugins {
-    id "com.grab.sizer.build.common"
-    alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.kotlin.kapt) apply false
-    alias(libs.plugins.johnrengelman.shadow) apply false
-    alias(libs.plugins.gradle.plugin.publish) apply false
-    alias(libs.plugins.dokka.gradle.plugin) apply false
+package com.grab.sizer.gradle
+
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+
+open class ConfigurablePlugin(
+    private val configuration: Project.() -> Unit
+) : Plugin<Project> {
+    override fun apply(project: Project): Unit = configuration(project)
 }
-apply from: "gradle/publish-root-config.gradle"

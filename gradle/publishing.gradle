@@ -35,14 +35,85 @@ artifacts {
     archives sourcesJar
 }
 
+def configurePom = { MavenPublication publication ->
+    publication.pom {
+        name = project.name
+        description = project.description
+        url = 'https://github.com/grab/app-sizer'
+        licenses {
+            license {
+                name = "The MIT License"
+                url = "https://github.com/grab/App-Sizer/blob/master/LICENSE"
+            }
+        }
+        developers {
+            developer {
+                id = 'MinhNguyen-nvm'
+                name = "Minh Nguyen"
+                email = 'van.minh@grab.com'
+                organization = 'Grab'
+                organizationUrl = 'https://github.com/grab'
+            }
+            developer {
+                id = "arunkumar9t2"
+                name = "Arunkumar"
+                email = "hi@arunkumar.dev"
+                organization = 'Grab'
+                organizationUrl = 'https://github.com/grab'
+            }
+            developer {
+                id = "minkuan88"
+                name = "Min Kuan Lim"
+                email = "minkuan88@hotmail.com"
+                organization = 'Grab'
+                organizationUrl = 'https://github.com/grab'
+            }
+            developer {
+                id = "mohammadkahelghi-grabtaxi"
+                name = "Mohammad Khaleghi"
+                email = "mohammad.khaleghi@grabtaxi.com"
+                organization = 'Grab'
+                organizationUrl = 'https://github.com/grab'
+            }
+            developer {
+                id = "stevenchao-grabtaxi"
+                name = "Steven Chao"
+                email = "steven.chao@grabtaxi.com"
+                organization = 'Grab'
+                organizationUrl = 'https://github.com/grab'
+            }
+            developer {
+                id = "arnav-grabtaxi"
+                name = "Arnav Jain"
+                email = "arnav.jain@grabtaxi.com"
+                organization = 'Grab'
+                organizationUrl = 'https://github.com/grab'
+            }
+            developer {
+                id = "adarsh-grabtaxi"
+                name = "Adarsh Srivastava"
+                email = "adarsh.srivastava@grabtaxi.com"
+                organization = 'Grab'
+                organizationUrl = 'https://github.com/grab'
+            }
+        }
+        scm {
+            connection = 'scm:git:git://github.com/grab/app-sizer.git'
+            developerConnection = 'scm:git:ssh://github.com:grab/app-sizer.git'
+            url = 'https://github.com/grab/app-sizer'
+        }
+    }
+}
+
 afterEvaluate {
     publishing {
         publications {
-            // Gradle plugin marker if it exists
-            named("grazelPluginPluginMarkerMaven") { publication ->
-                configurePom(publication)
+            try {
+                named("appSizerPluginPluginMarkerMaven") { publication ->
+                    configurePom(publication)
+                }
+            } catch (UnknownDomainObjectException ignored) {
             }
-
             release(MavenPublication) { publication ->
                 groupId project.findProperty("groupId")
                 artifactId project.name
@@ -59,48 +130,13 @@ afterEvaluate {
     }
 }
 
-private void configurePom(MavenPublication publication) {
-    publication.pom {
-        name = project.name
-        description = project.description
-        url = website
-        licenses {
-            license {
-                name = "The MIT License"
-                url = "https://github.com/grab/App-Sizer/blob/master/LICENSE"
-            }
-        }
-        developers {
-            developer {
-                id = "MinhNguyen-nvm"
-                name = "Minh Nguyen"
-                email = "minhnguyen.gtvt@gmail.com"
-            }
-            developer {
-                id = "arunkumar9t2"
-                name = "Arunkumar"
-                email = "hi@arunkumar.dev"
-            }
-            developer {
-                id = "minkuan88"
-                name = "Min Kuan Lim"
-                email = "minkuan88@hotmail.com"
-            }
-        }
-        scm {
-            connection = "git@github.com:grab/App-Sizer.git"
-            developerConnection = "git@github.com:grab/App-Sizer.git"
-            url = website
-        }
-    }
-}
 
 afterEvaluate {
     signing {
         useInMemoryPgpKeys(
-            rootProject.ext["signing.keyId"].toString(),
-            rootProject.ext["signing.key"].toString(),
-            rootProject.ext["signing.password"].toString(),
+                rootProject.ext["signing.keyId"].toString(),
+                rootProject.ext["signing.key"].toString(),
+                rootProject.ext["signing.password"].toString(),
         )
         sign publishing.publications
     }

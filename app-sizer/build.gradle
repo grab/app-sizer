@@ -26,8 +26,10 @@
  */
 
 plugins {
-    id 'com.grab.sizer.kotlin'
+    id 'com.grab.sizer.build.kotlin'
+    alias(libs.plugins.dokka.gradle.plugin)
 }
+apply from: "../gradle/publishing.gradle"
 
 dependencies {
     /**
