@@ -147,16 +147,16 @@ SOFTWARE
 
 ```
 [app_sizer_website]: https://grab.github.io/app-sizer/
-[report_doc]: https://engineering.grab.com/app-sizer/report/
-[plugin_doc]: https://engineering.grab.com/app-sizer/plugin/
-[cli_doc]: https://engineering.grab.com/app-sizer/cli/
-[grafana_docker_doc]: https://engineering.grab.com/app-sizer/docker/
-[limitation_doc]:https://engineering.grab.com/app-sizer/limitation/
+[report_doc]: https://grab.github.io/app-sizer/report/
+[plugin_doc]: https://grab.github.io/app-sizer/plugin/
+[cli_doc]: https://grab.github.io/app-sizer/cli/
+[grafana_docker_doc]: https://grab.github.io/app-sizer/docker/
+[limitation_doc]:https://grab.github.io/app-sizer/limitation/
+[blog_post]: https://engineering.grab.com/project-bonsai
+[latest_release_link]: https://github.com/grab/app-sizer/releases
 [gradle_plugin]: ./gradle-plugin
 [commandline_tool]: ./cli
 [grafana_docker]: ./docker
-[blog_post]: https://engineering.grab.com/project-bonsai
-[latest_release_link]: https://github.com/grab/app-sizer/releases
 
 
 
