@@ -95,11 +95,12 @@ For more detail on reports, see [Report Detail][report_doc]
 App Sizer functions as a mapping tool to generate the report. It takes APK, AAR, and JAR files as inputs.
 
 1. **Input parsing**:
-   - The tool parses the APK down to file and class levels. It calculates the contribution of each component to the total app download size.
-   - Similarly, App Sizer parses AAR and JAR files.
+    - The tool parses the APK down to file and class levels. It calculates the contribution of each component to the total app download size.
+    - Similarly, App Sizer parses AAR and JAR files.
+
 2. **Mapping and Report Generation**:
-   - The tool then maps the APK components to their corresponding elements in the AAR and JAR files.
-   - Based on this analysis and other metadata, App Sizer generates comprehensive reports detailing size contributions.
+    - The tool then maps the APK components to their corresponding elements in the AAR and JAR files.
+    - Based on this analysis and other metadata, App Sizer generates comprehensive reports detailing size contributions.
 
 ## Limitations
 
