@@ -7,18 +7,24 @@ There are two ways to integrate the App Sizer plugin into your project:
 
 ### Option 1: Plugins DSL (Recommended)
 
-1. Add the plugin to your root `settings.gradle`:
+1. Add the mavenCentral to your root `settings.gradle`:
 
 ```groovy
 pluginManagement {
     repositories {
         mavenCentral()
-        gradlePluginPortal()
     }
 }
 ```
+2. Add the plugin to your project classpath (root's build.gradle):
+```groovy
+plugins {
+    id "com.grab.sizer" version "0.1.0-alpha01" apply false
+}
+```
 
-2. Apply and configure the plugin in your app module's build.gradle:
+3. Apply and configure the plugin to your app module's build.gradle:
+
 ```groovy
 plugins {
     id "com.grab.sizer" version "0.1.0-alpha01"
@@ -46,14 +52,14 @@ buildscript {
 2. Apply the plugin in your app module's `build.gradle`
 
 ```groovy
-apply plugin: "com.grab.app-sizer"
+apply plugin: "com.grab.sizer"
 
 appSizer {
     // Configuration goes here
 }
 ```
 
-3. Run the analysis
+### Run the analysis
 
 ```bash
 ./gradlew app:appSizeAnalysis[Release|Debug] --no-configure-on-demand --no-configuration-cache
@@ -233,8 +239,24 @@ appSizer {
 
 ## Troubleshooting
 
-- If you encounter issues with the `verifyResourceRelease` task, try enabling `enableMatchDebugVariant`.
-- Ensure that the `bundletool` JAR file is correctly referenced in your configuration.
+### Resource Verification Failures
+If you encounter issues with the `verifyResourceRelease` task, try these solutions:
+- Check that your resource files are properly formatted and located
+- Verify that resource names follow Android naming conventions
+- Enable the `enableMatchDebugVariant` flag in your configuration
+
+### Dagger NoSuchMethodError
+If you encounter this exception:
+```java
+NoSuchMethodError: 'java.lang.Object dagger.internal.Preconditions.checkNotNullFromProvides'
+```
+This error typically occurs due to a version conflict between the Android build tools and the App-Sizer plugin's Dagger dependencies. To resolve:
+
+1. Ensure the App-Sizer plugin is added to the classpath in the root build.gradle before applying it to your app module
+2. If step 1 doesn't resolve the issue, you might have to resolve the Dagger version conflict by adding this to your classpath
+```
+classpath "com.google.dagger:dagger:2.47"
+```
 
 ## Resources
 
