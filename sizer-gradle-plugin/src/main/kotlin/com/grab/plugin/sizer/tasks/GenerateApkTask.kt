@@ -193,7 +193,9 @@ internal abstract class GenerateApkTask : DefaultTask() {
                         (it as FinalizeBundleTask).finalBundleFile.get()
                     }
                 )
-                signingConfig.set(variant.signingConfig.toInternalSigningConfig())
+                if (variant.signingConfig != null) {
+                    signingConfig.set(variant.signingConfig.toInternalSigningConfig())
+                }
                 variantName.set(variant.name)
             }
             return task
