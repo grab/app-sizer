@@ -22,62 +22,16 @@ App Sizer offers comprehensive analysis including:
 
 Reports are generated based on the provided Android device specifications. Our [blogpost][blog_post] introduce the tool features
 
-## Quick Start
+## Integration
 
 App Sizer provides two flexible integration methods:
 
-* A Gradle plugin that seamlessly integrates with your Android Gradle project.
-* A command-line tool to cater to non-Gradle build systems, offering the same comprehensive features.
+* A Gradle plugin that seamlessly integrates with your Android Gradle project ([Plugin Configuration Detail][plugin_doc].)
+* A command-line tool to cater to non-Gradle build systems, offering the same comprehensive features ([Commandline Configuration Detail][cli_doc].)
 
   *Note: The command-line option was the original implementation and remains supported for broader compatibility.*
 
-### Gradle Plugin Integration
-
-Add the plugin to your project using the Gradle plugins DSL:
-
-1. Add the plugin to your root `settings.gradle`:
-
-```groovy
-pluginManagement {
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}
-```
-2. Apply and configure the plugin in your app module's build.gradle:
-
-```groovy
-plugins {
-    id "com.grab.sizer" version "0.1.0-alpha01"
-}
-
-appSizer {
-    // Configuration goes here
-}
-```
-
-3. To run analysis:
-
-```
-./gradlew app:appSizeAnalysis[Release|Debug] --no-configure-on-demand --no-configuration-cache
-```
-
-For plugin configuration options, see [Plugin Configuration][plugin_doc].
-
-### Cli Tool Integration
-
-1. Download our [Latest Release][latest_release_link] from GitHub
-2. Ensure Java 11+ is installed
-
-To run analysis using the command line tool, execute
-```text
-java -jar cli-all.jar --config-file ./path/to/config/app-size-settings.yml
-```
-
-For command line configuration options, see [Commandline Configuration][cli_doc].
-
-## Report Types
+## Report types
 
 App Sizer currently supports three types of reports:
 
@@ -151,7 +105,7 @@ SOFTWARE
 [cli_doc]: ./cli.md
 [grafana_docker_doc]: ./docker.md
 [limitation_doc]:./limitation.md
-[gradle_plugin]: https://github.com/grab/app-sizer/tree/master/gradle-plugin
+[gradle_plugin]: https://github.com/grab/app-sizer/tree/master/sizer-gradle-plugin
 [commandline_tool]: https://github.com/grab/app-sizer/tree/master/cli
 [grafana_docker]: https://github.com/grab/app-sizer/tree/master/docker
 [blog_post]: https://engineering.grab.com/project-bonsai
