@@ -104,7 +104,7 @@ apply plugin: "com.grab.sizer"
 appSizer {
     enabled = true
     projectInput {
-        apk {
+        aab {
             bundleToolFile = file("${rootProject.rootDir}/binary/bundletool-all-1.15.4.jar")
             deviceSpecs = [
                     file("${rootProject.rootDir}/app-size-config/device-1.json"),
@@ -116,6 +116,7 @@ appSizer {
         }
         enableMatchDebugVariant = true
         largeFileThreshold = 10
+//        inputType = InputType.APK
         teamMappingFile = file("${rootProject.rootDir}/module-owner.yml")
     }
     metrics {

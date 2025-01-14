@@ -33,6 +33,7 @@ import com.android.build.gradle.internal.dsl.BuildType
 import com.android.build.gradle.internal.dsl.ProductFlavor
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import com.grab.plugin.sizer.configuration.DefaultVariantFilter
+import com.grab.plugin.sizer.configuration.InputType
 import com.grab.plugin.sizer.dependencies.*
 import com.grab.plugin.sizer.tasks.AppSizeAnalysisTask
 import com.grab.plugin.sizer.tasks.GenerateApkTask
@@ -44,7 +45,9 @@ import com.grab.plugin.sizer.utils.isKotlinJvm
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.file.Directory
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.listProperty
 import org.gradle.kotlin.dsl.the
 
 /*
@@ -71,11 +74,23 @@ internal class TaskManager(
                 val variantFilter = DefaultVariantFilter(variant)
                 pluginExtension.input.variantFilter?.execute(variantFilter)
                 if (!variantFilter.ignored) {
-                    val generateApkTask = GenerateApkTask.registerTask(
-                        project,
-                        pluginExtension,
-                        variant
-                    )
+
+                    val apksDirectory = when (pluginExtension.input.inputType) {
+                        InputType.APK -> {
+                            variant.packageApplicationProvider.map {
+                                project.objects.listProperty<Directory>().value(listOf(it.outputDirectory.get()))
+                            }
+                        }
+                        InputType.AAB -> {
+                            val generateApkTask = GenerateApkTask.registerTask(
+                                project,
+                                pluginExtension,
+                                variant
+                            )
+                            generateApkTask.map { it.outputDirectories }
+                        }
+                    }
+
 
                     val generateArchivesListTask = GenerateArchivesListTask.registerTask(
                         project,
@@ -89,7 +104,7 @@ internal class TaskManager(
                         project,
                         variant,
                         pluginExtension,
-                        generateApkTask,
+                        apksDirectory,
                         generateArchivesListTask,
                     )
                     registerAppSizeTaskDep(project, variant, this, appSizeAnalysisTask)
