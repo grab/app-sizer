@@ -85,7 +85,7 @@ internal abstract class GenerateApkTask : DefaultTask() {
         outputDirectories.convention(
             // Add the provider to ensure the deviceSpecFiles values has set
             project.provider {
-                deviceSpecFiles.map { specFile ->
+                deviceSpecs.map { specFile ->
                     project.layout.buildDirectory
                         .dir("sizer/apk/${variantName.get()}/${specFile.nameWithoutExtension}")
                         .get()
@@ -119,8 +119,8 @@ internal abstract class GenerateApkTask : DefaultTask() {
         }
     }
 
-    private val deviceSpecs: Iterable<File>
-        get() = if (deviceSpecFiles.isEmpty) {
+    private val deviceSpecs: Iterable<File> by lazy {
+        if (deviceSpecFiles.isEmpty) {
             setOf(
                 File.createTempFile(DEFAULT_DEVICE_NAME, ".json")
                     .apply {
@@ -132,6 +132,7 @@ internal abstract class GenerateApkTask : DefaultTask() {
         } else {
             deviceSpecFiles
         }
+    }
 
     private fun extractApksToDirectory(apksTempFile: File, deviceSpec: String, outputDirectory: File) {
         project.exec {
