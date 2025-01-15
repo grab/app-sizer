@@ -122,11 +122,16 @@ internal abstract class GenerateApkTask : DefaultTask() {
     private val deviceSpecs: Iterable<File> by lazy {
         if (deviceSpecFiles.isEmpty) {
             setOf(
-                File.createTempFile(DEFAULT_DEVICE_NAME, ".json")
+                project.layout.buildDirectory
+                    .file("sizer/device-specs/$DEFAULT_DEVICE_NAME.json")
+                    .get()
+                    .asFile
                     .apply {
-                        writeBytes(
-                            DEFAULT_DEVICE_SPEC.toByteArray()
-                        )
+                        if (!exists()) {
+                            parentFile.mkdirs()
+                            writeBytes(DEFAULT_DEVICE_SPEC.toByteArray())
+                            logger.quiet("Created default device spec file at: $path")
+                        }
                     }
             )
         } else {
