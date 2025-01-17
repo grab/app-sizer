@@ -31,6 +31,7 @@ import com.android.tools.apk.analyzer.ApkSizeCalculator
 import com.grab.sizer.analyzer.model.FileType
 import com.grab.sizer.analyzer.model.RawFileInfo
 import com.grab.sizer.di.AppScope
+import com.grab.sizer.SizeCalculationMode
 import shadow.bundletool.com.android.tools.proguard.ProguardMap
 import java.io.File
 import java.nio.file.Path
@@ -55,7 +56,8 @@ internal interface ApkFileParser {
 @AppScope
 internal class DefaultApkFileParser @Inject constructor(
     private val dexFileParser: DexFileParser,
-    private val apkSizeCalculator: ApkSizeCalculator
+    private val apkSizeCalculator: ApkSizeCalculator,
+    private val sizeCalculationMode: SizeCalculationMode
 ) : ApkFileParser {
     override fun parseApks(apks: Sequence<File>, proguardMap: ProguardMap): Set<ApkFileInfo> = apks
         .map { apkFile -> parse(apkFile, proguardMap) }
@@ -83,7 +85,8 @@ internal class DefaultApkFileParser @Inject constructor(
                 val fileInfo = RawFileInfo(
                     path = path,
                     downloadSize = downloadSize,
-                    size = rawSize
+                    rawSize = rawSize,
+                    sizeCalculationMode = sizeCalculationMode
                 )
 
                 when (fileInfo.type) {
@@ -116,7 +119,7 @@ internal class DefaultApkFileParser @Inject constructor(
 
     private fun ApkSizeCalculator.parseSize(path: Path): ApkSizeInfo = ApkSizeInfo(
         downloadSize = getFullApkDownloadSize(path),
-        size = getFullApkDownloadSize(path),
+        size = getFullApkRawSize(path),
         downloadFileSizeMap = getDownloadSizePerFile(path),
         rawFileSizeMap = getRawSizePerFile(path)
     )

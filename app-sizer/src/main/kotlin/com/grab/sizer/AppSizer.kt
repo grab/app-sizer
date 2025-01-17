@@ -31,6 +31,7 @@ import com.grab.sizer.di.DaggerAnalyzerComponent
 import com.grab.sizer.utils.InputProvider
 import com.grab.sizer.utils.Logger
 import com.grab.sizer.utils.OutputProvider
+import com.grab.sizer.SizeCalculationMode
 
 class AppSizer(
     private val inputProvider: InputProvider,
@@ -38,12 +39,13 @@ class AppSizer(
     private val libName: String?,
     private val logger: Logger
 ) {
-    fun process(option: AnalyticsOption) {
+    fun process(option: AnalyticsOption, sizeCalculationMode: SizeCalculationMode) {
         val analyzerComponent = DaggerAnalyzerComponent.factory()
             .create(
                 inputProvider = inputProvider,
                 outputProvider = outputProvider,
                 libName = libName,
+                sizeCalculationMode = sizeCalculationMode,
                 logger = logger
             )
         val analyzerMap = analyzerComponent.analyzerMap()

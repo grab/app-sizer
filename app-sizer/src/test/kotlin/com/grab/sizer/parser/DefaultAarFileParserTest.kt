@@ -1,5 +1,6 @@
 package com.grab.sizer.parser
 
+import com.grab.sizer.SizeCalculationMode
 import com.grab.sizer.utils.SizerInputFile
 import org.junit.Assert.*
 import org.junit.Before
@@ -21,7 +22,7 @@ class DefaultAarFileParserTest {
     @Before
     fun setup() {
         mockJarParser = MockJarStreamParser()
-        aarFileParser = DefaultAarFileParser(mockJarParser)
+        aarFileParser = DefaultAarFileParser(mockJarParser, SizeCalculationMode.DOWNLOADABLE)
     }
 
     @Test

@@ -29,7 +29,6 @@ package com.grab.sizer.analyzer
 
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.Contributor
-import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.Report
 import java.io.File
@@ -58,12 +57,12 @@ internal class LibrariesAnalyzer @Inject constructor(
     }
 
     private fun generateReport(contributors: Set<Contributor>): Report {
-        val contributorList = contributors.sortedBy { it.getDownloadSize() }
+        val contributorList = contributors.sortedBy { it.getSize() }
         val listOfReport = reportPerLibrary(contributorList)
         return Report(
             id = LIBRARY_METRICS_ID,
             name = LIBRARY_METRICS_ID,
-            rows = listOfReport.map { reportItem -> createRow(reportItem.name, reportItem.totalDownloadSize) },
+            rows = listOfReport.map { reportItem -> createRow(reportItem.name, reportItem.totalSize) },
         )
     }
 
@@ -71,12 +70,12 @@ internal class LibrariesAnalyzer @Inject constructor(
         name = tag,
         extraInfo = path.substring(path.indexOf("files-2.1/") + 9),
         id = File(path).nameWithoutExtension,
-        totalDownloadSize = getDownloadSize(),
-        classesDownloadSize = classDownloadSize,
-        nativeLibDownloadSize = nativeLibDownloadSize,
-        resourceDownloadSize = resourcesDownloadSize,
-        assetDownloadSize = assetsDownloadSize,
-        otherDownloadSize = othersDownloadSize,
+        totalSize = getSize(),
+        classesSize = classSize,
+        nativeLibSize = nativeLibSize,
+        resourceSize = resourcesSize,
+        assetSize = assetsSize,
+        otherSize = othersSize,
     )
 
     private fun reportPerLibrary(data: List<Contributor>): List<ReportItem> =

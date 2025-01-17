@@ -1,6 +1,7 @@
 package com.grab.sizer.parser
 
 import com.android.tools.apk.analyzer.ApkSizeCalculator
+import com.grab.sizer.SizeCalculationMode
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -27,7 +28,7 @@ class DefaultApkFileParserTest {
     fun setup() {
         mockDexFileParser = MockDexFileParser()
         mockApkSizeCalculator = MockApkSizeCalculator()
-        apkFileParser = DefaultApkFileParser(mockDexFileParser, mockApkSizeCalculator)
+        apkFileParser = DefaultApkFileParser(mockDexFileParser, mockApkSizeCalculator, SizeCalculationMode.DOWNLOADABLE)
     }
 
     @Test
@@ -78,8 +79,8 @@ class DefaultApkFileParserTest {
         mockApkSizeCalculator.mockApkSizeInfo = createMockApkSizeInfo()
         mockDexFileParser.setDexFileInfos(
             listOf(
-                DexFileInfo("classes.dex", 1000, emptySet(), emptySet(), 500),
-                DexFileInfo("classes2.dex", 1000, emptySet(), emptySet(), 500)
+                DexFileInfo("classes.dex", 1000, emptySet(), emptySet(), 500, SizeCalculationMode.DOWNLOADABLE),
+                DexFileInfo("classes2.dex", 1000, emptySet(), emptySet(), 500, SizeCalculationMode.DOWNLOADABLE)
             )
         )
 
@@ -117,7 +118,7 @@ class DefaultApkFileParserTest {
         ))
         mockApkSizeCalculator.mockApkSizeInfo = createMockApkSizeInfo()
         mockDexFileParser.setDexFileInfos(
-            listOf(DexFileInfo("classes.dex", 1000, emptySet(), emptySet(), 500))
+            listOf(DexFileInfo("classes.dex", 1000, emptySet(), emptySet(), 500, SizeCalculationMode.DOWNLOADABLE))
         )
 
         val result = apkFileParser.parseApks(sequenceOf(apk), ProguardMap())

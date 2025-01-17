@@ -58,14 +58,14 @@ internal class BasicApkAnalyzer @Inject constructor(
     }
 
     private fun Set<ApkFileInfo>.createApkReportRows(): List<Row> {
-        val resourceDownloadSize = flatMap { it.resources }.sumOf { it.downloadSize }
-        val nativeLibDownloadSize = flatMap { it.nativeLibs }.sumOf { it.downloadSize }
-        val assetDownloadSize = flatMap { it.assets }.sumOf { it.downloadSize }
-        val otherDownloadSize = flatMap { it.others }.sumOf { it.downloadSize }
-        val dexDownloadFile = flatMap { it.dexes }.sumOf { it.downloadSize }
-        val classDownloadSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.downloadSize }
+        val resourceSize = flatMap { it.resources }.sumOf { it.size }
+        val nativeLibSize = flatMap { it.nativeLibs }.sumOf { it.size }
+        val assetSize = flatMap { it.assets }.sumOf { it.size }
+        val otherSize = flatMap { it.others }.sumOf { it.size }
+        val dexSize = flatMap { it.dexes }.sumOf { it.size }
+        val classSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.downloadSize }
         val total =
-            resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + classDownloadSize
+            resourceSize + nativeLibSize + assetSize + otherSize + classSize
 
         return listOf(
             createRow(
@@ -74,23 +74,23 @@ internal class BasicApkAnalyzer @Inject constructor(
             ),
             createRow(
                 name = "resource",
-                value = resourceDownloadSize
+                value = resourceSize
             ),
             createRow(
                 name = "native_lib",
-                value = nativeLibDownloadSize
+                value = nativeLibSize
             ),
             createRow(
                 name = "asset",
-                value = assetDownloadSize
+                value = assetSize
             ),
             createRow(
                 name = "other",
-                value = otherDownloadSize
+                value = otherSize
             ),
             createRow(
                 name = "code",
-                value = dexDownloadFile
+                value = dexSize
             )
         )
     }

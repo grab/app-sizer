@@ -43,6 +43,7 @@ import com.grab.plugin.sizer.utils.PluginOutputProvider
 import com.grab.sizer.AnalyticsOption
 import com.grab.sizer.AppSizer
 import com.grab.sizer.report.ProjectInfo
+import com.grab.sizer.SizeCalculationMode
 import com.grab.sizer.report.db.DatabaseRetentionPolicy
 import com.grab.sizer.report.db.InfluxDBConfig
 import org.gradle.api.DefaultTask
@@ -74,6 +75,9 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
 
     @get:Input
     abstract val option: Property<AnalyticsOption>
+
+    @get:Input
+    abstract val sizeCalculationMode: Property<SizeCalculationMode>
 
     @get:OutputDirectory
     abstract val outputDirectory: DirectoryProperty
@@ -124,7 +128,7 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
                 outputProvider = createOutputProvider(projectInfo),
                 libName = libName.orNull,
                 logger = PluginLogger(project),
-            ).process(option.get())
+            ).process(option.get(), sizeCalculationMode.get())
         }
 
     }
@@ -171,6 +175,7 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
                 this.archiveDepJsonFile.set(generateArchivesListTask.map { it.archiveDepFile.get() })
                 this.libName.set(project.params().libraryName())
                 this.option.set(project.params().option())
+                this.sizeCalculationMode.set(project.params().sizeMode())
                 if (pluginExtension.metrics.influxDBExtension.url.isPresent) {
                     this.influxDBConfig.set(pluginExtension.metrics.influxDBExtension.toInfluxDBConfig())
                 }

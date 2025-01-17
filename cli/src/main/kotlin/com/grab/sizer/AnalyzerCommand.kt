@@ -53,7 +53,6 @@ class AnalyzerCommand : CliktCommand() {
         """.trimIndent()
     )
 
-
     private val reportOption by option()
         .switch(
             "--libraries" to AnalyticsOption.LIBRARIES,
@@ -64,6 +63,12 @@ class AnalyzerCommand : CliktCommand() {
             "--large-files" to AnalyticsOption.LARGE_FILE,
             "--lib-content" to AnalyticsOption.LIB_CONTENT,
         ).default(AnalyticsOption.DEFAULT)
+
+    private val sizeCalculationMode by option()
+        .switch(
+            "--raw-size" to SizeCalculationMode.RAW,
+            "--downloadable-size" to SizeCalculationMode.DOWNLOADABLE,
+        ).default(SizeCalculationMode.DOWNLOADABLE)
 
     override fun run() {
         val config = ConfigYmlLoader().load(settingFile)
@@ -83,7 +88,7 @@ class AnalyzerCommand : CliktCommand() {
                     outputProvider = CliOutputProvider(config, apkDirectory.nameWithoutExtension),
                     libName = libName,
                     logger = logger
-                ).process(reportOption)
+                ).process(reportOption, sizeCalculationMode)
             }
     }
 

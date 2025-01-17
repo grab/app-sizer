@@ -32,6 +32,7 @@ import com.grab.sizer.analyzer.model.ClassFileInfo
 import com.grab.sizer.di.AppScope
 import com.grab.sizer.utils.Logger
 import com.grab.sizer.utils.log
+import com.grab.sizer.SizeCalculationMode
 import org.jf.dexlib2.dexbacked.DexBackedClassDef
 import org.jf.dexlib2.dexbacked.DexBackedDexFile
 import shadow.bundletool.com.android.tools.proguard.ProguardMap
@@ -63,7 +64,8 @@ internal interface DexFileParser {
  */
 @AppScope
 internal class DefaultDexFileParser @Inject constructor(
-    private val logger: Logger
+    private val logger: Logger,
+    private val sizeCalculationMode: SizeCalculationMode
 ) : DexFileParser {
     override fun parse(
         entry: ZipEntry,
@@ -79,13 +81,14 @@ internal class DefaultDexFileParser @Inject constructor(
 
         val path = entry.getPath()
         val dexDownloadSize = apkSizeInfo.downloadFileSizeMap[path] ?: 0
-        val dexClassesSize = classes.sumOf { it.size }
+        val dexClassesSize = classes.sumOf { it.rawSize }
         val ratio = dexDownloadSize.toDouble() / dexClassesSize
         return DexFileInfo(
             name = path,
             downloadSize = dexDownloadSize,
-            size = apkSizeInfo.rawFileSizeMap[path] ?: 0,
-            classes = classes.map { it.copy(downloadSize = (it.size * ratio).toLong()) }.toSet()
+            rawSize = apkSizeInfo.rawFileSizeMap[path] ?: 0,
+            classes = classes.map { it.copy(downloadSize = (it.rawSize * ratio).toLong()) }.toSet(),
+            sizeCalculationMode = sizeCalculationMode
         )
     }
 
@@ -96,7 +99,8 @@ internal class DefaultDexFileParser @Inject constructor(
         }
         return ClassFileInfo(
             name = proguardMap?.getClassName(className) ?: className,
-            size = classDef.size.toLong()
+            rawSize = classDef.size.toLong(),
+            sizeCalculationMode = sizeCalculationMode
         )
     }
 }

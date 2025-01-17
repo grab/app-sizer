@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2024.  Grabtaxi Holdings Pte Ltd (GRAB), All rights reserved.
+ * Copyright (c) 2025.  Grabtaxi Holdings Pte Ltd (GRAB), All rights reserved.
  *
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,18 +25,24 @@
  * SOFTWARE
  */
 
-package com.grab.sizer.analyzer
+package com.grab.sizer
 
+/**
+ * Represents how to calculate sizes of files
+ */
+enum class SizeCalculationMode {
+    RAW,
+    DOWNLOADABLE;
 
-internal data class ReportItem(
-    val id: String,
-    val totalSize: Long,
-    val name: String = "",
-    val extraInfo: String = "",
-    val owner: String? = null,
-    val classesSize: Long = 0L,
-    val nativeLibSize: Long = 0L,
-    val resourceSize: Long = 0L,
-    val assetSize: Long = 0L,
-    val otherSize: Long = 0L,
-)
+    companion object {
+        /**
+         * Converts a string value to the corresponding SizeCalculationMode.
+         * If the value does not match any predefined options, the DOWNLOADABLE option is chosen.
+         */
+        fun fromString(value: String?): SizeCalculationMode = when (value) {
+            "raw" -> RAW
+            "downloadable" -> DOWNLOADABLE
+            else -> DOWNLOADABLE
+        }
+    }
+}

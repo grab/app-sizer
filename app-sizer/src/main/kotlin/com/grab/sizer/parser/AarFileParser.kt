@@ -31,6 +31,7 @@ import com.grab.sizer.analyzer.model.FileType
 import com.grab.sizer.analyzer.model.RawFileInfo
 import com.grab.sizer.di.AppScope
 import com.grab.sizer.utils.SizerInputFile
+import com.grab.sizer.SizeCalculationMode
 import java.util.zip.ZipFile
 import javax.inject.Inject
 
@@ -48,7 +49,10 @@ interface AarFileParser {
  * For more about the AAR file format, see: http://tools.android.com/tech-docs/new-build-system/aar-format
  */
 @AppScope
-class DefaultAarFileParser @Inject constructor(private val jarParser: JarStreamParser) : AarFileParser {
+class DefaultAarFileParser @Inject constructor(
+    private val jarParser: JarStreamParser,
+    private val sizeCalculationMode: SizeCalculationMode
+) : AarFileParser {
 
     private fun parse(sizerInputFile: SizerInputFile): AarFileInfo {
         ZipFile(sizerInputFile.file).use { zipFile ->
@@ -62,8 +66,9 @@ class DefaultAarFileParser @Inject constructor(private val jarParser: JarStreamP
                 val entry = entries.nextElement()
                 val fileInfo = RawFileInfo(
                     path = entry.getPath(),
-                    size = entry.size,
-                    downloadSize = -1,
+                    rawSize = entry.size,
+                    downloadSize = entry.size,
+                    sizeCalculationMode = sizeCalculationMode
                 )
 
                 when (fileInfo.type) {

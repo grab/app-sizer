@@ -27,6 +27,7 @@
 
 package com.grab.sizer.parser
 
+import com.grab.sizer.SizeCalculationMode
 import com.grab.sizer.analyzer.model.ClassFileInfo
 import com.grab.sizer.analyzer.model.FileType
 import com.grab.sizer.analyzer.model.RawFileInfo
@@ -52,7 +53,9 @@ interface JarStreamParser {
 }
 
 @AppScope
-class DefaultJarStreamParser @Inject constructor() : JarStreamParser {
+class DefaultJarStreamParser @Inject constructor(
+    private val sizeCalculationMode: SizeCalculationMode
+) : JarStreamParser {
     override fun parse(jarEntry: ZipEntry, inputStream: InputStream): JarFileInfo {
         ZipInputStream(inputStream).use { entries ->
             val others = mutableSetOf<RawFileInfo>()
@@ -61,11 +64,12 @@ class DefaultJarStreamParser @Inject constructor() : JarStreamParser {
             while (entry != null) {
                 val fileInfo = RawFileInfo(
                     path = entry.getPath(),
-                    size = entry.size,
-                    downloadSize = -1
+                    rawSize = entry.size,
+                    downloadSize = entry.size,
+                    sizeCalculationMode = sizeCalculationMode
                 )
                 when (fileInfo.type) {
-                    FileType.CLASS -> classes.add(entry.toClass())
+                    FileType.CLASS -> classes.add(entry.toClass(sizeCalculationMode))
                     else -> others.add(fileInfo)
                 }
                 entry = entries.nextEntry
@@ -82,14 +86,16 @@ class DefaultJarStreamParser @Inject constructor() : JarStreamParser {
     }
 }
 
-internal fun ZipEntry.toClass(): ClassFileInfo {
+internal fun ZipEntry.toClass(sizeCalculationMode: SizeCalculationMode): ClassFileInfo {
     return ClassFileInfo(
         /**
          * Convert ZipEntry name to class name
          * Example: "/com/grab/sample/dummy/DummyClass1.class" -> "com.grab.sample.dummy.DummyClass1"
          */
         name = name.replace('/', '.').removeSuffix(".class"),
-        size = size
+        rawSize = size,
+        downloadSize = size,
+        sizeCalculationMode = sizeCalculationMode
     )
 }
 

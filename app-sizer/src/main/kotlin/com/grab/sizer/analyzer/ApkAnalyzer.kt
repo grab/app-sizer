@@ -68,7 +68,7 @@ internal class ApkAnalyzer @Inject constructor(
     }
 
     private fun generateReport(apks: Set<ApkFileInfo>, contributors: Set<Contributor>): Report {
-        val contributorList = contributors.sortedBy { it.getDownloadSize() }
+        val contributorList = contributors.sortedBy { it.getSize() }
         val apkReportRow = createApkReportRow(apks)
         val totalLibsReport = totalLibrariesReport(contributorList)
         val libComponentReport = libComponentReport(totalLibsReport)
@@ -96,58 +96,58 @@ internal class ApkAnalyzer @Inject constructor(
     ): ReportItem = ReportItem(
         id = CODE_BASE_ID,
         name = CODE_BASE_ID,
-        totalDownloadSize = apkReport.totalDownloadSize - totalLibsReport.totalDownloadSize,
-        otherDownloadSize = apkReport.otherDownloadSize - totalLibsReport.otherDownloadSize,
-        resourceDownloadSize = apkReport.resourceDownloadSize - totalLibsReport.resourceDownloadSize,
-        nativeLibDownloadSize = apkReport.nativeLibDownloadSize - totalLibsReport.nativeLibDownloadSize,
-        assetDownloadSize = apkReport.assetDownloadSize - totalLibsReport.assetDownloadSize,
-        classesDownloadSize = apkReport.classesDownloadSize - totalLibsReport.classesDownloadSize,
+        totalSize = apkReport.totalSize - totalLibsReport.totalSize,
+        otherSize = apkReport.otherSize - totalLibsReport.otherSize,
+        resourceSize = apkReport.resourceSize - totalLibsReport.resourceSize,
+        nativeLibSize = apkReport.nativeLibSize - totalLibsReport.nativeLibSize,
+        assetSize = apkReport.assetSize - totalLibsReport.assetSize,
+        classesSize = apkReport.classesSize - totalLibsReport.classesSize,
     )
 
     private fun Contributor.toReportItem(): ReportItem = ReportItem(
         name = File(path).nameWithoutExtension,
         extraInfo = path.substring(path.indexOf("files-2.1/") + 9),
         id = File(path).nameWithoutExtension,
-        totalDownloadSize = getDownloadSize(),
-        classesDownloadSize = classDownloadSize,
-        nativeLibDownloadSize = nativeLibDownloadSize,
-        resourceDownloadSize = resourcesDownloadSize,
-        assetDownloadSize = assetsDownloadSize,
-        otherDownloadSize = othersDownloadSize,
+        totalSize = getSize(),
+        classesSize = classSize,
+        nativeLibSize = nativeLibSize,
+        resourceSize = resourcesSize,
+        assetSize = assetsSize,
+        otherSize = othersSize,
     )
 
 
     private fun libComponentReport(allLibReport: ReportItem): List<Row> = listOf(
         createRow(
             name = "android-java-libraries",
-            value = allLibReport.totalDownloadSize - allLibReport.nativeLibDownloadSize
+            value = allLibReport.totalSize - allLibReport.nativeLibSize
         ),
         createRow(
             name = "native-libraries",
-            value = allLibReport.nativeLibDownloadSize
+            value = allLibReport.nativeLibSize
         )
     )
 
     private fun codeBaseComponentReport(codeBaseReport: ReportItem): List<Row> = listOf(
         createRow(
             name = "codebase-kotlin-java",
-            value = codeBaseReport.classesDownloadSize,
+            value = codeBaseReport.classesSize,
         ),
         createRow(
             name = "codebase-resources",
-            value = codeBaseReport.resourceDownloadSize,
+            value = codeBaseReport.resourceSize,
         ),
         createRow(
             name = "codebase-assets",
-            value = codeBaseReport.assetDownloadSize,
+            value = codeBaseReport.assetSize,
         ),
         createRow(
             name = "codebase-native",
-            value = codeBaseReport.nativeLibDownloadSize,
+            value = codeBaseReport.nativeLibSize,
         ),
         createRow(
             name = "others",
-            value = codeBaseReport.otherDownloadSize,
+            value = codeBaseReport.otherSize,
         ),
     )
 

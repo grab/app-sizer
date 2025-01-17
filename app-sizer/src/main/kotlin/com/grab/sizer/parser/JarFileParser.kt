@@ -32,6 +32,7 @@ import com.grab.sizer.analyzer.model.FileType
 import com.grab.sizer.analyzer.model.RawFileInfo
 import com.grab.sizer.di.AppScope
 import com.grab.sizer.utils.SizerInputFile
+import com.grab.sizer.SizeCalculationMode
 import java.util.zip.ZipFile
 import javax.inject.Inject
 
@@ -46,7 +47,9 @@ interface JarFileParser {
 }
 
 @AppScope
-class DefaultJarFileParser @Inject constructor() : JarFileParser {
+class DefaultJarFileParser @Inject constructor(
+    private val sizeCalculationMode: SizeCalculationMode
+) : JarFileParser {
     private fun parse(sizerInputFile: SizerInputFile): JarFileInfo {
         ZipFile(sizerInputFile.file).use { zipFile ->
             val entries = zipFile.entries()
@@ -57,12 +60,13 @@ class DefaultJarFileParser @Inject constructor() : JarFileParser {
                 val entry = entries.nextElement()
                 val fileInfo = RawFileInfo(
                     path = entry.getPath(),
-                    size = entry.size,
-                    downloadSize = -1
+                    rawSize = entry.size,
+                    downloadSize = entry.size,
+                    sizeCalculationMode = sizeCalculationMode
                 )
                 when (fileInfo.type) {
                     FileType.NATIVE_LIB -> nativeLibs.add(fileInfo)
-                    FileType.CLASS -> classes.add(entry.toClass())
+                    FileType.CLASS -> classes.add(entry.toClass(sizeCalculationMode))
                     else -> others.add(fileInfo)
                 }
             }
