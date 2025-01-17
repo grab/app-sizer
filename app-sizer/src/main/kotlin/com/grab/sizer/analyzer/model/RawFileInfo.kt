@@ -27,6 +27,7 @@
 
 package com.grab.sizer.analyzer.model
 
+import com.grab.sizer.SizeCalculationMode
 import java.io.File
 
 
@@ -42,11 +43,13 @@ enum class FileType {
  *
  * @property name The name of the file/class.
  * @property downloadSize The size of the file in the binary that is downloadable from Google Play.(zipped APKs)
- * @property size The original size of the file.
+ * @property rawSize The original size of the file.
+ * @property size Original or downloadable size depending on plugin settings
  */
 interface FileInfo {
     val name: String
     val downloadSize: Long
+    val rawSize: Long
     val size: Long
 }
 
@@ -55,13 +58,20 @@ interface FileInfo {
  *
  * @property path             The path to the raw file within the aar/jar file.
  * @property downloadSize     The size of the file in the downloadable binary from Google Play.
- * @property size             The original, uncompressed size of the file.
+ * @property rawSize          The original, uncompressed size of the file.
  */
 data class RawFileInfo(
     val path: String,
     override val downloadSize: Long,
-    override val size: Long
+    override val rawSize: Long,
+    private val sizeCalculationMode: SizeCalculationMode
 ) : FileInfo {
+
+    override val size: Long get() = when (sizeCalculationMode) {
+         SizeCalculationMode.RAW -> rawSize
+         SizeCalculationMode.DOWNLOADABLE -> downloadSize
+     }
+
     val type: FileType
         get() = when {
             path.startsWith("/res/") -> FileType.RESOURCE

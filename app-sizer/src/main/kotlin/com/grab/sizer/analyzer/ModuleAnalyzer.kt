@@ -79,7 +79,7 @@ internal class ModuleAnalyzer @Inject constructor(
 
     private fun generateReport(contributors: Set<Contributor>): Report = contributors.toModules()
         .run {
-            val sortedTeamsReport = sortedBy { it.getDownloadSize() }
+            val sortedTeamsReport = sortedBy { it.getSize() }
                 .map { it.toReportItem(teamMapping.moduleToTeamMap) }
             return Report(
                 id = METRICS_ID_MODULES,
@@ -92,7 +92,7 @@ internal class ModuleAnalyzer @Inject constructor(
         reportItems.map { reportItem ->
             createRow(
                 name = reportItem.id,
-                value = reportItem.totalDownloadSize,
+                value = reportItem.totalSize,
                 owner = reportItem.owner ?: NOT_AVAILABLE_VALUE,
                 rowName = reportItem.name
             )

@@ -1,5 +1,6 @@
 package com.grab.sizer.parser
 
+import com.grab.sizer.SizeCalculationMode
 import com.grab.sizer.utils.SizerInputFile
 import org.junit.Assert.*
 import org.junit.Before
@@ -18,7 +19,7 @@ class DefaultJarFileParserTest {
 
     @Before
     fun setup() {
-        jarFileParser = DefaultJarFileParser()
+        jarFileParser = DefaultJarFileParser(SizeCalculationMode.DOWNLOADABLE)
     }
 
     @Test

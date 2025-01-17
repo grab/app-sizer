@@ -28,7 +28,11 @@
 package com.grab.sizer.analyzer
 
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
-import com.grab.sizer.analyzer.model.*
+import com.grab.sizer.analyzer.model.Contributor
+import com.grab.sizer.analyzer.model.Team
+import com.grab.sizer.analyzer.model.castToClass
+import com.grab.sizer.analyzer.model.castToRawFile
+import com.grab.sizer.analyzer.model.toTeams
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.parser.getAars
 import com.grab.sizer.parser.getJars
@@ -93,8 +97,8 @@ internal class LargeFileAnalyzer @Inject constructor(
     }
 
     private fun Set<Contributor>.filterLargeFileContributors(): Set<Contributor> = map {
-        val resources = it.resources.filter { file -> file.downloadSize >= largeFileThreshold }.toSet()
-        val assets = it.assets.filter { file -> file.downloadSize >= largeFileThreshold }.toSet()
+        val resources = it.resources.filter { file -> file.size >= largeFileThreshold }.toSet()
+        val assets = it.assets.filter { file -> file.size >= largeFileThreshold }.toSet()
         return@map it.copy(resources = resources, assets = assets)
     }.filter { it.resources.isNotEmpty() || it.assets.isNotEmpty() }
         .toSet()
@@ -110,7 +114,7 @@ internal class LargeFileAnalyzer @Inject constructor(
     }
 
     private fun List<Team>.sorByResources(): List<Team> = this.sortedBy {
-        it.resourcesDownloadSize + it.assetsDownloadSize
+        it.resourcesSize + it.assetsSize
     }
 
     private fun List<Team>.toReportRows(): List<Row> = map { it to it.modules }
@@ -122,7 +126,7 @@ internal class LargeFileAnalyzer @Inject constructor(
                         val fileName = segmentPaths.last()
                         createRow(
                             name = fileName,
-                            value = res.downloadSize,
+                            value = res.size,
                             owner = pair.first.name,
                             tag = module.tag,
                             rowName = fileName

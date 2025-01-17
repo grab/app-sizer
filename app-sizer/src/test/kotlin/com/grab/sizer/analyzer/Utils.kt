@@ -27,6 +27,7 @@
 
 package com.grab.sizer.analyzer
 
+import com.grab.sizer.SizeCalculationMode
 import com.grab.sizer.analyzer.mapper.*
 import com.grab.sizer.analyzer.model.ClassFileInfo
 import com.grab.sizer.analyzer.model.RawFileInfo
@@ -54,15 +55,16 @@ internal class MapperComponent {
 }
 
 
-internal fun createRawFileInfo(path: String, downloadSize: Long = 50, size: Long = 150) =
-    RawFileInfo(path = path, downloadSize = downloadSize, size = size)
+internal fun createRawFileInfo(path: String, downloadSize: Long = 50, rawSize: Long = 150) =
+    RawFileInfo(path = path, downloadSize = downloadSize, rawSize = rawSize, sizeCalculationMode = SizeCalculationMode.DOWNLOADABLE)
 
 internal fun createEmptyDexFileInfo(name: String = "dex"): DexFileInfo = DexFileInfo(
     name = name,
     downloadSize = 100,
-    size = 200,
+    rawSize = 200,
     classes = emptySet(),
+    sizeCalculationMode = SizeCalculationMode.DOWNLOADABLE
 )
 
-internal fun createClassFileInfo(name: String, downloadSize: Long = 100, size: Long = 300) =
-    ClassFileInfo(name = name, downloadSize = downloadSize, size = size)
+internal fun createClassFileInfo(name: String, downloadSize: Long = 100, rawSize: Long = 300) =
+    ClassFileInfo(name = name, downloadSize = downloadSize, rawSize = rawSize, sizeCalculationMode = SizeCalculationMode.DOWNLOADABLE)

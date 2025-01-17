@@ -27,6 +27,7 @@
 
 package com.grab.sizer.analyzer
 
+import com.grab.sizer.SizeCalculationMode
 import com.grab.sizer.analyzer.mapper.createEmptyAar
 import com.grab.sizer.analyzer.mapper.createEmptyApkInfo
 import com.grab.sizer.analyzer.mapper.createEmptyJar
@@ -37,38 +38,38 @@ private const val TEAM_2 = "team2"
 
 open class Project1Data {
     private object Assets {
-        val libAar1Asset1 = createRawFileInfo(path = "/assets/asset_resource_1.xml", downloadSize = 10, size = 30)
-        val moduleAar1Asset1 = createRawFileInfo(path = "/assets/asset_resource_2.xml", downloadSize = 20, size = 60)
-        val moduleAar2Asset1 = createRawFileInfo(path = "/assets/asset_resource_3.xml", downloadSize = 30, size = 90)
+        val libAar1Asset1 = createRawFileInfo(path = "/assets/asset_resource_1.xml", downloadSize = 10, rawSize = 30)
+        val moduleAar1Asset1 = createRawFileInfo(path = "/assets/asset_resource_2.xml", downloadSize = 20, rawSize = 60)
+        val moduleAar2Asset1 = createRawFileInfo(path = "/assets/asset_resource_3.xml", downloadSize = 30, rawSize = 90)
     }
 
     private object Classes {
-        val libAar1Class1 = createClassFileInfo(name = "com.grab.test.HelloWorld", downloadSize = 5, size = 20)
-        val libJar1Class1 = createClassFileInfo(name = "com.grab.test.TestClass2", downloadSize = 7, size = 30)
-        val moduleAar2Class1 = createClassFileInfo(name = "com.grab.test.TestClass3", downloadSize = 9, size = 40)
-        val moduleJar1Class1 = createClassFileInfo(name = "com.grab.test.TestClass4", downloadSize = 13, size = 60)
-        val moduleJar2Class1 = createClassFileInfo(name = "com.grab.test.TestClass5", downloadSize = 18, size = 80)
+        val libAar1Class1 = createClassFileInfo(name = "com.grab.test.HelloWorld", downloadSize = 5, rawSize = 20)
+        val libJar1Class1 = createClassFileInfo(name = "com.grab.test.TestClass2", downloadSize = 7, rawSize = 30)
+        val moduleAar2Class1 = createClassFileInfo(name = "com.grab.test.TestClass3", downloadSize = 9, rawSize = 40)
+        val moduleJar1Class1 = createClassFileInfo(name = "com.grab.test.TestClass4", downloadSize = 13, rawSize = 60)
+        val moduleJar2Class1 = createClassFileInfo(name = "com.grab.test.TestClass5", downloadSize = 18, rawSize = 80)
     }
 
     private object NativeLibs {
-        val libAar2NativeLib1 = createRawFileInfo(path = "/lib/armeabi-v7a/sample.so", downloadSize = 10, size = 20)
+        val libAar2NativeLib1 = createRawFileInfo(path = "/lib/armeabi-v7a/sample.so", downloadSize = 10, rawSize = 20)
         val moduleAar1NativeLib1 =
-            createRawFileInfo(path = "/lib/armeabi-v7a/sample2.so", downloadSize = 50, size = 100)
-        val moduleAar2NativeLib1 = createRawFileInfo(path = "/lib/armeabi-v7a/sample3.so", downloadSize = 30, size = 90)
+            createRawFileInfo(path = "/lib/armeabi-v7a/sample2.so", downloadSize = 50, rawSize = 100)
+        val moduleAar2NativeLib1 = createRawFileInfo(path = "/lib/armeabi-v7a/sample3.so", downloadSize = 30, rawSize = 90)
     }
 
     private object Resources {
         val libAar2Resource1 =
-            createRawFileInfo(path = "/res/drawable-xlarge-port-hdpi-v4/ic_test.xml", downloadSize = 30, size = 90)
+            createRawFileInfo(path = "/res/drawable-xlarge-port-hdpi-v4/ic_test.xml", downloadSize = 30, rawSize = 90)
         val moduleAar2Resource1 =
-            createRawFileInfo(path = "/res/animator/test_animator.xml", downloadSize = 20, size = 40)
-        val moduleAar1Resource1 = createRawFileInfo(path = "/res/font/test_font.xml", downloadSize = 20, size = 40)
+            createRawFileInfo(path = "/res/animator/test_animator.xml", downloadSize = 20, rawSize = 40)
+        val moduleAar1Resource1 = createRawFileInfo(path = "/res/font/test_font.xml", downloadSize = 20, rawSize = 40)
     }
 
     private object Others {
         val moduleJar2Other1 =
-            createRawFileInfo(path = "play-services-detection.properties", downloadSize = 10, size = 20)
-        val moduleAar1Other1 = createRawFileInfo(path = "build-data.properties", downloadSize = 10, size = 30)
+            createRawFileInfo(path = "play-services-detection.properties", downloadSize = 10, rawSize = 20)
+        val moduleAar1Other1 = createRawFileInfo(path = "build-data.properties", downloadSize = 10, rawSize = 30)
     }
 
     private val dexFile = DexFileInfo(
@@ -81,7 +82,8 @@ open class Project1Data {
             Classes.moduleJar1Class1,
             Classes.moduleJar2Class1
         ),
-        size = 200
+        rawSize = 200,
+        sizeCalculationMode = SizeCalculationMode.DOWNLOADABLE
     )
 
     /**

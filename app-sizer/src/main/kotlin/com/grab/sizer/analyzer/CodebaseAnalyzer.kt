@@ -94,7 +94,7 @@ internal class CodebaseAnalyzer @Inject constructor(
 
     private fun Team.toReportRow(): Row = createRow(
         name,
-        getDownloadSize(),
+        getSize(),
     )
 }
 

@@ -35,6 +35,7 @@ import com.grab.sizer.report.ReportWriter
 import com.grab.sizer.utils.InputProvider
 import com.grab.sizer.utils.Logger
 import com.grab.sizer.utils.OutputProvider
+import com.grab.sizer.SizeCalculationMode
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Named
@@ -61,6 +62,7 @@ interface AnalyzerComponent {
         fun create(
             @BindsInstance inputProvider: InputProvider,
             @BindsInstance outputProvider: OutputProvider,
+            @BindsInstance sizeCalculationMode: SizeCalculationMode,
             @BindsInstance @Named(NAMED_LIB_NAME) libName: String?,
             @BindsInstance logger: Logger,
         ): AnalyzerComponent

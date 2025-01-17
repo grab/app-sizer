@@ -82,7 +82,7 @@ internal class LibContentAnalyzer @Inject constructor(
         createRow(
             rowName = it.name,
             name = it.name,
-            value = it.downloadSize,
+            value = it.size,
             tag = type
         )
     }

@@ -35,12 +35,12 @@ data class Team(
     val name: String,
     val modules: List<Module>
 ) {
-    val resourcesDownloadSize: Long by lazy { modules.sumOf { contributor -> contributor.resourcesDownloadSize } }
-    val nativeLibDownloadSize: Long by lazy { modules.sumOf { contributor -> contributor.nativeLibDownloadSize } }
-    val assetsDownloadSize: Long by lazy { modules.sumOf { contributor -> contributor.assetsDownloadSize } }
-    val othersDownloadSize: Long by lazy { modules.sumOf { contributor -> contributor.othersDownloadSize } }
-    val classDownloadSize: Long by lazy { modules.sumOf { contributor -> contributor.classDownloadSize } }
-    fun getDownloadSize(): Long = modules.sumOf { it.getDownloadSize() }
+    val resourcesSize: Long by lazy { modules.sumOf { contributor -> contributor.resourcesSize } }
+    val nativeLibSize: Long by lazy { modules.sumOf { contributor -> contributor.nativeLibSize } }
+    val assetsSize: Long by lazy { modules.sumOf { contributor -> contributor.assetsSize } }
+    val othersSize: Long by lazy { modules.sumOf { contributor -> contributor.othersSize } }
+    val classSize: Long by lazy { modules.sumOf { contributor -> contributor.classSize } }
+    fun getSize(): Long = modules.sumOf { it.getSize() }
 }
 
 data class Module(
@@ -51,14 +51,14 @@ data class Module(
         get() = owner.tag
     val path: String
         get() = owner.path
-    val resourcesDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.resourcesDownloadSize } }
-    val nativeLibDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.nativeLibDownloadSize } }
-    val assetsDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.assetsDownloadSize } }
-    val othersDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.othersDownloadSize } }
-    val classDownloadSize: Long by lazy { contributors.sumOf { contributor -> contributor.classDownloadSize } }
+    val resourcesSize: Long by lazy { contributors.sumOf { contributor -> contributor.resourcesSize } }
+    val nativeLibSize: Long by lazy { contributors.sumOf { contributor -> contributor.nativeLibSize } }
+    val assetsSize: Long by lazy { contributors.sumOf { contributor -> contributor.assetsSize } }
+    val othersSize: Long by lazy { contributors.sumOf { contributor -> contributor.othersSize } }
+    val classSize: Long by lazy { contributors.sumOf { contributor -> contributor.classSize } }
 
-    fun getDownloadSize(): Long =
-        resourcesDownloadSize + nativeLibDownloadSize + assetsDownloadSize + othersDownloadSize + classDownloadSize
+    fun getSize(): Long =
+        resourcesSize + nativeLibSize + assetsSize + othersSize + classSize
 }
 
 internal fun Set<Contributor>.toTeams(teamMapping: TeamMapping): List<Team> {
@@ -72,8 +72,8 @@ internal fun Set<Contributor>.toTeams(teamMapping: TeamMapping): List<Team> {
 
 internal fun List<Team>.sort(): List<Team> {
     return sortedWith { o1, o2 ->
-        val size1 = o1.getDownloadSize()
-        val size2 = o2.getDownloadSize()
+        val size1 = o1.getSize()
+        val size2 = o2.getSize()
         if (size1 > size2) -1
         else if (size1 < size2) 1
         else 0
@@ -97,11 +97,11 @@ internal fun Module.toReportItem(moduleToTeamMap: Map<String, String>): ReportIt
         id = tag,
         owner = moduleToTeamMap[tag],
         extraInfo = "Sum up all codebase for $tag",
-        totalDownloadSize = getDownloadSize(),
-        classesDownloadSize = classDownloadSize,
-        nativeLibDownloadSize = nativeLibDownloadSize,
-        resourceDownloadSize = resourcesDownloadSize,
-        assetDownloadSize = assetsDownloadSize,
-        otherDownloadSize = othersDownloadSize
+        totalSize = getSize(),
+        classesSize = classSize,
+        nativeLibSize = nativeLibSize,
+        resourceSize = resourcesSize,
+        assetSize = assetsSize,
+        otherSize = othersSize
     )
 

@@ -31,35 +31,35 @@ import com.grab.sizer.analyzer.ReportItem
 import com.grab.sizer.parser.ApkFileInfo
 
 internal fun Set<ApkFileInfo>.apksSizeReport(): ReportItem {
-    val resourceDownloadSize = flatMap { it.resources }.sumOf { it.downloadSize }
-    val nativeLibDownloadSize = flatMap { it.nativeLibs }.sumOf { it.downloadSize }
-    val assetDownloadSize = flatMap { it.assets }.sumOf { it.downloadSize }
-    val otherDownloadSize = flatMap { it.others }.sumOf { it.downloadSize }
-    val classDownloadSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.downloadSize }
+    val resourceSize = flatMap { it.resources }.sumOf { it.size }
+    val nativeLibSize = flatMap { it.nativeLibs }.sumOf { it.size }
+    val assetSize = flatMap { it.assets }.sumOf { it.size }
+    val otherSize = flatMap { it.others }.sumOf { it.size }
+    val classSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.size }
     val total =
-        resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + classDownloadSize
+        resourceSize + nativeLibSize + assetSize + otherSize + classSize
 
     return ReportItem(
         id = "apk",
-        totalDownloadSize = total,
+        totalSize = total,
         name = "Apks",
-        resourceDownloadSize = resourceDownloadSize,
-        nativeLibDownloadSize = nativeLibDownloadSize,
-        assetDownloadSize = assetDownloadSize,
-        otherDownloadSize = otherDownloadSize,
-        classesDownloadSize = classDownloadSize,
+        resourceSize = resourceSize,
+        nativeLibSize = nativeLibSize,
+        assetSize = assetSize,
+        otherSize = otherSize,
+        classesSize = classSize,
         extraInfo = "Apk breakdown by component sizer"
     )
 }
 
 internal fun Set<ApkFileInfo>.toReportField(): List<Field> {
-    val resourceDownloadSize = flatMap { it.resources }.sumOf { it.downloadSize }
-    val nativeLibDownloadSize = flatMap { it.nativeLibs }.sumOf { it.downloadSize }
-    val assetDownloadSize = flatMap { it.assets }.sumOf { it.downloadSize }
-    val otherDownloadSize = flatMap { it.others }.sumOf { it.downloadSize }
-    val classDownloadSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.downloadSize }
+    val resourceSize = flatMap { it.resources }.sumOf { it.size }
+    val nativeLibSize = flatMap { it.nativeLibs }.sumOf { it.size }
+    val assetSize = flatMap { it.assets }.sumOf { it.size }
+    val otherSize = flatMap { it.others }.sumOf { it.size }
+    val classSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.downloadSize }
     val total =
-        resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + classDownloadSize
+        resourceSize + nativeLibSize + assetSize + otherSize + classSize
     return listOf(
         TagField(
             name = FIELD_KEY_CONTRIBUTOR,

@@ -52,24 +52,24 @@ data class Contributor(
         get() = originalOwner.tag
     val path: String
         get() = originalOwner.path
-    // Calculates the sum of the download sizes of all resources
-    val resourcesDownloadSize: Long by lazy { resources.sumOf { resource -> resource.downloadSize } }
+    // Calculates the sum of the sizes of all resources
+    val resourcesSize: Long by lazy { resources.sumOf { resource -> resource.size } }
 
-    // Calculates the sum of the download sizes of all native libraries
-    val nativeLibDownloadSize: Long by lazy { nativeLibs.sumOf { lib -> lib.downloadSize } }
+    // Calculates the sum of the sizes of all native libraries
+    val nativeLibSize: Long by lazy { nativeLibs.sumOf { lib -> lib.size } }
 
     // Calculates the sum of the download sizes of all assets
-    val assetsDownloadSize: Long by lazy { assets.sumOf { asset -> asset.downloadSize } }
+    val assetsSize: Long by lazy { assets.sumOf { asset -> asset.size } }
 
     // Calculates the sum of the download sizes of all "other" files
-    val othersDownloadSize: Long by lazy { others.sumOf { other -> other.downloadSize } }
+    val othersSize: Long by lazy { others.sumOf { other -> other.size } }
 
     // Calculates the sum of the sizes of all classes
-    val classDownloadSize: Long by lazy { classes.sumOf { clazz -> clazz.downloadSize } }
+    val classSize: Long by lazy { classes.sumOf { clazz -> clazz.size } }
 
-    // Calculates the total downloadable size of all component types (assets, resources, native libraries, classes, others).
-    fun getDownloadSize(): Long =
-        resourcesDownloadSize + nativeLibDownloadSize + assetsDownloadSize + othersDownloadSize + classDownloadSize
+    // Calculates the total size of all component types (assets, resources, native libraries, classes, others).
+    fun getSize(): Long =
+        resourcesSize + nativeLibSize + assetsSize + othersSize + classSize
 
     override fun equals(other: Any?): Boolean {
         if (other is Contributor) {
