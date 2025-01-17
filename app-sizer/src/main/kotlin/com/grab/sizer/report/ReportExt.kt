@@ -36,8 +36,9 @@ internal fun Set<ApkFileInfo>.apksSizeReport(): ReportItem {
     val assetDownloadSize = flatMap { it.assets }.sumOf { it.downloadSize }
     val otherDownloadSize = flatMap { it.others }.sumOf { it.downloadSize }
     val classDownloadSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.downloadSize }
+    val dexDownloadSize = flatMap { it.dexes }.sumOf { it.downloadSize }
     val total =
-        resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + classDownloadSize
+        resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + dexDownloadSize
 
     return ReportItem(
         id = "apk",
@@ -57,9 +58,9 @@ internal fun Set<ApkFileInfo>.toReportField(): List<Field> {
     val nativeLibDownloadSize = flatMap { it.nativeLibs }.sumOf { it.downloadSize }
     val assetDownloadSize = flatMap { it.assets }.sumOf { it.downloadSize }
     val otherDownloadSize = flatMap { it.others }.sumOf { it.downloadSize }
-    val classDownloadSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.downloadSize }
+    val dexDownloadSize = flatMap { it.dexes }.sumOf { it.downloadSize }
     val total =
-        resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + classDownloadSize
+        resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + dexDownloadSize
     return listOf(
         TagField(
             name = FIELD_KEY_CONTRIBUTOR,

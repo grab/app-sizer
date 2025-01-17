@@ -63,9 +63,8 @@ internal class BasicApkAnalyzer @Inject constructor(
         val assetDownloadSize = flatMap { it.assets }.sumOf { it.downloadSize }
         val otherDownloadSize = flatMap { it.others }.sumOf { it.downloadSize }
         val dexDownloadFile = flatMap { it.dexes }.sumOf { it.downloadSize }
-        val classDownloadSize = flatMap { it.dexes }.flatMap { it.classes }.sumOf { it.downloadSize }
         val total =
-            resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + classDownloadSize
+            resourceDownloadSize + nativeLibDownloadSize + assetDownloadSize + otherDownloadSize + dexDownloadFile
 
         return listOf(
             createRow(
