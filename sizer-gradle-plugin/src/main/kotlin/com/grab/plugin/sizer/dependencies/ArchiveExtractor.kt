@@ -31,6 +31,7 @@ import com.grab.plugin.sizer.utils.isAndroidApplication
 import com.grab.plugin.sizer.utils.isAndroidLibrary
 import com.grab.plugin.sizer.utils.isJava
 import com.grab.plugin.sizer.utils.isKotlinJvm
+import com.grab.plugin.sizer.utils.isKotlinMultiplatform
 import org.gradle.api.Project
 import javax.inject.Inject
 
@@ -44,38 +45,23 @@ internal class DefaultArchiveExtractor @Inject constructor(
 ) : ArchiveExtractor {
     override fun extract(project: Project): ArchiveDependency {
         val matchVariant = variantExtractor.findMatchVariant(project)
-        when {
-            project.isAndroidApplication -> {
-                return AppDependency(
-                    name = project.pathTrimColon,
-                    pathToArtifact = matchVariant.binaryOutPut.path
-                )
-            }
+        return when {
+            project.isAndroidApplication -> AppDependency(
+               name = project.pathTrimColon,
+               pathToArtifact = matchVariant.binaryOutPut.path
+           )
 
-            project.isAndroidLibrary -> {
-                return ModuleDependency(
-                    name = project.pathTrimColon,
-                    pathToArtifact = matchVariant.binaryOutPut.path
-                )
-            }
+            project.isAndroidLibrary -> ModuleDependency(
+               name = project.pathTrimColon,
+               pathToArtifact = matchVariant.binaryOutPut.path
+           )
 
-            project.isKotlinJvm -> {
-                return JavaModuleDependency(
-                    name = project.pathTrimColon,
-                    pathToArtifact = matchVariant.binaryOutPut.path
-                )
-            }
+            project.isKotlinJvm || project.isJava || project.isKotlinMultiplatform -> JavaModuleDependency(
+               name = project.pathTrimColon,
+               pathToArtifact = matchVariant.binaryOutPut.path
+           )
 
-            project.isJava -> {
-                return JavaModuleDependency(
-                    name = project.pathTrimColon,
-                    pathToArtifact = matchVariant.binaryOutPut.path
-                )
-            }
-
-            else -> {
-                throw IllegalArgumentException("The ${project.name} is not an Android/Kotlin/Java module")
-            }
+            else -> throw IllegalArgumentException("The ${project.name} is not an Android/Kotlin/Java module")
         }
     }
 }
