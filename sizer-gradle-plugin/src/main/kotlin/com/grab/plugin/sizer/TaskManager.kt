@@ -28,12 +28,12 @@
 package com.grab.plugin.sizer
 
 import com.android.build.gradle.AppExtension
+import com.android.build.gradle.api.ApplicationVariant
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.internal.dsl.BuildType
 import com.android.build.gradle.internal.dsl.ProductFlavor
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import com.grab.plugin.sizer.configuration.DefaultVariantFilter
-import com.grab.plugin.sizer.configuration.InputType
 import com.grab.plugin.sizer.dependencies.*
 import com.grab.plugin.sizer.tasks.AppSizeAnalysisTask
 import com.grab.plugin.sizer.tasks.GenerateApkTask
@@ -75,49 +75,66 @@ internal class TaskManager(
                 pluginExtension.input.variantFilter?.execute(variantFilter)
                 if (!variantFilter.ignored) {
 
-                    val apksDirectory = when (pluginExtension.input.inputType) {
-                        InputType.APK -> {
-                            variant.packageApplicationProvider.map {
-                                project.objects.listProperty<Directory>().value(listOf(it.outputDirectory.get()))
-                            }
-                        }
-                        InputType.AAB -> {
-                            val generateApkTask = GenerateApkTask.registerTask(
-                                project,
-                                pluginExtension,
-                                variant
-                            )
-                            generateApkTask.map { it.outputDirectories }
-                        }
-                    }
-
-
                     val generateArchivesListTask = GenerateArchivesListTask.registerTask(
-                        project,
+                        project = project,
                         variant = variant,
                         flavorMatchingFallbacks = getProductFlavor(variant)?.matchingFallbacks ?: emptyList(),
                         buildTypeMatchingFallbacks = getOriginalBuildType(variant).matchingFallbacks,
                         enableMatchDebugVariant = pluginExtension.input.enableMatchDebugVariant
                     )
 
-                    val appSizeAnalysisTask = AppSizeAnalysisTask.registerTask(
-                        project,
-                        variant,
-                        pluginExtension,
-                        apksDirectory,
-                        generateArchivesListTask,
-                    )
-                    registerAppSizeTaskDep(project, variant, this, appSizeAnalysisTask)
+                    val aabSizeAnalysisTask = createAabAnalysisTask(project, variant, generateArchivesListTask)
+                    val apkSizeAnalysisTask = createApkAnylysisTask(project, variant, generateArchivesListTask)
+
+                    registerAppSizeTaskDep(project, variant, this, listOf(aabSizeAnalysisTask, apkSizeAnalysisTask))
                 }
             }
         }
+    }
+
+    private fun createApkAnylysisTask(
+        project: Project,
+        variant: ApplicationVariant,
+        generateArchivesListTask: TaskProvider<GenerateArchivesListTask>
+    ) = AppSizeAnalysisTask.registerTask(
+        name = "apk",
+        project = project,
+        variant = variant,
+        pluginExtension = pluginExtension,
+        apkDirectories = variant.packageApplicationProvider.map {
+            project.objects.listProperty<Directory>().value(listOf(it.outputDirectory.get()))
+        },
+        generateArchivesListTask = generateArchivesListTask,
+    )
+
+    private fun createAabAnalysisTask(
+        project: Project,
+        variant: ApplicationVariant,
+        generateArchivesListTask: TaskProvider<GenerateArchivesListTask>
+    ): TaskProvider<AppSizeAnalysisTask> {
+        val generateApkFromAabTask = GenerateApkTask.registerTask(
+            project,
+            pluginExtension,
+            variant
+        )
+
+        val appSizeAnalysisTask = AppSizeAnalysisTask.registerTask(
+            name = "app",
+            project = project,
+            variant = variant,
+            pluginExtension = pluginExtension,
+            apkDirectories = generateApkFromAabTask.map { it.outputDirectories },
+            generateArchivesListTask = generateArchivesListTask,
+        )
+
+        return appSizeAnalysisTask
     }
 
     private fun registerAppSizeTaskDep(
         project: Project,
         variant: BaseVariant,
         appExtension: AppExtension,
-        depTask: TaskProvider<out Task>
+        depTasks: List<TaskProvider<out Task>>
     ) {
         val dependenciesComponent = DaggerDependenciesComponent.factory().create(
             project = project,
@@ -127,46 +144,46 @@ internal class TaskManager(
             enableMatchDebugVariant = pluginExtension.input.enableMatchDebugVariant
         )
         val markAsChecked = mutableSetOf<String>()
-        dfs(project, markAsChecked, dependenciesComponent, depTask)
+        dfs(project, markAsChecked, dependenciesComponent, depTasks)
     }
 
     private fun dfs(
         project: Project,
         markAsChecked: MutableSet<String>,
         dependenciesComponent: DependenciesComponent,
-        depTask: TaskProvider<out Task>
+        depTasks: List<TaskProvider<out Task>>
     ) {
         if (markAsChecked.contains(project.path)) return
         markAsChecked.add(project.path)
-        handleSubProject(project, depTask, dependenciesComponent.variantExtractor())
+        handleSubProject(project, depTasks, dependenciesComponent.variantExtractor())
         dependenciesComponent.configurationExtractor()
             .runtimeConfigurations(project)
             .flatMap { configuration ->
                 configuration.dependencies.withType(ProjectDependency::class.java)
             }.forEach {
-                dfs(it.dependencyProject, markAsChecked, dependenciesComponent, depTask)
+                dfs(it.dependencyProject, markAsChecked, dependenciesComponent, depTasks)
             }
     }
 
     private fun handleSubProject(
         project: Project,
-        task: TaskProvider<out Task>,
+        tasks: List<TaskProvider<out Task>>,
         variantExtractor: VariantExtractor
     ) {
         when {
             project.isAndroidLibrary -> {
                 val variant = variantExtractor.findMatchVariant(project)
                 if (variant is AndroidAppSizeVariant) {
-                    task.dependsOn(variant.baseVariant.assembleProvider)
+                    tasks.forEach { it.dependsOn(variant.baseVariant.assembleProvider) }
                 }
             }
 
             project.isKotlinJvm -> {
-                task.dependsOn(project.tasks.named("jar"))
+                tasks.forEach { it.dependsOn(project.tasks.named("jar")) }
             }
 
             project.isJava -> {
-                task.dependsOn(project.tasks.named("jar"))
+                 tasks.forEach { it.dependsOn(project.tasks.named("jar")) }
             }
         }
 

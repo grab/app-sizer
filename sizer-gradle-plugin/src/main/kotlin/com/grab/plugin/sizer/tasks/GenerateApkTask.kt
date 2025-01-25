@@ -192,8 +192,8 @@ internal abstract class GenerateApkTask : DefaultTask() {
         ): TaskProvider<GenerateApkTask> {
             val bundleTask = project.tasks.named("sign${variant.name.capitalize()}Bundle")
             val task = project.tasks.register("generateApk${variant.name.capitalize()}", GenerateApkTask::class.java) {
-                deviceSpecFiles.setFrom(extension.input.aab.deviceSpecs)
-                bundleToolFile.set(extension.input.aab.bundleToolFile)
+                deviceSpecFiles.setFrom(extension.input.apk.deviceSpecs)
+                bundleToolFile.set(extension.input.apk.bundleToolFile)
                 appBundleFile.set(
                     bundleTask.map {
                         (it as FinalizeBundleTask).finalBundleFile.get()

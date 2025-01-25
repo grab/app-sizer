@@ -160,6 +160,7 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
 
     companion object {
         fun registerTask(
+            name: String = "app",
             project: Project,
             variant: BaseVariant,
             pluginExtension: AppSizePluginExtension,
@@ -167,7 +168,7 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
             generateArchivesListTask: TaskProvider<GenerateArchivesListTask>,
         ): TaskProvider<AppSizeAnalysisTask> {
             return project.tasks.register(
-                "appSizeAnalysis${variant.name.capitalize()}", AppSizeAnalysisTask::class.java
+                "${name}SizeAnalysis${variant.name.capitalize()}", AppSizeAnalysisTask::class.java
             ) {
                 this.variantInput.set(variant.toVariantInput())
                 this.apkDirectories.setFrom(apkDirectories)
