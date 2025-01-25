@@ -2,7 +2,7 @@ Platform:
   - app
 Team1:
   - android-module-level1
+  - kotlin-multiplatform-module
 Team2:
   - sample-group:android-module-level2
   - kotlin-module
-

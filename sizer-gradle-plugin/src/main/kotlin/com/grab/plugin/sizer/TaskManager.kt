@@ -41,9 +41,11 @@ import com.grab.plugin.sizer.utils.isAndroidApplication
 import com.grab.plugin.sizer.utils.isAndroidLibrary
 import com.grab.plugin.sizer.utils.isJava
 import com.grab.plugin.sizer.utils.isKotlinJvm
+import com.grab.plugin.sizer.utils.isKotlinMultiplatform
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.the
 
@@ -147,11 +149,15 @@ internal class TaskManager(
             }
 
             project.isKotlinJvm -> {
-                task.dependsOn(project.tasks.named("jar"))
+                task.dependsOn(project.tasks.named(JavaPlugin.JAR_TASK_NAME))
             }
 
             project.isJava -> {
-                task.dependsOn(project.tasks.named("jar"))
+                task.dependsOn(project.tasks.named(JavaPlugin.JAR_TASK_NAME))
+            }
+
+            project.isKotlinMultiplatform -> {
+                task.dependsOn(project.tasks.named("jvmJar"))
             }
         }
 

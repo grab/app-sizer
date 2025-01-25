@@ -31,6 +31,7 @@ import com.grab.plugin.sizer.utils.isAndroidApplication
 import com.grab.plugin.sizer.utils.isAndroidLibrary
 import com.grab.plugin.sizer.utils.isJava
 import com.grab.plugin.sizer.utils.isKotlinJvm
+import com.grab.plugin.sizer.utils.isKotlinMultiplatform
 import org.gradle.api.Project
 import javax.inject.Inject
 
@@ -67,6 +68,13 @@ internal class DefaultArchiveExtractor @Inject constructor(
             }
 
             project.isJava -> {
+                return JavaModuleDependency(
+                    name = project.pathTrimColon,
+                    pathToArtifact = matchVariant.binaryOutPut.path
+                )
+            }
+
+            project.isKotlinMultiplatform -> {
                 return JavaModuleDependency(
                     name = project.pathTrimColon,
                     pathToArtifact = matchVariant.binaryOutPut.path
