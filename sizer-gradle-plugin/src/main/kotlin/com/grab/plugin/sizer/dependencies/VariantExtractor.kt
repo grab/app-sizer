@@ -34,6 +34,7 @@ import com.grab.plugin.sizer.utils.isAndroidApplication
 import com.grab.plugin.sizer.utils.isAndroidLibrary
 import com.grab.plugin.sizer.utils.isJava
 import com.grab.plugin.sizer.utils.isKotlinJvm
+import com.grab.plugin.sizer.utils.isKotlinMultiplatform
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -133,6 +134,9 @@ internal class DefaultVariantExtractor @Inject constructor(
             )
 
             project.isJava || project.isKotlinJvm -> JarAppSizeVariant(project)
+
+            project.isKotlinMultiplatform -> JarAppSizeVariant(project, "jvmJar", "jvmRuntimeClasspath")
+
             else -> {
                 throw IllegalArgumentException("${project.name} is not supported")
             }
@@ -158,6 +162,9 @@ internal class DefaultVariantExtractor @Inject constructor(
             )
 
             project.isJava || project.isKotlinJvm -> JarAppSizeVariant(project)
+
+            project.isKotlinMultiplatform -> JarAppSizeVariant(project, "jvmJar", "jvmRuntimeClasspath")
+
             else -> {
                 throw IllegalArgumentException("${project.name} is not supported")
             }
@@ -275,17 +282,19 @@ internal class DefaultVariantExtractor @Inject constructor(
 }
 
 internal class JarAppSizeVariant(
-    private val project: Project
+    private val project: Project,
+    private val taskName: String = JavaPlugin.JAR_TASK_NAME,
+    private val configurationName: String = "RuntimeClasspath"
 ) : AppSizeVariant {
     override val binaryOutPut: File
         get() {
-            val jarTask = project.tasks.findByName(JavaPlugin.JAR_TASK_NAME) as Jar
+            val jarTask = project.tasks.findByName(taskName) as Jar
             return jarTask.archiveFile.get().asFile
         }
 
     override val runtimeConfiguration: Configuration by lazy {
         project.configurations.first {
-            it.name.equals("RuntimeClasspath", true)
+            it.name.equals(configurationName, true)
         }
     }
 
