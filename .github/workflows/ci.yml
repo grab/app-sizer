@@ -64,4 +64,4 @@ jobs:
             - name: Build sample app
               run: |
                   cd ./sample
-                  ./gradlew app:appSizeAnalysisProRelease --stacktrace -Dorg.gradle.debug=false --no-daemon
+                  ./gradlew app:aabSizeAnalysisProRelease --stacktrace -Dorg.gradle.debug=false --no-daemon

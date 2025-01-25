@@ -27,14 +27,13 @@
 
 package com.grab.plugin.sizer.configuration
 
-import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import java.io.File
 import javax.inject.Inject
 
-open class ApkGeneratorExtension @Inject constructor(objects: ObjectFactory) {
+open class AabGeneratorExtension @Inject constructor(objects: ObjectFactory) {
     val bundleToolFile: RegularFileProperty = objects.fileProperty()
     val deviceSpecs: ListProperty<File> = objects.listProperty(File::class.java)
 }
