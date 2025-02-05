@@ -38,6 +38,7 @@ import com.grab.plugin.sizer.dependencies.*
 import com.grab.plugin.sizer.tasks.AppSizeAnalysisTask
 import com.grab.plugin.sizer.tasks.GenerateApkTask
 import com.grab.plugin.sizer.tasks.GenerateArchivesListTask
+import com.grab.plugin.sizer.tasks.capitalize
 import com.grab.plugin.sizer.utils.isAndroidApplication
 import com.grab.plugin.sizer.utils.isAndroidLibrary
 import com.grab.plugin.sizer.utils.isJava
@@ -83,10 +84,15 @@ internal class TaskManager(
                         enableMatchDebugVariant = pluginExtension.input.enableMatchDebugVariant
                     )
 
-                    val aabSizeAnalysisTask = createAabAnalysisTask(project, variant, generateArchivesListTask)
-                    val apkSizeAnalysisTask = createApkAnylysisTask(project, variant, generateArchivesListTask)
+                    val collectAppDependenciesTask = registerCollectDependenciesTask(project, variant, this)
 
-                    registerAppSizeTaskDep(project, variant, this, listOf(aabSizeAnalysisTask, apkSizeAnalysisTask))
+                    createAabAnalysisTask(project, variant, generateArchivesListTask).configure {
+                        dependsOn(collectAppDependenciesTask)
+                    }
+                    createApkAnylysisTask(project, variant, generateArchivesListTask).configure {
+                        dependsOn(collectAppDependenciesTask)
+                    }
+
                 }
             }
         }
@@ -130,12 +136,11 @@ internal class TaskManager(
         return appSizeAnalysisTask
     }
 
-    private fun registerAppSizeTaskDep(
+    private fun registerCollectDependenciesTask(
         project: Project,
         variant: BaseVariant,
         appExtension: AppExtension,
-        depTasks: List<TaskProvider<out Task>>
-    ) {
+    ): TaskProvider<Task> {
         val dependenciesComponent = DaggerDependenciesComponent.factory().create(
             project = project,
             variantInput = variant.toVariantInput(),
@@ -143,47 +148,51 @@ internal class TaskManager(
             buildTypeMatchingFallbacks = appExtension.getOriginalBuildType(variant).matchingFallbacks,
             enableMatchDebugVariant = pluginExtension.input.enableMatchDebugVariant
         )
+        val collectDependenciesTask = project.tasks.register("collectAppDependencies${variant.name.capitalize()}")
+
         val markAsChecked = mutableSetOf<String>()
-        dfs(project, markAsChecked, dependenciesComponent, depTasks)
+        dfs(project, markAsChecked, dependenciesComponent, collectDependenciesTask)
+
+        return collectDependenciesTask
     }
 
     private fun dfs(
         project: Project,
         markAsChecked: MutableSet<String>,
         dependenciesComponent: DependenciesComponent,
-        depTasks: List<TaskProvider<out Task>>
+        depTask: TaskProvider<Task>
     ) {
         if (markAsChecked.contains(project.path)) return
         markAsChecked.add(project.path)
-        handleSubProject(project, depTasks, dependenciesComponent.variantExtractor())
+        handleSubProject(project, depTask, dependenciesComponent.variantExtractor())
         dependenciesComponent.configurationExtractor()
             .runtimeConfigurations(project)
             .flatMap { configuration ->
                 configuration.dependencies.withType(ProjectDependency::class.java)
             }.forEach {
-                dfs(it.dependencyProject, markAsChecked, dependenciesComponent, depTasks)
+                dfs(it.dependencyProject, markAsChecked, dependenciesComponent, depTask)
             }
     }
 
     private fun handleSubProject(
         project: Project,
-        tasks: List<TaskProvider<out Task>>,
+        task: TaskProvider<Task>,
         variantExtractor: VariantExtractor
     ) {
         when {
             project.isAndroidLibrary -> {
                 val variant = variantExtractor.findMatchVariant(project)
                 if (variant is AndroidAppSizeVariant) {
-                    tasks.forEach { it.dependsOn(variant.baseVariant.assembleProvider) }
+                    task.dependsOn(variant.baseVariant.assembleProvider)
                 }
             }
 
             project.isKotlinJvm -> {
-                tasks.forEach { it.dependsOn(project.tasks.named("jar")) }
+                task.dependsOn(project.tasks.named("jar"))
             }
 
             project.isJava -> {
-                 tasks.forEach { it.dependsOn(project.tasks.named("jar")) }
+                task.dependsOn(project.tasks.named("jar"))
             }
         }
 
