@@ -118,8 +118,8 @@ internal class TaskManager(
             variant
         )
 
-        val aabSizeAnalysisTask = AppSizeAnalysisTask.registerTask(
-            name = "aab",
+        val appSizeAnalysisTask = AppSizeAnalysisTask.registerTask(
+            name = "app",
             project = project,
             variant = variant,
             pluginExtension = pluginExtension,
@@ -127,7 +127,7 @@ internal class TaskManager(
             generateArchivesListTask = generateArchivesListTask,
         )
 
-        return aabSizeAnalysisTask
+        return appSizeAnalysisTask
     }
 
     private fun registerAppSizeTaskDep(

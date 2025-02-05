@@ -38,7 +38,7 @@ import javax.inject.Inject
 private const val DEFAULT_LARGE_FILE = 10240L // 10kb
 
 open class InputExtension @Inject constructor(objects: ObjectFactory) {
-    val aab: AabGeneratorExtension = objects.newInstance(AabGeneratorExtension::class.java, objects)
+    val apk: ApkGeneratorExtension = objects.newInstance(ApkGeneratorExtension::class.java, objects)
     val teamMappingFile: RegularFileProperty = objects.fileProperty()
     var variantFilter: Action<VariantFilter>? = null
     var largeFileThreshold: Long = DEFAULT_LARGE_FILE
@@ -48,18 +48,13 @@ open class InputExtension @Inject constructor(objects: ObjectFactory) {
         variantFilter = action
     }
 
-    fun aab(action: Action<in AabGeneratorExtension>) {
-        action.execute(aab)
+    fun apk(action: Action<in ApkGeneratorExtension>) {
+        action.execute(apk)
     }
 
-    fun aab(block: AabGeneratorExtension.() -> Unit) {
-        block(aab)
+    fun apk(block: ApkGeneratorExtension.() -> Unit) {
+        block(apk)
     }
-}
-
-enum class InputType {
-    AAB,
-    APK
 }
 
 interface VariantFilter {

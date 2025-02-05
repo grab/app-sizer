@@ -33,7 +33,7 @@ import org.gradle.api.provider.ListProperty
 import java.io.File
 import javax.inject.Inject
 
-open class AabGeneratorExtension @Inject constructor(objects: ObjectFactory) {
+open class ApkGeneratorExtension @Inject constructor(objects: ObjectFactory) {
     val bundleToolFile: RegularFileProperty = objects.fileProperty()
     val deviceSpecs: ListProperty<File> = objects.listProperty(File::class.java)
 }
