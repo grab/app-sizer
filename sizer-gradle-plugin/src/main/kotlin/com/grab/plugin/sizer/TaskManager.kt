@@ -84,21 +84,24 @@ internal class TaskManager(
                         enableMatchDebugVariant = pluginExtension.input.enableMatchDebugVariant
                     )
 
-                    val collectAppDependenciesTask = registerCollectDependenciesTask(project, variant, this)
-
-                    createAabAnalysisTask(project, variant, generateArchivesListTask).configure {
-                        dependsOn(collectAppDependenciesTask)
+                    runCatching {
+                        registerCollectDependenciesTask(project, variant, this)
+                    }.onFailure {
+                        project.logger.error("Can't create tasks for ${project.name} with variant ${variant.name}")
+                    }.onSuccess { collectAppDependenciesTask ->
+                        createAabAnalysisTask(project, variant, generateArchivesListTask).configure {
+                            dependsOn(collectAppDependenciesTask)
+                        }
+                        createApkAnalysisTask(project, variant, generateArchivesListTask).configure {
+                            dependsOn(collectAppDependenciesTask)
+                        }
                     }
-                    createApkAnylysisTask(project, variant, generateArchivesListTask).configure {
-                        dependsOn(collectAppDependenciesTask)
-                    }
-
                 }
             }
         }
     }
 
-    private fun createApkAnylysisTask(
+    private fun createApkAnalysisTask(
         project: Project,
         variant: ApplicationVariant,
         generateArchivesListTask: TaskProvider<GenerateArchivesListTask>
