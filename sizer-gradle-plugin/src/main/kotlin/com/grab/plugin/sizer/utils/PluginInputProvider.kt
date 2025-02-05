@@ -34,6 +34,7 @@ import java.io.File
 
 private const val EXT_AAR = "aar"
 private const val EXT_JAR = "jar"
+private const val EXT_APK = "apk"
 
 class PluginInputProvider(
     private val archiveDependencyStore: ArchiveDependencyStore,
@@ -79,7 +80,8 @@ class PluginInputProvider(
         .filter { it.file.extension.equals(EXT_AAR, true) }
 
     override fun provideApkFiles(): Sequence<File> {
-        return apksDirectory.listFiles()?.asSequence() ?: emptySequence()
+        return apksDirectory.listFiles()?.asSequence()?.filter { it.extension.equals(EXT_APK, true) }
+            ?: emptySequence()
     }
 
     override fun provideR8MappingFile(): File? = r8MappingFile

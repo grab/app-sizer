@@ -34,7 +34,11 @@ appSizer {
 To run the App Sizer analysis using the Gradle plugin:
 
 1. Open a terminal in the sample project directory.
-2. Execute the following command:
+2. Execute one of the following commands:
+   ```
+   ./gradlew app:apkSizeAnalysisProRelease --no-configure-on-demand
+   ```   
+   If you need to analyze apk files generated from the aab file according to device specs:
    ```
    ./gradlew app:appSizeAnalysisProRelease --no-configure-on-demand
    ```

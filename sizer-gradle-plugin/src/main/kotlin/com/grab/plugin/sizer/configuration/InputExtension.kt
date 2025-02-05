@@ -44,7 +44,6 @@ open class InputExtension @Inject constructor(objects: ObjectFactory) {
     var largeFileThreshold: Long = DEFAULT_LARGE_FILE
     var enableMatchDebugVariant = false
 
-
     fun variantFilter(action: Action<VariantFilter>) {
         variantFilter = action
     }

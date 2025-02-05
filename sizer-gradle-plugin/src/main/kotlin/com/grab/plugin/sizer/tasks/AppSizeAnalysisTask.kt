@@ -48,10 +48,13 @@ import com.grab.sizer.report.db.InfluxDBConfig
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import java.io.File
 
@@ -157,17 +160,18 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
 
     companion object {
         fun registerTask(
+            name: String = "app",
             project: Project,
             variant: BaseVariant,
             pluginExtension: AppSizePluginExtension,
-            generateApkTask: TaskProvider<GenerateApkTask>,
+            apkDirectories: Provider<ListProperty<Directory>>,
             generateArchivesListTask: TaskProvider<GenerateArchivesListTask>,
         ): TaskProvider<AppSizeAnalysisTask> {
             return project.tasks.register(
-                "appSizeAnalysis${variant.name.capitalize()}", AppSizeAnalysisTask::class.java
+                "${name}SizeAnalysis${variant.name.capitalize()}", AppSizeAnalysisTask::class.java
             ) {
                 this.variantInput.set(variant.toVariantInput())
-                this.apkDirectories.setFrom(generateApkTask.map { it.outputDirectories })
+                this.apkDirectories.setFrom(apkDirectories)
                 this.archiveDepJsonFile.set(generateArchivesListTask.map { it.archiveDepFile.get() })
                 this.libName.set(project.params().libraryName())
                 this.option.set(project.params().option())

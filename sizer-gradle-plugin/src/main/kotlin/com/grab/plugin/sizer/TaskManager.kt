@@ -28,6 +28,7 @@
 package com.grab.plugin.sizer
 
 import com.android.build.gradle.AppExtension
+import com.android.build.gradle.api.ApplicationVariant
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.internal.dsl.BuildType
 import com.android.build.gradle.internal.dsl.ProductFlavor
@@ -37,6 +38,7 @@ import com.grab.plugin.sizer.dependencies.*
 import com.grab.plugin.sizer.tasks.AppSizeAnalysisTask
 import com.grab.plugin.sizer.tasks.GenerateApkTask
 import com.grab.plugin.sizer.tasks.GenerateArchivesListTask
+import com.grab.plugin.sizer.tasks.capitalize
 import com.grab.plugin.sizer.utils.isAndroidApplication
 import com.grab.plugin.sizer.utils.isAndroidLibrary
 import com.grab.plugin.sizer.utils.isJava
@@ -44,7 +46,9 @@ import com.grab.plugin.sizer.utils.isKotlinJvm
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.file.Directory
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.listProperty
 import org.gradle.kotlin.dsl.the
 
 /*
@@ -71,39 +75,75 @@ internal class TaskManager(
                 val variantFilter = DefaultVariantFilter(variant)
                 pluginExtension.input.variantFilter?.execute(variantFilter)
                 if (!variantFilter.ignored) {
-                    val generateApkTask = GenerateApkTask.registerTask(
-                        project,
-                        pluginExtension,
-                        variant
-                    )
 
                     val generateArchivesListTask = GenerateArchivesListTask.registerTask(
-                        project,
+                        project = project,
                         variant = variant,
                         flavorMatchingFallbacks = getProductFlavor(variant)?.matchingFallbacks ?: emptyList(),
                         buildTypeMatchingFallbacks = getOriginalBuildType(variant).matchingFallbacks,
                         enableMatchDebugVariant = pluginExtension.input.enableMatchDebugVariant
                     )
 
-                    val appSizeAnalysisTask = AppSizeAnalysisTask.registerTask(
-                        project,
-                        variant,
-                        pluginExtension,
-                        generateApkTask,
-                        generateArchivesListTask,
-                    )
-                    registerAppSizeTaskDep(project, variant, this, appSizeAnalysisTask)
+                    runCatching {
+                        registerCollectDependenciesTask(project, variant, this)
+                    }.onFailure {
+                        project.logger.error("Can't create tasks for ${project.name} with variant ${variant.name}")
+                    }.onSuccess { collectAppDependenciesTask ->
+                        createAabAnalysisTask(project, variant, generateArchivesListTask).configure {
+                            dependsOn(collectAppDependenciesTask)
+                        }
+                        createApkAnalysisTask(project, variant, generateArchivesListTask).configure {
+                            dependsOn(collectAppDependenciesTask)
+                        }
+                    }
                 }
             }
         }
     }
 
-    private fun registerAppSizeTaskDep(
+    private fun createApkAnalysisTask(
+        project: Project,
+        variant: ApplicationVariant,
+        generateArchivesListTask: TaskProvider<GenerateArchivesListTask>
+    ) = AppSizeAnalysisTask.registerTask(
+        name = "apk",
+        project = project,
+        variant = variant,
+        pluginExtension = pluginExtension,
+        apkDirectories = variant.packageApplicationProvider.map {
+            project.objects.listProperty<Directory>().value(listOf(it.outputDirectory.get()))
+        },
+        generateArchivesListTask = generateArchivesListTask,
+    )
+
+    private fun createAabAnalysisTask(
+        project: Project,
+        variant: ApplicationVariant,
+        generateArchivesListTask: TaskProvider<GenerateArchivesListTask>
+    ): TaskProvider<AppSizeAnalysisTask> {
+        val generateApkFromAabTask = GenerateApkTask.registerTask(
+            project,
+            pluginExtension,
+            variant
+        )
+
+        val appSizeAnalysisTask = AppSizeAnalysisTask.registerTask(
+            name = "app",
+            project = project,
+            variant = variant,
+            pluginExtension = pluginExtension,
+            apkDirectories = generateApkFromAabTask.map { it.outputDirectories },
+            generateArchivesListTask = generateArchivesListTask,
+        )
+
+        return appSizeAnalysisTask
+    }
+
+    private fun registerCollectDependenciesTask(
         project: Project,
         variant: BaseVariant,
         appExtension: AppExtension,
-        depTask: TaskProvider<out Task>
-    ) {
+    ): TaskProvider<Task> {
         val dependenciesComponent = DaggerDependenciesComponent.factory().create(
             project = project,
             variantInput = variant.toVariantInput(),
@@ -111,15 +151,19 @@ internal class TaskManager(
             buildTypeMatchingFallbacks = appExtension.getOriginalBuildType(variant).matchingFallbacks,
             enableMatchDebugVariant = pluginExtension.input.enableMatchDebugVariant
         )
+        val collectDependenciesTask = project.tasks.register("collectAppDependencies${variant.name.capitalize()}")
+
         val markAsChecked = mutableSetOf<String>()
-        dfs(project, markAsChecked, dependenciesComponent, depTask)
+        dfs(project, markAsChecked, dependenciesComponent, collectDependenciesTask)
+
+        return collectDependenciesTask
     }
 
     private fun dfs(
         project: Project,
         markAsChecked: MutableSet<String>,
         dependenciesComponent: DependenciesComponent,
-        depTask: TaskProvider<out Task>
+        depTask: TaskProvider<Task>
     ) {
         if (markAsChecked.contains(project.path)) return
         markAsChecked.add(project.path)
@@ -135,7 +179,7 @@ internal class TaskManager(
 
     private fun handleSubProject(
         project: Project,
-        task: TaskProvider<out Task>,
+        task: TaskProvider<Task>,
         variantExtractor: VariantExtractor
     ) {
         when {
