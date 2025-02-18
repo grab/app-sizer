@@ -51,6 +51,7 @@ internal const val BUILD_TYPE = "BUILD_TYPE"
 internal const val BUILD_FLAVOR = "BUILD_FLAVOR"
 internal const val ENABLE_MATCH_DEBUG_VARIANT = "ENABLE_MATCH_DEBUG_VARIANT"
 internal const val BUILD_TYPE_DEBUG = "debug"
+internal const val KMP_JAR_TASK = "jvmJar"
 
 internal interface VariantExtractor {
     /**
@@ -135,7 +136,7 @@ internal class DefaultVariantExtractor @Inject constructor(
 
             project.isJava || project.isKotlinJvm -> JarAppSizeVariant(project)
 
-            project.isKotlinMultiplatform -> JarAppSizeVariant(project, "jvmJar", "jvmRuntimeClasspath")
+            project.isKotlinMultiplatform -> KmpJarAppSizeVariant(project)
 
             else -> {
                 throw IllegalArgumentException("${project.name} is not supported")
@@ -163,7 +164,7 @@ internal class DefaultVariantExtractor @Inject constructor(
 
             project.isJava || project.isKotlinJvm -> JarAppSizeVariant(project)
 
-            project.isKotlinMultiplatform -> JarAppSizeVariant(project, "jvmJar", "jvmRuntimeClasspath")
+            project.isKotlinMultiplatform -> KmpJarAppSizeVariant(project)
 
             else -> {
                 throw IllegalArgumentException("${project.name} is not supported")
@@ -283,18 +284,16 @@ internal class DefaultVariantExtractor @Inject constructor(
 
 internal class JarAppSizeVariant(
     private val project: Project,
-    private val taskName: String = JavaPlugin.JAR_TASK_NAME,
-    private val configurationName: String = "RuntimeClasspath"
 ) : AppSizeVariant {
     override val binaryOutPut: File
         get() {
-            val jarTask = project.tasks.findByName(taskName) as Jar
+            val jarTask = project.tasks.findByName(JavaPlugin.JAR_TASK_NAME) as Jar
             return jarTask.archiveFile.get().asFile
         }
 
     override val runtimeConfiguration: Configuration by lazy {
         project.configurations.first {
-            it.name.equals(configurationName, true)
+            it.name.equals("RuntimeClasspath", true)
         }
     }
 
@@ -303,6 +302,26 @@ internal class JarAppSizeVariant(
     override val buildFlavor: String
         get() = ""
 }
+
+internal class KmpJarAppSizeVariant(
+    private val project: Project
+) : AppSizeVariant {
+    override val binaryOutPut: File
+        get() {
+            val jarTask = project.tasks.findByName(KMP_JAR_TASK) as Jar
+            return jarTask.archiveFile.get().asFile
+        }
+
+    override val runtimeConfiguration: Configuration by lazy {
+        project.configurations.first {
+            it.name.equals("jvmRuntimeClasspath", true)
+        }
+    }
+
+    override val buildType: String get() = ""
+    override val buildFlavor: String get() = ""
+}
+
 
 internal class AndroidAppSizeVariant(
     val baseVariant: BaseVariant

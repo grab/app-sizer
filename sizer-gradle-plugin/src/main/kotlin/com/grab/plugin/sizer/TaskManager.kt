@@ -157,7 +157,7 @@ internal class TaskManager(
             }
 
             project.isKotlinMultiplatform -> {
-                task.dependsOn(project.tasks.named("jvmJar"))
+                task.dependsOn(project.tasks.named(KMP_JAR_TASK))
             }
         }
 
