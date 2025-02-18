@@ -54,13 +54,13 @@ appSizer {
 ```
 
 ### Run the analysis
-
-```bash
-./gradlew app:apkSizeAnalysis[Release|Debug] --no-configure-on-demand --no-configuration-cache
-```
-Or if you need to analyze apk files generated from the aab file according to device specs:
+If you need to analyze apk files generated from the aab file according to device specs:
 ```bash
 ./gradlew app:appSizeAnalysis[Release|Debug] --no-configure-on-demand --no-configuration-cache
+```
+Or if you need to analyze the apk file that is the result of the assemble task, you can execute the following command:
+```bash
+./gradlew app:apkSizeAnalysis[Release|Debug] --no-configure-on-demand --no-configuration-cache
 ```
 
 ## Configuration
@@ -91,7 +91,7 @@ appSizer {
         variantFilter { variant ->
             variant.setIgnore(variant.flavors.contains("your-ignore-flavor"))
         }
-        aab {
+        apk {
             // APK Generation from aab
         }
     }
@@ -126,7 +126,7 @@ Configure APK generation settings:
 appSizer {
     projectInput {
         ...
-        aab {
+        apk {
             deviceSpecs = [
                 file("path/to/device-1.json"),
                 file("path/to/device-2.json"),
@@ -190,7 +190,7 @@ appSizer {
 appSizer {
     enabled = true
     projectInput {
-        aab {
+        apk {
             bundleToolFile = file("${rootProject.rootDir}/binary/bundletool-all-1.15.4.jar")
             deviceSpecs = [
                 file("${rootProject.rootDir}/app-size-config/device-1.json"),
