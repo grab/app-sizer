@@ -27,7 +27,6 @@
 
 package com.grab.plugin.sizer.configuration
 
-import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty

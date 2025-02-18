@@ -54,9 +54,13 @@ appSizer {
 ```
 
 ### Run the analysis
-
+If you need to analyze apk files generated from the aab file according to device specs:
 ```bash
 ./gradlew app:appSizeAnalysis[Release|Debug] --no-configure-on-demand --no-configuration-cache
+```
+Or if you need to analyze the apk file that is the result of the assemble task, you can execute the following command:
+```bash
+./gradlew app:apkSizeAnalysis[Release|Debug] --no-configure-on-demand --no-configuration-cache
 ```
 
 ## Configuration
@@ -88,7 +92,7 @@ appSizer {
             variant.setIgnore(variant.flavors.contains("your-ignore-flavor"))
         }
         apk {
-            // APK Generation
+            // APK Generation from aab
         }
     }
     ...
