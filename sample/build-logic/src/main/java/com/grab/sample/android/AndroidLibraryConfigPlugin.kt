@@ -24,42 +24,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE
  */
-
-plugins {
-    id 'java-gradle-plugin'
-    alias(libs.plugins.kotlin.dsl)
-}
-
-repositories {
-    google()
-    mavenCentral()
-}
-
-dependencies {
-    compileOnly libs.kotlin.gradle.plugin
-    compileOnly libs.android.gradle.plugin
-}
+package com.grab.sample.android
 
 
-gradlePlugin {
-    plugins {
-        androidAppConfigPlugin {
-            id = 'com.sample.android.application'
-            implementationClass = 'com.grab.sample.android.AndroidAppConfigPlugin'
-        }
-        androidLibConfigPlugin {
-            id = 'com.sample.android.library'
-            implementationClass = 'com.grab.sample.android.AndroidLibraryConfigPlugin'
+import com.android.build.gradle.LibraryExtension
+import com.grab.sample.BuildConfig
+import com.grab.sample.gradle.ConfigurablePlugin
+import com.grab.sample.jvm.kotlinCommon
+import org.gradle.kotlin.dsl.configure
+
+class AndroidLibraryConfigPlugin : ConfigurablePlugin({
+    plugins.apply("com.android.library")
+    plugins.apply("kotlin-android")
+
+    extensions.configure<LibraryExtension> {
+        compileSdk = BuildConfig.COMPILE_SDK
+
+        defaultConfig {
+            minSdk = BuildConfig.MIN_SDK
+            testInstrumentationRunner = BuildConfig.TEST_INSTRUMENTATION_RUNNER
+            consumerProguardFiles("consumer-rules.pro")
         }
 
-        kotlinKmpConfigPlugin {
-            id = 'com.sample.kotlin.kmp'
-            implementationClass = 'com.grab.sample.jvm.KmpConfigPlugin'
-        }
-
-        kotlinLibConfigPlugin {
-            id = 'com.sample.kotlin.library'
-            implementationClass = 'com.grab.sample.jvm.KotlinLibraryConfigPlugin'
+        compileOptions {
+            sourceCompatibility = BuildConfig.JAVA_VERSION
+            targetCompatibility = BuildConfig.JAVA_VERSION
         }
     }
-}
+
+    kotlinCommon()
+})

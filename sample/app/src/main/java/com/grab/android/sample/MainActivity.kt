@@ -10,6 +10,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
 import com.grab.android.sample.databinding.ActivityMainBinding
+import com.grab.sample.dummy.KMPDummyClass1
 import com.grab.sample.dummy.KDummyClass1
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         KDummyClass1().method1()
+        KMPDummyClass1().method1()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

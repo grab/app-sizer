@@ -25,41 +25,16 @@
  * SOFTWARE
  */
 
-plugins {
-    id 'java-gradle-plugin'
-    alias(libs.plugins.kotlin.dsl)
-}
+package com.grab.sample
 
-repositories {
-    google()
-    mavenCentral()
-}
+import org.gradle.api.JavaVersion
 
-dependencies {
-    compileOnly libs.kotlin.gradle.plugin
-    compileOnly libs.android.gradle.plugin
-}
-
-
-gradlePlugin {
-    plugins {
-        androidAppConfigPlugin {
-            id = 'com.sample.android.application'
-            implementationClass = 'com.grab.sample.android.AndroidAppConfigPlugin'
-        }
-        androidLibConfigPlugin {
-            id = 'com.sample.android.library'
-            implementationClass = 'com.grab.sample.android.AndroidLibraryConfigPlugin'
-        }
-
-        kotlinKmpConfigPlugin {
-            id = 'com.sample.kotlin.kmp'
-            implementationClass = 'com.grab.sample.jvm.KmpConfigPlugin'
-        }
-
-        kotlinLibConfigPlugin {
-            id = 'com.sample.kotlin.library'
-            implementationClass = 'com.grab.sample.jvm.KotlinLibraryConfigPlugin'
-        }
-    }
+object BuildConfig {
+    const val COMPILE_SDK = 34
+    const val JVM_TARGET = "17"
+    val JAVA_VERSION = JavaVersion.VERSION_17
+    const val MIN_SDK = 21
+    const val TARGET_SDK = 33
+    const val APPLICATION_ID = "com.grab.android.sample"
+    const val TEST_INSTRUMENTATION_RUNNER = "androidx.test.runner.AndroidJUnitRunner"
 }

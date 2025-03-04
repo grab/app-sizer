@@ -25,41 +25,32 @@
  * SOFTWARE
  */
 
-plugins {
-    id 'java-gradle-plugin'
-    alias(libs.plugins.kotlin.dsl)
-}
+package com.grab.sample.android
 
-repositories {
-    google()
-    mavenCentral()
-}
+import com.android.build.api.dsl.ApplicationExtension
+import com.grab.sample.BuildConfig
+import com.grab.sample.gradle.ConfigurablePlugin
+import com.grab.sample.jvm.kotlinCommon
+import org.gradle.kotlin.dsl.configure
 
-dependencies {
-    compileOnly libs.kotlin.gradle.plugin
-    compileOnly libs.android.gradle.plugin
-}
+class AndroidAppConfigPlugin : ConfigurablePlugin({
+    plugins.apply("com.android.application")
+    plugins.apply("org.jetbrains.kotlin.android")
 
+    extensions.configure<ApplicationExtension> {
+        compileSdk = BuildConfig.COMPILE_SDK
 
-gradlePlugin {
-    plugins {
-        androidAppConfigPlugin {
-            id = 'com.sample.android.application'
-            implementationClass = 'com.grab.sample.android.AndroidAppConfigPlugin'
-        }
-        androidLibConfigPlugin {
-            id = 'com.sample.android.library'
-            implementationClass = 'com.grab.sample.android.AndroidLibraryConfigPlugin'
+        defaultConfig {
+            applicationId = BuildConfig.APPLICATION_ID
+            minSdk = BuildConfig.MIN_SDK
+            targetSdk = BuildConfig.TARGET_SDK
         }
 
-        kotlinKmpConfigPlugin {
-            id = 'com.sample.kotlin.kmp'
-            implementationClass = 'com.grab.sample.jvm.KmpConfigPlugin'
-        }
-
-        kotlinLibConfigPlugin {
-            id = 'com.sample.kotlin.library'
-            implementationClass = 'com.grab.sample.jvm.KotlinLibraryConfigPlugin'
+        compileOptions {
+            sourceCompatibility = BuildConfig.JAVA_VERSION
+            targetCompatibility = BuildConfig.JAVA_VERSION
         }
     }
-}
+
+    kotlinCommon()
+})

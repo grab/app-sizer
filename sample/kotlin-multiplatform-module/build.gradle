@@ -26,5 +26,5 @@
  */
 
 plugins {
-    id 'com.sample.kotlin.multiplatform.library'
+    id 'com.sample.kotlin.kmp'
 }
