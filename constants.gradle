@@ -27,5 +27,5 @@
 
 ext {
     groupId = "com.grab.sizer"
-    versionName = project.hasProperty("versionName") ? versionName : "0.1.0-alpha01"
+    versionName = project.hasProperty("versionName") ? versionName : "0.1.0-alpha02"
 }
