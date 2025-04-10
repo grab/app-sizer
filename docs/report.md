@@ -20,7 +20,7 @@ docker run -d \
   -p 8086:8086 \
   -v /path/for/influxdb:/var/lib/influxdb \
   -v /path/for/grafana:/var/lib/grafana \
-  mikenguyen/sizer-influx-grafana:latest
+  mikenguyen/sizer-influx-grafana:SNAPSHOT
 ```
 
 For more details on the Docker setup, see our [Docker guide][grafana_docker_doc].
