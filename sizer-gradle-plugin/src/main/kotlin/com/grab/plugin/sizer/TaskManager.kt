@@ -142,9 +142,13 @@ internal class TaskManager(
     ) {
         when {
             project.isAndroidLibrary -> {
-                val variant = variantExtractor.findMatchVariant(project)
-                if (variant is AndroidAppSizeVariant) {
-                    task.dependsOn(variant.baseVariant.assembleProvider)
+                try {
+                    val variant = variantExtractor.findMatchVariant(project)
+                    if (variant is AndroidAppSizeVariant) {
+                        task.dependsOn(variant.baseVariant.assembleProvider)
+                    }
+                } catch (e: RuntimeException) {
+                    project.logger.warn("Could not find matching variant for Android library project ${project.name}: ${e.message}")
                 }
             }
 
@@ -158,6 +162,11 @@ internal class TaskManager(
 
             project.isKotlinMultiplatform -> {
                 task.dependsOn(project.tasks.named(KMP_JAR_TASK))
+            }
+            
+            else -> {
+                // Skip unsupported project types to avoid variant extraction errors
+                project.logger.debug("Skipping variant extraction for unsupported project type: ${project.name}")
             }
         }
 
