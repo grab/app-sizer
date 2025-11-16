@@ -28,15 +28,48 @@
 package com.grab.plugin.sizer.utils
 
 import com.grab.plugin.sizer.dependencies.DependenciesScope
+import com.grab.sizer.utils.DEFAULT_TAG
 import com.grab.sizer.utils.Logger
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 import javax.inject.Inject
 
-@DependenciesScope
-class PluginLogger @Inject constructor(private val project: Project) : Logger {
-    override fun log(tag: String, message: String) = project.logger.log(LogLevel.QUIET, "$tag: $message")
 
-    override fun logDebug(tag: String, message: String) = project.logger.log(LogLevel.DEBUG, "$tag: $message")
-    override fun log(tag: String, e: Exception) = project.logger.log(LogLevel.DEBUG, tag, e)
+interface PluginLogger : Logger {
+    fun warn(tag: String, message: String)
+    fun warn(tag: String, message: String, e: Exception)
+
+    fun debug(tag: String, message: String)
+    fun debug(tag: String, message: String, e: Exception)
+}
+
+fun PluginLogger.warn(message: String) {
+    warn(DEFAULT_TAG, message)
+}
+
+fun PluginLogger.warn(message: String, e: Exception) {
+    warn(DEFAULT_TAG, message, e)
+}
+
+fun PluginLogger.debug(message: String) {
+    debug(DEFAULT_TAG, message)
+}
+
+fun PluginLogger.debug(message: String, e: Exception) {
+    debug(DEFAULT_TAG, message, e)
+}
+
+
+@DependenciesScope
+class DefaultPluginLogger @Inject constructor(private val project: Project) : PluginLogger {
+    override fun log(tag: String, message: String) = project.logger.log(LogLevel.QUIET, "$tag: $message")
+    override fun log(tag: String, message: String, e: Exception) =
+        project.logger.log(LogLevel.DEBUG, "$tag: $message", e)
+
+    override fun warn(tag: String, message: String) = project.logger.warn("$tag: $message")
+
+    override fun warn(tag: String, message: String, e: Exception) = project.logger.warn("$tag: $message", e)
+
+    override fun debug(tag: String, message: String) = project.logger.debug("$tag: $message")
+    override fun debug(tag: String, message: String, e: Exception) = project.logger.debug("$tag: $message", e)
 }

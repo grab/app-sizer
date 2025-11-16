@@ -27,6 +27,7 @@
 
 package com.grab.plugin.sizer.dependencies
 
+import com.grab.plugin.sizer.utils.DefaultPluginLogger
 import com.grab.plugin.sizer.utils.PluginLogger
 import com.grab.sizer.utils.Logger
 import dagger.Binds
@@ -49,8 +50,6 @@ internal interface DependenciesComponent {
     fun dependencyExtractor(): DependencyExtractor
     fun configurationExtractor(): ConfigurationExtractor
     fun variantExtractor(): VariantExtractor
-
-    fun logger(): Logger
 
     @Component.Factory
     interface Factory {
@@ -79,5 +78,5 @@ internal interface DependenciesModule {
     fun bindVariantExtractor(extractor: DefaultVariantExtractor): VariantExtractor
 
     @Binds
-    fun bindLogger(logger: PluginLogger): Logger
+    fun bindLogger(logger: DefaultPluginLogger): PluginLogger
 }

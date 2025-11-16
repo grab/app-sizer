@@ -27,6 +27,7 @@
 
 package com.grab.plugin.sizer
 
+import com.grab.plugin.sizer.utils.DefaultPluginLogger
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -36,6 +37,7 @@ class AppSizerPlugin : Plugin<Project> {
     override fun apply(project: Project) =
         TaskManager(
             project,
-            project.extensions.create(PLUGIN_EXTENSION, AppSizePluginExtension::class.java)
+            project.extensions.create(PLUGIN_EXTENSION, AppSizePluginExtension::class.java),
+            DefaultPluginLogger(project)
         ).configTasks()
 }

@@ -30,11 +30,7 @@ package com.grab.plugin.sizer.dependencies
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
-import com.grab.plugin.sizer.utils.isAndroidApplication
-import com.grab.plugin.sizer.utils.isAndroidLibrary
-import com.grab.plugin.sizer.utils.isJava
-import com.grab.plugin.sizer.utils.isKotlinJvm
-import com.grab.plugin.sizer.utils.isKotlinMultiplatform
+import com.grab.plugin.sizer.utils.*
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -60,8 +56,10 @@ internal interface VariantExtractor {
      *
      * @param project The project for which to locate the matching variant.
      * @return AppSizeVariant that is the extracted variant for the given project type.
-     * @throws IllegalArgumentException if the project type is not supported.
+     * @throws UnsupportedOperationException if the project type is not supported.
+     * @throws IllegalStateException if no matching variant can be found.
      */
+    @Throws(UnsupportedOperationException::class, IllegalStateException::class)
     fun findMatchVariant(project: Project): AppSizeVariant
 }
 
@@ -109,8 +107,9 @@ internal class DefaultVariantExtractor @Inject constructor(
     private val enableMatchDebugVariant: Boolean,
 ) : VariantExtractor {
 
-    override fun findMatchVariant(project: Project): AppSizeVariant{
-        return when{
+    @Throws(UnsupportedOperationException::class, IllegalStateException::class)
+    override fun findMatchVariant(project: Project): AppSizeVariant {
+        return when {
             enableMatchDebugVariant -> findMatchDebugVariant(project)
             else -> defaultFindMatchVariant(project)
         }
@@ -122,8 +121,10 @@ internal class DefaultVariantExtractor @Inject constructor(
      *
      * @param project The project for which to locate the matching variant.
      * @return AppSizeVariant that is the extracted variant for the given project type.
-     * @throws IllegalArgumentException if the project type is not supported.
+     * @throws UnsupportedOperationException if the project type is not supported.
+     * @throws IllegalStateException if no matching variant can be found.
      */
+    @Throws(UnsupportedOperationException::class, IllegalStateException::class)
     private fun defaultFindMatchVariant(project: Project): AppSizeVariant {
         return when {
             project.isAndroidApplication -> AndroidAppSizeVariant(
@@ -139,7 +140,7 @@ internal class DefaultVariantExtractor @Inject constructor(
             project.isKotlinMultiplatform -> KmpJarAppSizeVariant(project)
 
             else -> {
-                throw IllegalArgumentException("${project.name} is not supported")
+                throw UnsupportedOperationException("Project type not supported: ${project.name}")
             }
         }
     }
@@ -150,8 +151,10 @@ internal class DefaultVariantExtractor @Inject constructor(
      *
      * @param project The project for which to locate the debug variant.
      * @return AppSizeVariant that is the debug variant for the given project type.
-     * @throws IllegalArgumentException if the project type is not supported.
+     * @throws UnsupportedOperationException if the project type is not supported.
+     * @throws IllegalStateException if no matching debug variant can be found.
      */
+    @Throws(UnsupportedOperationException::class, IllegalStateException::class)
     private fun findMatchDebugVariant(project: Project): AppSizeVariant {
         return when {
             project.isAndroidApplication -> AndroidAppSizeVariant(
@@ -167,7 +170,7 @@ internal class DefaultVariantExtractor @Inject constructor(
             project.isKotlinMultiplatform -> KmpJarAppSizeVariant(project)
 
             else -> {
-                throw IllegalArgumentException("${project.name} is not supported")
+                throw UnsupportedOperationException("Project type not supported: ${project.name}")
             }
         }
     }
@@ -177,8 +180,9 @@ internal class DefaultVariantExtractor @Inject constructor(
      *
      * @param variants DomainObjectSet of BaseVariants that should be searched.
      * @return BaseVariant that is the debug variant matching the flavor of the base variant.
-     * @throws RuntimeException if no matching debug variant can be found.
+     * @throws IllegalStateException if no matching debug variant can be found.
      */
+    @Throws(IllegalStateException::class)
     private fun findDebugVariant(variants: DomainObjectSet<out BaseVariant>): BaseVariant {
         // Filter out the debug variants from the provided set of variants.
         val debugVariants = variants.filter { variant ->
@@ -205,7 +209,7 @@ internal class DefaultVariantExtractor @Inject constructor(
             }
         }
         // If no match was found, throw an exception.
-        throw RuntimeException("Can not find the matching debug variant")
+        throw IllegalStateException("Cannot find matching debug variant")
     }
 
 
@@ -214,8 +218,9 @@ internal class DefaultVariantExtractor @Inject constructor(
      *
      * @receiver Project The project from which to extract the variant.
      * @return BaseVariant that is the variant matching the flavor and build type of the base variant.
-     * @throws RuntimeException if no matching variant can be found.
+     * @throws IllegalStateException if no matching variant can be found.
      */
+    @Throws(IllegalStateException::class)
     private fun Project.extractVariant(variants: DomainObjectSet<out BaseVariant>): BaseVariant {
 
         // Try to find a variant that fully matches the base variant
@@ -278,7 +283,7 @@ internal class DefaultVariantExtractor @Inject constructor(
             }
         }
         // When no match found, throw exception
-        throw RuntimeException("Can not find the matching variant for ${project.name}")
+        throw IllegalStateException("Cannot find matching variant for ${project.name}")
     }
 }
 

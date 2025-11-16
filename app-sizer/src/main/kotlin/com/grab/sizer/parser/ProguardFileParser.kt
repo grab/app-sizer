@@ -58,9 +58,9 @@ class DefaultProguardFileParser @Inject constructor(
                 readFromReader(InputStreamReader(it, Charsets.UTF_8))
             }
         } catch (e: IOException) {
-            logger.log(e)
+            logger.log("Parse mapping file failure", e)
         } catch (e: ParseException) {
-            logger.log(e)
+            logger.log("Parse mapping file failure", e)
         }
     }
 }

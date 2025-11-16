@@ -81,7 +81,7 @@ class DefaultVariantExtractorTest {
         val project = ProjectBuilder.builder().withParent(rootProject).build()
         project.doEvaluate()
 
-        assertThrows<IllegalArgumentException>("${project.name} is not supported") {
+        assertThrows<UnsupportedOperationException>("Project type not supported: ${project.name}") {
             extractor.findMatchVariant(project)
         }
     }
