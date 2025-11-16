@@ -27,6 +27,9 @@
 
 package com.grab.plugin.sizer.dependencies
 
+import com.grab.plugin.sizer.utils.PluginLogger
+import com.grab.plugin.sizer.utils.debug
+import com.grab.plugin.sizer.utils.warn
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import javax.inject.Inject
@@ -37,14 +40,22 @@ interface ConfigurationExtractor {
 
 @DependenciesScope
 internal class DefaultConfigurationExtractor @Inject constructor(
-    private val variantExtractor: VariantExtractor
+    private val variantExtractor: VariantExtractor,
+    private val logger: PluginLogger
 ) : ConfigurationExtractor {
     override fun runtimeConfigurations(project: Project): Sequence<Configuration> {
-        val variant = variantExtractor.findMatchVariant(project)
-        return project.configurations.asSequence()
-            .filter {
-                variant.runtimeConfiguration.hierarchy.contains(it)
-            }
+        return try {
+            val variant = variantExtractor.findMatchVariant(project)
+            project.configurations.asSequence()
+                .filter {
+                    variant.runtimeConfiguration.hierarchy.contains(it)
+                }
+        } catch (e: RuntimeException) {
+            logger.warn("Could not find matching variant for project ${project.name}: ${e.message}")
+            logger.debug("Full stack trace for variant extraction failure:", e)
+            // Return empty sequence if variant extraction fails
+            emptySequence()
+        }
     }
 }
 

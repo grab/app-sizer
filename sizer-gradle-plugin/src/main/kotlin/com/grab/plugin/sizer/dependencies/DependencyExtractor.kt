@@ -27,14 +27,14 @@
 
 package com.grab.plugin.sizer.dependencies
 
-import com.grab.sizer.utils.Logger
-import com.grab.sizer.utils.log
+import com.grab.plugin.sizer.utils.PluginLogger
+import com.grab.plugin.sizer.utils.debug
+import com.grab.plugin.sizer.utils.warn
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.ResolvedDependency
-import org.gradle.api.internal.artifacts.DefaultResolvedDependency
 import org.gradle.internal.component.AmbiguousVariantSelectionException
 import java.util.*
 import javax.inject.Inject
@@ -53,7 +53,7 @@ class DefaultDependencyExtractor @Inject constructor(
     private val appProject: Project,
     private val configurationExtractor: ConfigurationExtractor,
     private val archiveExtractor: ArchiveExtractor,
-    private val logger: Logger
+    private val logger: PluginLogger
 ) : DependencyExtractor {
     override fun extract(): ArchiveDependencyStore {
         return ArchiveDependencyStore().apply {
@@ -62,8 +62,16 @@ class DefaultDependencyExtractor @Inject constructor(
 
             while (queue.isNotEmpty()) {
                 val project = queue.poll()
-                val projectArchive = archiveExtractor.extract(project)
-                add(projectArchive)
+                try {
+                    val projectArchive = archiveExtractor.extract(project)
+                    add(projectArchive)
+                } catch (e: UnsupportedOperationException) {
+                    logger.warn("Skipping project ${project.name} - unsupported type: ${e.message}")
+                    logger.debug("Full stack trace for archive extraction failure:", e)
+                } catch (e: IllegalStateException) {
+                    logger.warn("Skipping project ${project.name} - variant extraction failed: ${e.message}")
+                    logger.debug("Full stack trace for archive extraction failure:", e)
+                }
                 fetchInternalDependency(project, this, checkedProjects, queue)
                 fetchExternalDependency(project, this)
             }
@@ -81,9 +89,17 @@ class DefaultDependencyExtractor @Inject constructor(
             .filterIsInstance<ProjectDependency>()
             .map { it.dependencyProject }
             .forEach { dependencyProject ->
-                archiveDependencyStore.add(
-                    archiveExtractor.extract(dependencyProject)
-                )
+                try {
+                    archiveDependencyStore.add(
+                        archiveExtractor.extract(dependencyProject)
+                    )
+                } catch (e: UnsupportedOperationException) {
+                    logger.warn("Skipping dependency project ${dependencyProject.name} - unsupported type: ${e.message}")
+                    logger.debug("Full stack trace for dependency archive extraction failure:", e)
+                } catch (e: IllegalStateException) {
+                    logger.warn("Skipping dependency project ${dependencyProject.name} - variant extraction failed: ${e.message}")
+                    logger.debug("Full stack trace for dependency archive extraction failure:", e)
+                }
                 if (!checkedProjects.contains(dependencyProject.path)) {
                     queue.add(dependencyProject)
                     checkedProjects.add(dependencyProject.path)
@@ -102,7 +118,7 @@ class DefaultDependencyExtractor @Inject constructor(
                 try {
                     it.firstLevelModuleDependencies
                 } catch (e: ResolveException) {
-                    logger.log("Fetching firstLevelModuleDependencies having issue with $it for ${project.name}")
+                    logger.warn("Fetching firstLevelModuleDependencies having issue with $it for ${project.name}")
                     emptySet<ResolvedDependency>()
                 }
             }
@@ -118,7 +134,7 @@ class DefaultDependencyExtractor @Inject constructor(
                             archiveDependencyStore.add(artifact.toArchiveDependency())
                         }
                     } catch (e: AmbiguousVariantSelectionException) {
-                        logger.log("Fetching allModuleArtifacts having issue with ${resolvedDep.name}")
+                        logger.warn("Fetching allModuleArtifacts having issue with ${resolvedDep.name}")
                     }
                 }
             }

@@ -231,13 +231,75 @@ appSizer {
 <img src="../images/task-graph.png" width="80%">
 </p>
 
+## Known Limitations
+
+### Variant Matching and Module Skipping
+
+The App Sizer plugin uses sophisticated variant matching to analyze dependencies across different project types. However, some scenarios may result in modules being skipped during analysis, which can impact the accuracy of the final results.
+
+#### When Modules Are Skipped
+
+The plugin may skip modules in the following scenarios:
+
+1. **Unsupported Project Types**: Projects that don't match any supported type (Android app/library, Java/Kotlin JVM, Kotlin Multiplatform)
+2. **Missing Build Variants**: Android library modules that lack variants matching the main app's flavor/buildType configuration
+4. **Custom Build Logic**: Modules using non-standard build configurations that the plugin cannot interpret
+
+
+#### Error Handling Behavior
+
+The plugin uses defensive error handling to maintain build stability while logging informative warnings:
+
+```
+AppSize: Skipping project module-name - variant extraction failed: Cannot find matching variant for module-name
+AppSize: Skipping dependency project library-name - unsupported type: Project type not supported: library-name
+AppSize: Could not find matching variant for Android library project module-name: Cannot find matching variant for module-name
+AppSize: Unsupported project type for Android library project module-name: Project type not supported: module-name
+```
+
+When debug logging is enabled (`--debug` flag), full stack traces are available for detailed troubleshooting:
+
+```
+AppSize: Full stack trace for variant extraction failure:
+java.lang.IllegalStateException: Cannot find matching variant for module-name
+    at com.grab.plugin.sizer.dependencies.DefaultVariantExtractor.extractVariant(VariantExtractor.kt:284)
+    at com.grab.plugin.sizer.dependencies.DefaultVariantExtractor.defaultFindMatchVariant(VariantExtractor.kt:132)
+    [... full stack trace ...]
+```
+
+#### Impact on Analysis Results
+
+All classes and resources belonging to skipped modules will be automatically attributed to the app module during analysis, which may impact the accuracy of module-wise and team-based size breakdowns.
+
+
 ## Troubleshooting
+
+### Common Variant Matching Issues
+
+1. **"Cannot find matching variant for [module-name]"**
+   - **Cause**: Library module lacks a variant matching the app's configuration
+   - **Solution**: Add `matchingFallbacks` to the library module or ensure consistent flavor/buildType naming
+
+2. **"Unsupported project type: [project-name]"**
+   - **Cause**: Project doesn't use a supported plugin type  
+   - **Solution**: Verify the project applies Android, Java, or Kotlin plugin correctly
+
+3. **"Skipping dependency project [library-name]"**
+   - **Cause**: External or internal dependency has configuration issues
+   - **Solution**: Check dependency's build configuration and ensure it's compatible
 
 ### Resource Verification Failures
 If you encounter issues with the `verifyResourceRelease` task, try these solutions:
 - Check that your resource files are properly formatted and located
 - Verify that resource names follow Android naming conventions
 - Enable the `enableMatchDebugVariant` flag in your configuration
+
+### Missing Analysis Data
+
+If modules appear to be missing from your analysis reports:
+
+1. **Check Warning Logs**: Look for "Skipping project" messages in build output
+2. **Enable Debug Mode**: Run with `--debug` to get detailed variant matching information
 
 ### Dagger NoSuchMethodError
 If you encounter this exception:
@@ -251,6 +313,16 @@ This error typically occurs due to a version conflict between the Android build 
 ```
 classpath "com.google.dagger:dagger:2.47"
 ```
+
+### Debug Mode Analysis
+
+Run with debug logging to get detailed information about module processing, variant matching, and potential issues:
+
+```bash
+./gradlew appSizeAnalysisRelease --debug 2>&1 | grep -E "(Skipping|variant|extraction)"
+```
+
+This will filter the output to show only variant matching and module processing information.
 
 ## Resources
 

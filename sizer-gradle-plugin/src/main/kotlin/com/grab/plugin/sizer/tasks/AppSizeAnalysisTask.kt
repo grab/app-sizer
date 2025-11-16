@@ -37,8 +37,8 @@ import com.grab.plugin.sizer.dependencies.ArchiveDependencyStore
 import com.grab.plugin.sizer.dependencies.VariantInput
 import com.grab.plugin.sizer.dependencies.toVariantInput
 import com.grab.plugin.sizer.params
+import com.grab.plugin.sizer.utils.DefaultPluginLogger
 import com.grab.plugin.sizer.utils.PluginInputProvider
-import com.grab.plugin.sizer.utils.PluginLogger
 import com.grab.plugin.sizer.utils.PluginOutputProvider
 import com.grab.sizer.AnalyticsOption
 import com.grab.sizer.AppSizer
@@ -123,7 +123,7 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
                 inputProvider = createInputProvider(archiveDependencyStore, apkDirectory),
                 outputProvider = createOutputProvider(projectInfo),
                 libName = libName.orNull,
-                logger = PluginLogger(project),
+                logger = DefaultPluginLogger(project),
             ).process(option.get())
         }
 
@@ -181,7 +181,7 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
                     this.outputDirectory.set(project.layout.buildDirectory.dir("sizer/reports/${variant.name}"))
                 }
 
-                if(pluginExtension.input.teamMappingFile.isPresent){
+                if (pluginExtension.input.teamMappingFile.isPresent) {
                     this.teamMappingFile.set(pluginExtension.input.teamMappingFile)
                 }
 

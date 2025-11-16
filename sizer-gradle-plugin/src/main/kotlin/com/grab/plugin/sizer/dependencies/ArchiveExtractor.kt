@@ -36,6 +36,15 @@ import org.gradle.api.Project
 import javax.inject.Inject
 
 interface ArchiveExtractor {
+    /**
+     * Extracts archive dependency from a project.
+     * 
+     * @param project The project to extract archive dependency from
+     * @return ArchiveDependency representing the project's binary output
+     * @throws UnsupportedOperationException if the project type is unsupported
+     * @throws IllegalStateException if variant extraction fails
+     */
+    @Throws(UnsupportedOperationException::class, IllegalStateException::class)
     fun extract(project: Project): ArchiveDependency
 }
 
@@ -43,6 +52,7 @@ interface ArchiveExtractor {
 internal class DefaultArchiveExtractor @Inject constructor(
     private val variantExtractor: VariantExtractor
 ) : ArchiveExtractor {
+    @Throws(UnsupportedOperationException::class, IllegalStateException::class)
     override fun extract(project: Project): ArchiveDependency {
         val matchVariant = variantExtractor.findMatchVariant(project)
         return when {
@@ -61,7 +71,7 @@ internal class DefaultArchiveExtractor @Inject constructor(
                pathToArtifact = matchVariant.binaryOutPut.path
            )
 
-            else -> throw IllegalArgumentException("The ${project.name} is not an Android/Kotlin/Java module")
+            else -> throw UnsupportedOperationException("Unsupported project type: ${project.name}")
         }
     }
 }

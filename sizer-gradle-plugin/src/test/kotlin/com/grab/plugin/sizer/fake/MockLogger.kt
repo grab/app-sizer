@@ -27,20 +27,32 @@
 
 package com.grab.plugin.sizer.fake
 
-import com.grab.sizer.utils.Logger
+import com.grab.plugin.sizer.utils.PluginLogger
 
-class MockLogger : Logger {
+class MockLogger : PluginLogger {
     val loggedMessages = mutableListOf<String>()
 
     override fun log(tag: String, message: String) {
         loggedMessages.add("$tag: $message")
     }
 
-    override fun log(tag: String, e: Exception) {
-        loggedMessages.add("$tag: ${e.message}")
+    override fun log(tag: String, message: String, e: Exception) {
+        loggedMessages.add("$tag: $message ${e.message}")
     }
 
-    override fun logDebug(tag: String, message: String) {
+    override fun warn(tag: String, message: String) {
+        loggedMessages.add("$tag: $message")
+    }
+
+    override fun warn(tag: String, message: String, e: Exception) {
+        loggedMessages.add("$tag: $message ${e.message}")
+    }
+
+    override fun debug(tag: String, message: String) {
         loggedMessages.add("DEBUG - $tag: $message")
+    }
+
+    override fun debug(tag: String, message: String, e: Exception) {
+        loggedMessages.add("DEBUG - $tag: $message ${e.message}")
     }
 }

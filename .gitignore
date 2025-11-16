@@ -16,5 +16,3 @@ build/
 *.iws
 .java-version
 
-# Documentation folder - contains drafts, AI-generated content, and other private content not intended for public repo
-docs/

@@ -32,12 +32,8 @@ class CliLogger : Logger {
         println("$tag : $message")
     }
 
-    override fun log(tag: String, e: Exception) {
-        println("$tag :")
-        e.printStackTrace()
-    }
-
-    override fun logDebug(tag: String, message: String) {
+    override fun log(tag: String, message: String, e: Exception) {
         println("$tag : $message")
+        e.printStackTrace()
     }
 }

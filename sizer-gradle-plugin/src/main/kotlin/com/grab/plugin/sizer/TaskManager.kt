@@ -37,11 +37,7 @@ import com.grab.plugin.sizer.dependencies.*
 import com.grab.plugin.sizer.tasks.AppSizeAnalysisTask
 import com.grab.plugin.sizer.tasks.GenerateApkTask
 import com.grab.plugin.sizer.tasks.GenerateArchivesListTask
-import com.grab.plugin.sizer.utils.isAndroidApplication
-import com.grab.plugin.sizer.utils.isAndroidLibrary
-import com.grab.plugin.sizer.utils.isJava
-import com.grab.plugin.sizer.utils.isKotlinJvm
-import com.grab.plugin.sizer.utils.isKotlinMultiplatform
+import com.grab.plugin.sizer.utils.*
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.ProjectDependency
@@ -57,7 +53,8 @@ import org.gradle.kotlin.dsl.the
  */
 internal class TaskManager(
     private val project: Project,
-    private val pluginExtension: AppSizePluginExtension
+    private val pluginExtension: AppSizePluginExtension,
+    private val logger: PluginLogger
 ) {
     fun configTasks() {
         project.rootProject.gradle.projectsEvaluated {
@@ -147,8 +144,12 @@ internal class TaskManager(
                     if (variant is AndroidAppSizeVariant) {
                         task.dependsOn(variant.baseVariant.assembleProvider)
                     }
-                } catch (e: RuntimeException) {
-                    project.logger.warn("Could not find matching variant for Android library project ${project.name}: ${e.message}")
+                } catch (e: UnsupportedOperationException) {
+                    logger.warn("Unsupported project type for Android library project ${project.name}: ${e.message}")
+                    logger.debug("Full stack trace for variant extraction failure:", e)
+                } catch (e: IllegalStateException) {
+                    logger.warn("Could not find matching variant for Android library project ${project.name}: ${e.message}")
+                    logger.debug("Full stack trace for variant extraction failure:", e)
                 }
             }
 
@@ -163,10 +164,10 @@ internal class TaskManager(
             project.isKotlinMultiplatform -> {
                 task.dependsOn(project.tasks.named(KMP_JAR_TASK))
             }
-            
+
             else -> {
                 // Skip unsupported project types to avoid variant extraction errors
-                project.logger.debug("Skipping variant extraction for unsupported project type: ${project.name}")
+                logger.warn("Skipping variant extraction for unsupported project type: ${project.name}")
             }
         }
 
