@@ -30,7 +30,9 @@ package com.grab.sizer
 import com.grab.sizer.config.Config
 import com.grab.sizer.utils.FileQuery
 import com.grab.sizer.utils.InputProvider
+import com.grab.sizer.utils.Logger
 import com.grab.sizer.utils.SizerInputFile
+import com.grab.sizer.utils.log
 import java.io.File
 
 
@@ -41,6 +43,9 @@ internal const val DEFAULT_JAR_DIR = "build/libs"
 internal const val GRADLE_FILE = "build.gradle"
 internal const val DEFAULT_AAR_FOLDER = "/build/outputs/aar"
 private const val BUILD_FOLDER = "build"
+
+// Gradle cache path constants for Maven coordinate extraction
+private const val VERSION_REGEX_PATTERN = ".*\\d+.*"
 
 interface FileSystem {
     fun create(parent: File, path: String): File
@@ -54,6 +59,7 @@ class CliInputProvider constructor(
     private val fileQuery: FileQuery,
     private val config: Config,
     private val apksDirectory: File,
+    private val logger: Logger,
     private val fileSystem: FileSystem = DefaultFileSystem()
 ) : InputProvider {
     override fun provideModuleAar(): Sequence<SizerInputFile> {
@@ -113,7 +119,7 @@ class CliInputProvider constructor(
         config.projectInput.librariesDirectory, EXT_JAR
     ).map { file ->
         SizerInputFile(
-            tag = file.nameWithoutExtension,
+            tag = extractMavenCoordinate(file),
             file = file
         )
     }
@@ -122,7 +128,7 @@ class CliInputProvider constructor(
         config.projectInput.librariesDirectory, EXT_AAR
     ).map { file ->
         SizerInputFile(
-            tag = file.nameWithoutExtension,
+            tag = extractMavenCoordinate(file),
             file = file
         )
     }
@@ -133,7 +139,63 @@ class CliInputProvider constructor(
 
     override fun provideTeamMappingFile(): File? = config.projectInput.ownerMappingFile
 
+    override fun provideLibraryOwnershipFile(): File? = config.projectInput.libraryOwnerMappingFile
+
     override fun provideLargeFileThreshold(): Long = config.projectInput.largeFileThreshold
+
+    /**
+     * Extracts Maven coordinate from Gradle cache path structure with robust fallbacks.
+     * Path pattern: [gradle-folder]/caches/modules-2/files-2.1/{groupId}/{artifactId}/{version}/{hash}/{filename}
+     * Example: ~/.gradle/caches/modules-2/files-2.1/androidx.core/core/1.13.1/.../core-1.13.1.aar
+     *          -> androidx.core:core:1.13.1
+     *
+     * Fallbacks:
+     * 1. If not in Gradle cache: try to parse filename patterns
+     * 2. If all fails: use filename without extension
+     */
+    private fun extractMavenCoordinate(file: File): String {
+        val path = file.absolutePath
+
+        // Primary: Extract from official Gradle cache structure
+        val gradleCachePattern = "caches${File.separator}modules-2${File.separator}files-2.1${File.separator}"
+        val cacheIndex = path.indexOf(gradleCachePattern)
+
+        if (cacheIndex != -1) {
+            val afterCache = path.substring(cacheIndex + gradleCachePattern.length)
+            val pathParts = afterCache.split(File.separator)
+
+            if (pathParts.size >= 3) {
+                val groupId = pathParts[0]
+                val artifactId = pathParts[1]
+                val version = pathParts[2]
+                return "$groupId:$artifactId:$version"
+            }
+        }
+
+        // Fallback 1: Try to parse common filename patterns
+        val filename = file.nameWithoutExtension
+
+        // Pattern: groupId-artifactId-version (e.g., "androidx.core-core-1.13.1")
+        val dashParts = filename.split("-")
+        if (dashParts.size >= 3) {
+            // Try to identify version pattern (ends with numbers/dots)
+            for (i in 2 until dashParts.size) {
+                val potentialVersion = dashParts.subList(i, dashParts.size).joinToString("-")
+                if (potentialVersion.matches(Regex(VERSION_REGEX_PATTERN))) { // Contains digits
+                    val groupId = dashParts[0]
+                    val artifactId = dashParts.subList(1, i).joinToString("-")
+                    return "$groupId:$artifactId:$potentialVersion"
+                }
+            }
+        }
+
+        // Fallback 2: Use filename as-is (for custom libraries or non-standard structures)
+        logger.log("⚠️  WARNING: Could not extract Maven coordinate from path: ${file.absolutePath}")
+        logger.log("   Using filename as coordinate: $filename")
+        logger.log("   📋 IMPORTANT: Update library-owner.yml to use filename patterns:")
+        logger.log("      Instead of: 'com.example:*' use: '$filename*' or '$filename'")
+        return filename
+    }
 }
 
 

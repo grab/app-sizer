@@ -45,6 +45,7 @@ interface InputProvider {
     fun provideApkFiles(): Sequence<File>
     fun provideR8MappingFile(): File?
     fun provideTeamMappingFile(): File?
+    fun provideLibraryOwnershipFile(): File?
     fun provideLargeFileThreshold(): Long
 }
 

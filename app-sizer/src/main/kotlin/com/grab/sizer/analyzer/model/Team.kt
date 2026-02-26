@@ -33,14 +33,29 @@ import com.grab.sizer.parser.BinaryFileInfo
 
 data class Team(
     val name: String,
-    val modules: List<Module>
+    val moduleContributors: List<Contributor>,
+    val libContributors: List<Contributor>
 ) {
-    val resourcesDownloadSize: Long by lazy { modules.sumOf { contributor -> contributor.resourcesDownloadSize } }
-    val nativeLibDownloadSize: Long by lazy { modules.sumOf { contributor -> contributor.nativeLibDownloadSize } }
-    val assetsDownloadSize: Long by lazy { modules.sumOf { contributor -> contributor.assetsDownloadSize } }
-    val othersDownloadSize: Long by lazy { modules.sumOf { contributor -> contributor.othersDownloadSize } }
-    val classDownloadSize: Long by lazy { modules.sumOf { contributor -> contributor.classDownloadSize } }
-    fun getDownloadSize(): Long = modules.sumOf { it.getDownloadSize() }
+
+    val contributors: List<Contributor> = moduleContributors + libContributors
+
+    fun getDownloadSize(): Long = contributors.sumOf { it.getDownloadSize() }
+
+    val codebaseResourcesDownloadSize: Long by lazy { moduleContributors.sumOf { it.resourcesDownloadSize } }
+    val codebaseNativeLibDownloadSize: Long by lazy { moduleContributors.sumOf { it.nativeLibDownloadSize } }
+    val codebaseAssetsDownloadSize: Long by lazy { moduleContributors.sumOf { it.assetsDownloadSize } }
+    val codebaseOthersDownloadSize: Long by lazy { moduleContributors.sumOf { it.othersDownloadSize } }
+    val codebaseClassDownloadSize: Long by lazy { moduleContributors.sumOf { it.classDownloadSize } }
+
+    // Library-specific calculations for library reports
+    val libTotalDownloadSize: Long by lazy { libContributors.sumOf { it.getDownloadSize() } }
+    val libNativeDownloadSize: Long by lazy { libContributors.sumOf { it.nativeLibDownloadSize } }
+
+    val resourcesDownloadSize: Long by lazy { contributors.sumOf { it.resourcesDownloadSize } }
+    val nativeLibDownloadSize: Long by lazy { contributors.sumOf { it.nativeLibDownloadSize } }
+    val assetsDownloadSize: Long by lazy { contributors.sumOf { it.assetsDownloadSize } }
+    val othersDownloadSize: Long by lazy { contributors.sumOf { it.othersDownloadSize } }
+    val classDownloadSize: Long by lazy { contributors.sumOf { it.classDownloadSize } }
 }
 
 data class Module(
@@ -61,13 +76,32 @@ data class Module(
         resourcesDownloadSize + nativeLibDownloadSize + assetsDownloadSize + othersDownloadSize + classDownloadSize
 }
 
-internal fun Set<Contributor>.toTeams(teamMapping: TeamMapping): List<Team> {
-    val modules = toModules()
-    return teamMapping.teamToModuleMap.mapValues { teamToModule ->
-        teamToModule.value.mapNotNull { moduleNameFromTeamMapping ->
-            modules.find { module -> module.tag == moduleNameFromTeamMapping }
+internal fun Set<Contributor>.toTeams(teamMapping: TeamMapping?): List<Team> {
+    return teamMapping?.let { mapping ->
+        // Single-pass grouping to avoid O(N×T) complexity
+        val moduleContributorsByTeam = mutableMapOf<String, MutableList<Contributor>>()
+        val libContributorsByTeam = mutableMapOf<String, MutableList<Contributor>>()
+
+        // Group contributors by team in single pass
+        this.forEach { contributor ->
+            mapping.getModuleOwner(contributor.tag)?.let { teamName ->
+                moduleContributorsByTeam.getOrPut(teamName) { mutableListOf() }.add(contributor)
+            }
+            mapping.getLibraryOwner(contributor.tag)?.let { teamName ->
+                libContributorsByTeam.getOrPut(teamName) { mutableListOf() }.add(contributor)
+            }
         }
-    }.map { Team(it.key, it.value) }
+
+        // Create teams from grouped contributors
+        val allTeamNames = moduleContributorsByTeam.keys + libContributorsByTeam.keys
+        allTeamNames.map { teamName ->
+            Team(
+                teamName,
+                moduleContributorsByTeam[teamName] ?: emptyList(),
+                libContributorsByTeam[teamName] ?: emptyList()
+            )
+        }
+    } ?: emptyList()
 }
 
 internal fun List<Team>.sort(): List<Team> {
@@ -91,11 +125,11 @@ internal fun Set<Contributor>.toModules(): List<Module> {
         }
 }
 
-internal fun Module.toReportItem(moduleToTeamMap: Map<String, String>): ReportItem =
+internal fun Module.toReportItem(teamMapping: TeamMapping?): ReportItem =
     ReportItem(
         name = tag,
         id = tag,
-        owner = moduleToTeamMap[tag],
+        owner = teamMapping?.getModuleOwner(tag),
         extraInfo = "Sum up all codebase for $tag",
         totalDownloadSize = getDownloadSize(),
         classesDownloadSize = classDownloadSize,

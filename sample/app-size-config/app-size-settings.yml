@@ -4,6 +4,7 @@ project-input:
   project-root-dir: "./"
   r8-mapping-file: "./app/build/outputs/mapping/proRelease/mapping.txt"
   owner-mapping-file: "./module-owner.yml"
+  library-owner-mapping-file: "./library-owner.yml"
   version: "1.0.1"
   large-file-threshold: 10
   project-name: "sample"

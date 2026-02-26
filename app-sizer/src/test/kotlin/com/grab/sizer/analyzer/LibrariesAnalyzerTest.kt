@@ -36,7 +36,8 @@ class LibrariesAnalyzerTest {
     private val project1Data = Project1Data()
     private val analyzer = LibrariesAnalyzer(
         apkComponentProcessor = mapperComponent.apkComponentProcessor,
-        dataParser = project1Data.fakeDataPasser
+        dataParser = project1Data.fakeDataPasser,
+        teamMapping = null  // Optional teamMapping for tests
     )
 
     @Test

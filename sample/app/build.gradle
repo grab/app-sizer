@@ -118,6 +118,7 @@ appSizer {
         enableMatchDebugVariant = true
         largeFileThreshold = 10
         teamMappingFile = file("${rootProject.rootDir}/module-owner.yml")
+        libraryOwnershipFile = file("${rootProject.rootDir}/library-owner.yml")
     }
     metrics {
         /** Enable this block if you have an InfluxDb locally **/

@@ -41,6 +41,7 @@ class PluginInputProvider(
     private val largeFileThreshold: Long,
     private val teamMappingFile: File? = null,
     private val r8MappingFile: File? = null,
+    private val libraryOwnershipFile: File? = null,
 ) : InputProvider {
     override fun provideModuleAar(): Sequence<SizerInputFile> =
         archiveDependencyStore.getModuleDependency()
@@ -85,6 +86,8 @@ class PluginInputProvider(
     override fun provideR8MappingFile(): File? = r8MappingFile
 
     override fun provideTeamMappingFile(): File? = teamMappingFile
+
+    override fun provideLibraryOwnershipFile(): File? = libraryOwnershipFile
 
     override fun provideLargeFileThreshold(): Long = largeFileThreshold
 }

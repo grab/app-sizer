@@ -31,6 +31,7 @@ import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.Row
+import com.grab.sizer.report.size
 import javax.inject.Inject
 
 /**
@@ -51,7 +52,7 @@ internal class BasicApkAnalyzer @Inject constructor(
     override fun process(): Report {
         val androidBinaryInfo = dataParser.apks
         return Report(
-            rows = androidBinaryInfo.createApkReportRows(),
+            rows = androidBinaryInfo.createApkReportRows().sortedBy { it.size() },
             id = METRICS_ID_BASIC,
             name = METRICS_ID_BASIC,
         )

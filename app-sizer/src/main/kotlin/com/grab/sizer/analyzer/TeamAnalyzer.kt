@@ -39,18 +39,18 @@ import javax.inject.Inject
 
 
 /**
- * A specific implementation of the Analyzer interface with a focus on project codebase analysis.
- * Assigned to handle [com.grab.sizer.AnalyticsOption.CODEBASE], this class provides a detailed report on the
- * size contributions of individual team to the total app download size.
+ * Team-focused analyzer that provides comprehensive team dashboard analysis.
+ * Assigned to handle [com.grab.sizer.AnalyticsOption.TEAMS], this class provides a detailed report on the
+ * total size contributions of individual teams to the app download size, combining both module and library contributions.
  *
  * @property dataParser Handles the parsing of APK, AAR, or JAR files.
  * @property apkComponentProcessor Processes APK, AAR, or JAR files to produce a list of contributors.
- * @property teamMapping Maps module to their corresponding team and vise versa
+ * @property teamMapping Optional team mapping for modules and libraries.
  */
-internal class CodebaseAnalyzer @Inject constructor(
+internal class TeamAnalyzer @Inject constructor(
     private val dataParser: DataParser,
     private val apkComponentProcessor: ApkComponentProcessor,
-    private val teamMapping: TeamMapping,
+    private val teamMapping: TeamMapping?,
 ) : Analyzer {
     override fun process(): Report {
         /**
@@ -72,29 +72,89 @@ internal class CodebaseAnalyzer @Inject constructor(
             //others = wholeProject.noOwnerOthers.castToRawFile()
         )
 
-        val modulesData = apkComponentProcessor
+        // Process all contributors together (modules + libraries) for team analysis
+        val allContributorsData = apkComponentProcessor
             .process(
                 dataParser.apks,
-                dataParser.moduleAars,
-                dataParser.moduleJars
+                dataParser.getAars(),
+                dataParser.getJars()
             )
-        return generateReport(modulesData.contributors + appContributor)
+
+        return generateTeamReport(allContributorsData.contributors + appContributor)
     }
 
-    private fun generateReport(contributors: Set<Contributor>): Report {
+    private fun generateTeamReport(contributors: Set<Contributor>): Report {
+        // Convert all contributors to teams (handles both modules and libraries)
         val teams: List<Team> = contributors.toTeams(teamMapping)
-        val sortedTeamsReport = teams.sort()
-            .map { it.toReportRow() }
+
+        val allTeamRows = teams.sortedBy { it.getDownloadSize() }
+            .flatMap { it.toDetailedReportRows() }
         return Report(
-            id = METRICS_ID_CODEBASE,
-            name = METRICS_ID_CODEBASE,
-            rows = sortedTeamsReport
+            id = METRICS_ID_TEAM,
+            name = METRICS_ID_TEAM,
+            rows = allTeamRows
         )
     }
 
-    private fun Team.toReportRow(): Row = createRow(
-        name,
-        getDownloadSize(),
+    private fun Team.toDetailedReportRows(): List<Row> {
+        return teamTotalReport() + teamLibrariesReport() + teamComponentReport()
+    }
+
+    private fun Team.teamTotalReport(): List<Row> = listOf(
+        createRow(
+            name = TOTAL_ID,
+            value = getDownloadSize(),
+            owner = name,
+            rowName = name
+        )
+    )
+
+    private fun Team.teamLibrariesReport(): List<Row> = listOf(
+        createRow(
+            name = ANDROID_JAVA_LIBRARIES_ID,
+            value = libTotalDownloadSize - libNativeDownloadSize,
+            owner = name,
+            rowName = name
+        ),
+        createRow(
+            name = NATIVE_LIBRARIES_ID,
+            value = libNativeDownloadSize,
+            owner = name,
+            rowName = name
+        )
+    )
+
+    private fun Team.teamComponentReport(): List<Row> = listOf(
+        createRow(
+            name = CODEBASE_KOTLIN_JAVA_ID,
+            value = codebaseClassDownloadSize,
+            owner = name,
+            rowName = name
+        ),
+        createRow(
+            name = CODEBASE_RESOURCES_ID,
+            value = codebaseResourcesDownloadSize,
+            owner = name,
+            rowName = name
+        ),
+        createRow(
+            name = CODEBASE_ASSETS_ID,
+            value = codebaseAssetsDownloadSize,
+            owner = name,
+            rowName = name
+        ),
+        createRow(
+            name = CODEBASE_NATIVE_ID,
+            value = codebaseNativeLibDownloadSize,
+            owner = name,
+            rowName = name
+        ),
+        createRow(
+            name = OTHERS_ID,
+            value = codebaseOthersDownloadSize,
+            owner = name,
+            rowName = name
+        )
     )
 }
 

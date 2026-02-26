@@ -32,11 +32,20 @@ import com.grab.sizer.report.*
 internal const val LIBRARY_METRICS_ID = "library"
 internal const val METRICS_ID_APK = "apk"
 internal const val METRICS_ID_BASIC = "apk_basic"
-internal const val METRICS_ID_CODEBASE = "team"
+internal const val METRICS_ID_TEAM = "team"
 internal const val METRICS_ID_LARGE_FILES = "large_file"
 internal const val LIB_CONTENT_METRICS_ID = "library_content"
 internal const val METRICS_ID_MODULES = "module"
 internal const val NOT_AVAILABLE_VALUE = "NA"
+
+internal const val CODEBASE_KOTLIN_JAVA_ID = "codebase-kotlin-java"
+internal const val CODEBASE_RESOURCES_ID = "codebase-resources"
+internal const val CODEBASE_ASSETS_ID = "codebase-assets"
+internal const val CODEBASE_NATIVE_ID = "codebase-native"
+internal const val OTHERS_ID = "others"
+internal const val TOTAL_ID = "total"
+internal const val ANDROID_JAVA_LIBRARIES_ID = "android-java-libraries"
+internal const val NATIVE_LIBRARIES_ID = "native-libraries"
 
 internal fun createRow(
     name: String,

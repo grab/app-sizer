@@ -34,6 +34,7 @@ import com.grab.sizer.analyzer.*
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.parser.DefaultDataParser
 import com.grab.sizer.utils.InputProvider
+import com.grab.sizer.utils.Logger
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -57,12 +58,15 @@ object AnalyzerModule {
 
     @Provides
     fun provideTeamMapping(
-        inputProvider: InputProvider
-    ): TeamMapping {
-        // Todo : Remove this logic from dagger module, possible remove DummyTeamMapping
-        val ownerMapping = inputProvider.provideTeamMappingFile()
-        return if (ownerMapping == null) DummyTeamMapping()
-        else YmlTeamMapping(ownerMapping)
+        inputProvider: InputProvider,
+        logger: Logger
+    ): TeamMapping? {
+        val moduleFile = inputProvider.provideTeamMappingFile()
+        val libraryFile = inputProvider.provideLibraryOwnershipFile()
+
+        return if (moduleFile != null) {
+            TeamMapping.createWithValidation(moduleFile, libraryFile, logger)
+        } else null
     }
 
     @Provides
@@ -78,8 +82,8 @@ internal interface AnalyzerBinder {
 
     @Binds
     @IntoMap
-    @AnalyticsOptionKey(AnalyticsOption.CODEBASE)
-    fun bindGeneralAnalyzer(analyzer: CodebaseAnalyzer): Analyzer
+    @AnalyticsOptionKey(AnalyticsOption.TEAMS)
+    fun bindTeamAnalyzer(analyzer: TeamAnalyzer): Analyzer
 
     @Binds
     @IntoMap

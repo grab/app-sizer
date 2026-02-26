@@ -34,6 +34,7 @@ import com.grab.sizer.parser.getAars
 import com.grab.sizer.parser.getJars
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.Row
+import com.grab.sizer.report.size
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -51,7 +52,7 @@ import javax.inject.Named
 internal class LargeFileAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
-    private val teamMapping: TeamMapping,
+    private val teamMapping: TeamMapping?,
     @Named("largeFileThreshold")
     private val largeFileThreshold: Long
 ) : Analyzer {
@@ -105,7 +106,7 @@ internal class LargeFileAnalyzer @Inject constructor(
         return Report(
             id = METRICS_ID_LARGE_FILES,
             name = METRICS_ID_LARGE_FILES,
-            rows = reportRows,
+            rows = reportRows.sortedBy { it.size() },
         )
     }
 
@@ -113,20 +114,18 @@ internal class LargeFileAnalyzer @Inject constructor(
         it.resourcesDownloadSize + it.assetsDownloadSize
     }
 
-    private fun List<Team>.toReportRows(): List<Row> = map { it to it.modules }
-        .flatMap { pair ->
-            pair.second.flatMap { module ->
-                module.contributors.flatMap { contributor -> contributor.resources + contributor.assets }
-                    .map { res ->
-                        val segmentPaths = res.path.split("/")
-                        val fileName = segmentPaths.last()
-                        createRow(
-                            name = fileName,
-                            value = res.downloadSize,
-                            owner = pair.first.name,
-                            tag = module.tag,
-                            rowName = fileName
-                        )
+    private fun List<Team>.toReportRows(): List<Row> = flatMap { team ->
+        team.contributors.flatMap { contributor ->
+            (contributor.resources + contributor.assets).map { res ->
+                val segmentPaths = res.path.split("/")
+                val fileName = segmentPaths.last()
+                createRow(
+                    name = fileName,
+                    value = res.downloadSize,
+                    owner = team.name,
+                    tag = contributor.tag,
+                    rowName = fileName
+                )
                     }
             }
         }

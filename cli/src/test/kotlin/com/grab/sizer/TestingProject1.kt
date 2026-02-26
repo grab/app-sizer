@@ -118,17 +118,31 @@ class TestingProject1 : FileSystem {
 
     val expectingLibAars = libDir.getAll().filter { it.extension == EXT_AAR }
         .map {
-            SizerInputFile(
-                file = it,
-                tag = it.nameWithoutExtension
-            )
+            when (it.name) {
+                SECURITY_CRYPTO_AAR -> SizerInputFile(
+                    file = it,
+                    tag = "androidx.security:security-crypto:1.1.0-alpha03"
+                )
+                WORK_MULTIPROCESS_AAR -> SizerInputFile(
+                    file = it,
+                    tag = "androidx.work:work-multiprocess:2.8.0"
+                )
+                else -> SizerInputFile(file = it, tag = it.nameWithoutExtension)
+            }
         }
     val expectingLibJars = libDir.getAll().filter { it.extension == EXT_JAR }
         .map {
-            SizerInputFile(
-                file = it,
-                tag = it.nameWithoutExtension
-            )
+            when (it.name) {
+                SECURITY_CRYPTO_SOURCES_JAR -> SizerInputFile(
+                    file = it,
+                    tag = "androidx.security:security-crypto:1.1.0-alpha03"
+                )
+                WORK_MULTIPROCESS_SOURCES_JAR -> SizerInputFile(
+                    file = it,
+                    tag = "androidx.work:work-multiprocess:2.8.0"
+                )
+                else -> SizerInputFile(file = it, tag = it.nameWithoutExtension)
+            }
         }
 
 
@@ -157,33 +171,39 @@ class TestingProject1 : FileSystem {
 
     private fun createLibDir(): FakeFile {
         return FakeFile(File("."), "gradle-cache", directory = true) {
-            addDirectory("androidx.security") {
-                addDirectory("security-crypto") {
-                    addDirectory("1.1.0-alpha03") {
-                        addDirectory("a96855861b33f9a46ca6a1556118ae592cad2014") {
-                            addFile(SECURITY_CRYPTO_SOURCES_JAR)
+            addDirectory("caches") {
+                addDirectory("modules-2") {
+                    addDirectory("files-2.1") {
+                        addDirectory("androidx.security") {
+                            addDirectory("security-crypto") {
+                                addDirectory("1.1.0-alpha03") {
+                                    addDirectory("sources-jar-hash") {
+                                        addFile(SECURITY_CRYPTO_SOURCES_JAR)
+                                    }
+                                    addDirectory("pom-file-hash") {
+                                        addFile(SECURITY_CRYPTO_POM)
+                                    }
+                                    addDirectory("aar-file-hash") {
+                                        addFile(SECURITY_CRYPTO_AAR)
+                                    }
+                                }
+                            }
                         }
-                        addDirectory("b3c8960986915ab431476ae2072273adb4b83515") {
-                            addFile(SECURITY_CRYPTO_POM)
-                        }
-                        addDirectory("f54110eab7610d08d7c41c594b3a248dac488e00") {
-                            addFile(SECURITY_CRYPTO_AAR)
-                        }
-                    }
-                }
-            }
 
-            addDirectory("androidx.work") {
-                addDirectory("work-multiprocess") {
-                    addDirectory("2.8.0") {
-                        addDirectory("8547c508168f54ce7c2fa0c4b6c3fc8850d30f23") {
-                            addFile(WORK_MULTIPROCESS_SOURCES_JAR)
-                        }
-                        addDirectory("90aacad73ba44fe05b25de0c5308160c703dba0b") {
-                            addFile(WORK_MULTIPROCESS_AAR)
-                        }
-                        addDirectory("77a1c6094184a05d8718a77f004aaa75fd296b") {
-                            addFile(WORK_MULTIPROCESS_POM)
+                        addDirectory("androidx.work") {
+                            addDirectory("work-multiprocess") {
+                                addDirectory("2.8.0") {
+                                    addDirectory("multiprocess-sources-hash") {
+                                        addFile(WORK_MULTIPROCESS_SOURCES_JAR)
+                                    }
+                                    addDirectory("multiprocess-aar-hash") {
+                                        addFile(WORK_MULTIPROCESS_AAR)
+                                    }
+                                    addDirectory("multiprocess-pom-hash") {
+                                        addFile(WORK_MULTIPROCESS_POM)
+                                    }
+                                }
+                            }
                         }
                     }
                 }

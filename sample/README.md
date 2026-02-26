@@ -72,19 +72,42 @@ For the CLI tool:
 - Markdown report: `[root-project]/build/app-sizer/[option]-report.md`
 - JSON report: `[root-project]/build/app-sizer/[option]-metrics.json`
 
-## Module Ownership
+## Ownership
 
-The `module-owner.yml` file in the project root defines the ownership of different modules. This is used by App Sizer to attribute size contributions to different teams or components.
+App Sizer tracks both module and library ownership to provide comprehensive team size attribution.
+
+### Module Ownership: `module-owner.yml`
+Defines which teams own internal modules:
 ```yaml
 Platform:
   - app
 Team1:
   - android-module-level1
+  - kotlin-multiplatform-module
 Team2:
-  - android-module-level2
+  - sample-group:android-module-level2
   - kotlin-module
-
 ```
+
+### Library Ownership: `library-owner.yml`
+Maps external libraries to teams using Maven coordinate patterns:
+```yaml
+Platform:
+  - androidx.core:*
+  - androidx.lifecycle:*
+  - androidx.appcompat:*
+
+Team1:
+  - com.google.android.material:*
+  - androidx.constraintlayout:*
+  - androidx.navigation:*
+
+Team2:
+  - org.jetbrains.kotlin:*
+  - org.jetbrains.kotlinx:*
+  - com.google.guava:*
+```
+
 
 ## Additional Resources
 

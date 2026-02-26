@@ -59,6 +59,8 @@ data class Row(
     val fields: List<Field>
 )
 
+fun Row.size(): Long = fields.find { it.name == "size" }?.value as Long
+
 interface Field {
     val name: String
     val value: Any

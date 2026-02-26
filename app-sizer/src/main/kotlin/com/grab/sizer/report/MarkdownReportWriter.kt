@@ -46,7 +46,7 @@ class MarkdownReportWriter @Inject constructor(
             initOutPutFile()
             writeText(
                 MarkdownTable(report.createHeader()).apply {
-                    report.rows.sortedBy { it.size() }.forEach { row ->
+                    report.rows.forEach { row ->
                         addRow(row.toMarkDown())
                     }
                 }.generate()
@@ -80,8 +80,6 @@ class MarkdownReportWriter @Inject constructor(
             createNewFile()
         }
     }
-
-    private fun Row.size(): Long = fields.find { it.name == "size" }?.value as Long
 }
 
 internal fun Long.reportSize(): String = when {

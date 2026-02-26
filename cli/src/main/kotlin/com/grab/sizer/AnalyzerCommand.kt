@@ -60,7 +60,7 @@ class AnalyzerCommand : CliktCommand() {
             "--modules" to AnalyticsOption.MODULES,
             "--apk" to AnalyticsOption.APK,
             "--basic" to AnalyticsOption.BASIC,
-            "--codebase" to AnalyticsOption.CODEBASE,
+            "--codebase" to AnalyticsOption.TEAMS,
             "--large-files" to AnalyticsOption.LARGE_FILE,
             "--lib-content" to AnalyticsOption.LIB_CONTENT,
         ).default(AnalyticsOption.DEFAULT)
@@ -78,7 +78,8 @@ class AnalyzerCommand : CliktCommand() {
                     inputProvider = CliInputProvider(
                         fileQuery = DefaultFileQuery(),
                         config = config,
-                        apksDirectory = apkDirectory
+                        apksDirectory = apkDirectory,
+                        logger = logger
                     ),
                     outputProvider = CliOutputProvider(config, apkDirectory.nameWithoutExtension),
                     libName = libName,

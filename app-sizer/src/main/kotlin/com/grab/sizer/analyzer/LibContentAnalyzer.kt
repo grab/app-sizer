@@ -31,10 +31,10 @@ import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.Contributor
 import com.grab.sizer.analyzer.model.FileInfo
 import com.grab.sizer.di.NAMED_LIB_NAME
-import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.Row
+import com.grab.sizer.report.size
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
@@ -74,7 +74,7 @@ internal class LibContentAnalyzer @Inject constructor(
         return Report(
             id = LIB_CONTENT_METRICS_ID,
             name = LIB_CONTENT_METRICS_ID,
-            rows = resourceRows + assetRows + nativeLibRows + otherRows + classRows,
+            rows = (resourceRows + assetRows + nativeLibRows + otherRows + classRows).sortedBy { it.size() },
         )
     }
 

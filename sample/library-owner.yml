@@ -1,0 +1,58 @@
+# Library Ownership Configuration for Sample Project
+# This file maps external library dependencies to internal teams
+# Teams match those defined in module-owner.yml: Platform, Team1, Team2
+
+# Platform Team - Core Android libraries and foundational components
+# Also owns the main 'app' module
+Platform:
+  - androidx.core:*
+  - androidx.annotation:*
+  - androidx.collection:*
+  - androidx.arch.core:*
+  - androidx.profileinstaller:*
+  - androidx.startup:*
+  - androidx.tracing:*
+  - androidx.concurrent:*
+  - androidx.resourceinspection:*
+  - androidx.legacy:*
+  - androidx.lifecycle:*
+  - androidx.savedstate:*
+  - androidx.databinding:*
+  - androidx.activity:*
+  - androidx.fragment:*
+  - androidx.appcompat:*
+  - androidx.vectordrawable:*
+  - androidx.emoji2:*
+  - androidx.versionedparcelable:*
+  - androidx.window:*
+
+# Team1 - UI and Layout libraries
+# Also owns android-module-level1 and kotlin-multiplatform-module
+Team1:
+  - com.google.android.material:*
+  - androidx.constraintlayout:*
+  - androidx.recyclerview:*
+  - androidx.cardview:*
+  - androidx.coordinatorlayout:*
+  - androidx.viewpager:*
+  - androidx.viewpager2:*
+  - androidx.customview:*
+  - androidx.drawerlayout:*
+  - androidx.slidingpanelayout:*
+  - androidx.transition:*
+  - androidx.dynamicanimation:*
+  - androidx.interpolator:*
+  - androidx.navigation:*
+
+# Team2 - Kotlin and utility libraries
+# Also owns sample-group:android-module-level2 and kotlin-module
+Team2:
+  - org.jetbrains.kotlin:*
+  - org.jetbrains.kotlinx:*
+  - org.jetbrains:annotations:*
+  - com.google.guava:*
+  - androidx.cursoradapter:*
+  - androidx.loader:*
+  - androidx.localbroadcastmanager:*
+  - androidx.print:*
+  - androidx.documentfile:*

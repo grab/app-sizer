@@ -33,6 +33,7 @@ import com.grab.sizer.parser.DataParser
 import com.grab.sizer.parser.getAars
 import com.grab.sizer.parser.getJars
 import com.grab.sizer.report.Report
+import com.grab.sizer.report.size
 import javax.inject.Inject
 
 
@@ -49,7 +50,7 @@ import javax.inject.Inject
 internal class ModuleAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
-    private val teamMapping: TeamMapping,
+    private val teamMapping: TeamMapping?,
 ) : Analyzer {
     override fun process(): Report {
         /**
@@ -80,11 +81,11 @@ internal class ModuleAnalyzer @Inject constructor(
     private fun generateReport(contributors: Set<Contributor>): Report = contributors.toModules()
         .run {
             val sortedTeamsReport = sortedBy { it.getDownloadSize() }
-                .map { it.toReportItem(teamMapping.moduleToTeamMap) }
+                .map { it.toReportItem(teamMapping) }
             return Report(
                 id = METRICS_ID_MODULES,
                 name = METRICS_ID_MODULES,
-                rows = toReportRows(sortedTeamsReport),
+                rows = toReportRows(sortedTeamsReport).sortedBy { it.size() },
             )
         }
 

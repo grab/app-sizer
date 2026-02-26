@@ -86,6 +86,11 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
     @get:InputFile
     @get:Optional
     @get:PathSensitive(PathSensitivity.NONE)
+    abstract val libraryOwnershipFile: RegularFileProperty
+
+    @get:InputFile
+    @get:Optional
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val r8MappingFile: RegularFileProperty
 
     @get:Input
@@ -142,7 +147,8 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
         r8MappingFile = r8MappingFile.orNull?.asFile,
         apksDirectory = apksDirectory,
         largeFileThreshold = largeFileThreshold.get(),
-        teamMappingFile = if (teamMappingFile.isPresent) teamMappingFile.asFile.get() else null
+        teamMappingFile = if (teamMappingFile.isPresent) teamMappingFile.asFile.get() else null,
+        libraryOwnershipFile = if (libraryOwnershipFile.isPresent) libraryOwnershipFile.asFile.get() else null  // NEW
     )
 
     private fun createOutputProvider(
@@ -183,6 +189,9 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
 
                 if (pluginExtension.input.teamMappingFile.isPresent) {
                     this.teamMappingFile.set(pluginExtension.input.teamMappingFile)
+                }
+                if (pluginExtension.input.libraryOwnershipFile.isPresent) {
+                    this.libraryOwnershipFile.set(pluginExtension.input.libraryOwnershipFile)
                 }
 
                 this.largeFileThreshold.set(pluginExtension.input.largeFileThreshold)

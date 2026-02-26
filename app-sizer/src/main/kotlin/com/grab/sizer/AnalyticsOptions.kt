@@ -36,7 +36,7 @@ import java.io.Serializable
  * - APK: Generates a report breaking down the App Download Size by Components. Sections include android-java-libraries, codebase-kotlin-java, codebase-resources, codebase-assets, codebase-native, and native libraries.
  * - BASIC: Provides a fundamental breakdown report of the App Download size, similar to opening the APK in Android Studio.
  * - MODULES: Generates a report showing the contribution of each module to the total App Download Size. Grouping by team should be feasible.
- * - CODEBASE: Produces a report showing the contribution of each team to the total App Download Size.
+ * - TEAMS: Produces a report showing the contribution of each team to the total App Download Size.
  * - LARGE_FILE: Generates a list of files whose sizes exceed a certain threshold.
  * - LIB_CONTENT: Provides a breakdown of a single library's size contribution (Resources, Assets, Native libraries, Classes, others).
  */
@@ -46,7 +46,7 @@ enum class AnalyticsOption : Serializable {
     APK,
     BASIC,
     MODULES,
-    CODEBASE,
+    TEAMS,
     LARGE_FILE,
     LIB_CONTENT;
 
@@ -60,7 +60,7 @@ enum class AnalyticsOption : Serializable {
             "modules" -> MODULES
             "apk" -> APK
             "basic" -> BASIC
-            "codebase" -> CODEBASE
+            "teams" -> TEAMS
             "large-files" -> LARGE_FILE
             "lib-content" -> LIB_CONTENT
             else -> DEFAULT

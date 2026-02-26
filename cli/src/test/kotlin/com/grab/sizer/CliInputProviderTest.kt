@@ -28,6 +28,8 @@
 package com.grab.sizer
 
 import com.grab.sizer.utils.DefaultFileQuery
+import com.grab.sizer.utils.Logger
+import com.grab.sizer.utils.SizerInputFile
 import org.junit.Assert
 import org.junit.Test
 import java.io.File
@@ -36,6 +38,15 @@ class CliInputProviderTest {
     private val fileQuery = DefaultFileQuery()
     private val testingProject1 = TestingProject1()
     private val config = testingProject1.config
+    private val testLogger = object : Logger {
+        override fun log(tag: String, message: String) {
+            // Silent logger for tests
+        }
+        override fun log(tag: String, message: String, e: Exception) {
+            // Silent logger for tests
+        }
+    }
+
 
 
     @Test
@@ -48,6 +59,7 @@ class CliInputProviderTest {
             fileQuery = fileQuery,
             config = config,
             apksDirectory = File("FakeDir"),
+            logger = testLogger,
             fileSystem = testingProject1
         )
         val moduleAars = cliInputProvider.provideModuleAar()
@@ -71,6 +83,7 @@ class CliInputProviderTest {
             fileQuery = fileQuery,
             config = config,
             apksDirectory = File("FakeDir"),
+            logger = testLogger,
             fileSystem = testingProject1
         )
         val moduleJars = cliInputProvider.provideModuleJar()
@@ -90,6 +103,7 @@ class CliInputProviderTest {
             fileQuery = fileQuery,
             config = config,
             apksDirectory = File("FakeDir"),
+            logger = testLogger,
             fileSystem = testingProject1
         )
         val moduleAars = cliInputProvider.provideModuleAar()
@@ -110,6 +124,7 @@ class CliInputProviderTest {
             fileQuery = fileQuery,
             config = config,
             apksDirectory = File("FakeDir"),
+            logger = testLogger,
             fileSystem = testingProject1
         )
         val moduleJars = cliInputProvider.provideModuleJar()
@@ -129,6 +144,7 @@ class CliInputProviderTest {
             fileQuery = fileQuery,
             config = config,
             apksDirectory = File("FakeDir"),
+            logger = testLogger,
             fileSystem = testingProject1
         )
         val libraryAar = cliInputProvider.provideLibraryAar().toList()
@@ -147,6 +163,7 @@ class CliInputProviderTest {
             fileQuery = fileQuery,
             config = config,
             apksDirectory = File("FakeDir"),
+            logger = testLogger,
             fileSystem = testingProject1
         )
         val libraryJars = cliInputProvider.provideLibraryJar()

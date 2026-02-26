@@ -177,15 +177,30 @@ open class Project1Data {
     )
 
     val teamMapping = object : TeamMapping {
-        override val teamToModuleMap: Map<String, List<String>> = mapOf(
+        private val teamToModuleMap: Map<String, List<String>> = mapOf(
             TEAM_1 to listOf(moduleAar1.name, moduleJar1.name),
             TEAM_2 to listOf(moduleAar2.name, moduleJar2.name),
         )
-        override val moduleToTeamMap: Map<String, String> = mapOf(
+        private val moduleToTeamMap: Map<String, String> = mapOf(
             moduleAar1.name to TEAM_1,
             moduleJar1.name to TEAM_1,
             moduleAar2.name to TEAM_2,
             moduleJar2.name to TEAM_2
         )
+
+        // Library ownership mapping
+        private val libraryToTeamMap: Map<String, String> = mapOf(
+            "libAar1" to TEAM_1,  // 15 bytes to team1
+            "libAar2" to TEAM_2,  // 40 bytes to team2
+            "libJar" to TEAM_1    // 7 bytes to team1
+        )
+
+        override fun getModuleOwner(moduleName: String): String? = moduleToTeamMap[moduleName]
+
+        override fun getLibraryOwner(libraryCoordinate: String): String? = libraryToTeamMap[libraryCoordinate]
+
+        override fun getAllTeams(): Set<String> = setOf(TEAM_1, TEAM_2)
+        override fun getModuleTeams(): Set<String> = teamToModuleMap.keys
+        override fun getLibraryTeams(): Set<String> = libraryToTeamMap.values.toSet()
     }
 }

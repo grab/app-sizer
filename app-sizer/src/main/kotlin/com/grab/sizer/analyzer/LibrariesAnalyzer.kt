@@ -29,9 +29,9 @@ package com.grab.sizer.analyzer
 
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.Contributor
-import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.Report
+import com.grab.sizer.report.size
 import java.io.File
 import javax.inject.Inject
 
@@ -43,10 +43,12 @@ import javax.inject.Inject
  *
  * @property apkComponentProcessor An instance for processing APK, AAR, or JAR files to produce a list of contributors.
  * @property dataParser Parses APK, AAR, and JAR files for analysis.
+ * @property teamMapping Optional team ownership mapping for libraries.
  */
 internal class LibrariesAnalyzer @Inject constructor(
     private val apkComponentProcessor: ApkComponentProcessor,
-    private val dataParser: DataParser
+    private val dataParser: DataParser,
+    private val teamMapping: TeamMapping?
 ) : Analyzer {
     override fun process(): Report {
         val processedData = apkComponentProcessor.process(
@@ -63,7 +65,13 @@ internal class LibrariesAnalyzer @Inject constructor(
         return Report(
             id = LIBRARY_METRICS_ID,
             name = LIBRARY_METRICS_ID,
-            rows = listOfReport.map { reportItem -> createRow(reportItem.name, reportItem.totalDownloadSize) },
+            rows = listOfReport.map { reportItem ->
+                createRow(
+                    name = reportItem.name,
+                    value = reportItem.totalDownloadSize,
+                    owner = reportItem.owner
+                )
+            }.sortedBy { it.size() },
         )
     }
 
@@ -71,6 +79,7 @@ internal class LibrariesAnalyzer @Inject constructor(
         name = tag,
         extraInfo = path.substring(path.indexOf("files-2.1/") + 9),
         id = File(path).nameWithoutExtension,
+        owner = teamMapping?.getLibraryOwner(tag),
         totalDownloadSize = getDownloadSize(),
         classesDownloadSize = classDownloadSize,
         nativeLibDownloadSize = nativeLibDownloadSize,

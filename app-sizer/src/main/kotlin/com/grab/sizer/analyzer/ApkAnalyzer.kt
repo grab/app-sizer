@@ -34,6 +34,7 @@ import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.Row
 import com.grab.sizer.report.apksSizeReport
+import com.grab.sizer.report.size
 import com.grab.sizer.report.toReportField
 import java.io.File
 import javax.inject.Inject
@@ -77,7 +78,7 @@ internal class ApkAnalyzer @Inject constructor(
         val listOfReport = listOf(apkReportRow) + codeBaseReports + libComponentReport
 
         return Report(
-            rows = listOfReport,
+            rows = listOfReport.sortedBy { it.size() },
             id = METRICS_ID_APK,
             name = METRICS_ID_APK,
         )
@@ -119,34 +120,34 @@ internal class ApkAnalyzer @Inject constructor(
 
     private fun libComponentReport(allLibReport: ReportItem): List<Row> = listOf(
         createRow(
-            name = "android-java-libraries",
+            name = ANDROID_JAVA_LIBRARIES_ID,
             value = allLibReport.totalDownloadSize - allLibReport.nativeLibDownloadSize
         ),
         createRow(
-            name = "native-libraries",
+            name = NATIVE_LIBRARIES_ID,
             value = allLibReport.nativeLibDownloadSize
         )
     )
 
     private fun codeBaseComponentReport(codeBaseReport: ReportItem): List<Row> = listOf(
         createRow(
-            name = "codebase-kotlin-java",
+            name = CODEBASE_KOTLIN_JAVA_ID,
             value = codeBaseReport.classesDownloadSize,
         ),
         createRow(
-            name = "codebase-resources",
+            name = CODEBASE_RESOURCES_ID,
             value = codeBaseReport.resourceDownloadSize,
         ),
         createRow(
-            name = "codebase-assets",
+            name = CODEBASE_ASSETS_ID,
             value = codeBaseReport.assetDownloadSize,
         ),
         createRow(
-            name = "codebase-native",
+            name = CODEBASE_NATIVE_ID,
             value = codeBaseReport.nativeLibDownloadSize,
         ),
         createRow(
-            name = "others",
+            name = OTHERS_ID,
             value = codeBaseReport.otherDownloadSize,
         ),
     )
