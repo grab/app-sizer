@@ -41,6 +41,7 @@ report:
 | modules-dir-is-project-root | Boolean value. Enable this flag if you set the root project as the modules-directory to optimize performance                                                                                                                                                                                                                               |
 | r8-mapping-file | Path to the R8 mapping file if you enable R8 for your build                                                                                                                                                                                                                                                                                |
 | owner-mapping-file | Path to YAML file mapping project modules to team owners                                                                                                                                                                                                                                                                                   |
+| library-owner-mapping-file | Path to YAML file mapping external libraries (Maven coordinates) to team owners. Optional.                                                                                                                                                                                                                                                |
 | version | Your app version                                                                                                                                                                                                                                                                                                                           |
 | large-file-threshold | File size threshold (in bytes) for considering a file as large                                                                                                                                                                                                                                                                             |
 | project-name | Project name                                                                                                                                                                                                                                                                                                                               |
@@ -56,6 +57,28 @@ Team1:
 Team2:
   - sample-group:android-module-level2
 ```
+
+And example of `library-owner-mapping-file`:
+
+```yaml
+Platform:
+  - androidx.core:*           # all artifacts under the androidx.core group
+  - androidx.lifecycle:*
+Team1:
+  - com.google.android.material:*
+  - androidx.navigation:*
+Team2:
+  - org.jetbrains.kotlin:*
+  - org.jetbrains.kotlinx:*
+```
+
+Pattern matching is evaluated in this order; the first match wins:
+
+1. **Exact coordinate** — e.g. `androidx.core:core-ktx:1.13.1`
+2. **Group wildcard** using `:*` — e.g. `androidx.core:*` (matches any artifact under `androidx.core`)
+3. **Group wildcard** using `.*` — e.g. `androidx.*` (matches any group beginning with `androidx.`)
+
+Libraries that do not match any pattern are attributed to the `app` module (see [Limitations](./limitation.md)).
 
 ### APK Generation
 
@@ -94,6 +117,7 @@ project-input:
   modules-dir-is-project-root: true
   r8-mapping-file: "./app/build/outputs/mapping/proDebug/mapping.txt"
   owner-mapping-file: "./module-owner.yml"
+  library-owner-mapping-file: "./library-owner.yml"
   version: "1.0.1"
   large-file-threshold: 10
   project-name: "sample"

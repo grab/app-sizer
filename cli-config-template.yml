@@ -4,6 +4,7 @@ project-input:
   modules-dir-is-project-root: true
   r8-mapping-file: "./path/to/R8/mapping/file.txt"
   owner-mapping-file: "./path/to/owner/mapping/file.yml"
+  library-owner-mapping-file: "./path/to/library/owner/mapping/file.yml"
   version: "your/app/version"
   large-file-threshold: 10
   project-name: "your/project/name"

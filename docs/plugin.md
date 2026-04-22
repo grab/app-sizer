@@ -83,6 +83,7 @@ appSizer {
     projectInput {
         largeFileThreshold = [your_threshold_in_bytes]
         teamMappingFile = file("path/to/your/module-owner.yml")
+        libraryOwnershipFile = file("path/to/your/library-owner.yml")
         enableMatchDebugVariant = [true|false]
         variantFilter { variant ->
             variant.setIgnore(variant.flavors.contains("your-ignore-flavor"))
@@ -99,6 +100,7 @@ appSizer {
 |----------|----------------------------------------------------------------|
 | `largeFileThreshold` | File size threshold (in bytes) for considering a file as large. |
 | `teamMappingFile` | YAML file mapping project modules to team owners.              |
+| `libraryOwnershipFile` | YAML file mapping external libraries (Maven coordinates) to team owners. Optional. |
 | `enableMatchDebugVariant` | If true, uses debug AAR files to improve build performance.    |
 | `variantFilter` | Specifies which variants to exclude from analysis.             |
 
@@ -113,6 +115,28 @@ Team1:
 Team2:
   - sample-group:android-module-level2
 ```
+
+And example of `libraryOwnershipFile`:
+
+```yaml
+Platform:
+  - androidx.core:*           # all artifacts under the androidx.core group
+  - androidx.lifecycle:*
+Team1:
+  - com.google.android.material:*
+  - androidx.navigation:*
+Team2:
+  - org.jetbrains.kotlin:*
+  - org.jetbrains.kotlinx:*
+```
+
+Pattern matching is evaluated in this order; the first match wins:
+
+1. **Exact coordinate** — e.g. `androidx.core:core-ktx:1.13.1`
+2. **Group wildcard** using `:*` — e.g. `androidx.core:*` (matches any artifact under `androidx.core`)
+3. **Group wildcard** using `.*` — e.g. `androidx.*` (matches any group beginning with `androidx.`)
+
+Libraries that do not match any pattern are attributed to the `app` module (see [Limitations](./limitation.md)).
 
 ### APK Generation
 
@@ -199,6 +223,7 @@ appSizer {
         enableMatchDebugVariant = true
         largeFileThreshold = 10
         teamMappingFile = file("${rootProject.rootDir}/module-owner.yml")
+        libraryOwnershipFile = file("${rootProject.rootDir}/library-owner.yml")
     }
     metrics {
         influxDB {

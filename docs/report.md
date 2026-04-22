@@ -43,6 +43,14 @@ Markdown tables provide a convenient format for local analysis. The report is sa
 | android-module-level1 | Team1 | 124.042 KB | 
 | kotlin-module | Team2 | 248.326 KB | 
 
+### Example: Library-wise Size Contribution
+
+| Contributor | Owner | Size |
+|-------------|-------|------|
+| androidx.appcompat:appcompat:1.7.0 | Platform | 166.844 KB |
+| com.google.android.material:material:1.4.0-beta01 | Team1 | 164.000 KB |
+| org.jetbrains.kotlin:kotlin-stdlib:1.8.22 | Team2 | 58.547 KB |
+
 ## JSON Report
 
 JSON reports offer compatibility with other platforms and tools. The report is saved as `[option]-metrics.json` in the configured output folder.

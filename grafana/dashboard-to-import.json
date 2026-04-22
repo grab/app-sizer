@@ -25,7 +25,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 3,
-  "iteration": 1718528153248,
+  "iteration": 1776832837098,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -229,8 +229,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 15,
-        "w": 12,
+        "h": 13,
+        "w": 24,
         "x": 0,
         "y": 17
       },
@@ -260,86 +260,18 @@
       },
       "targets": [
         {
-          "alias": "$tag_contributor",
+          "alias": "$tag_owner",
           "datasource": {
             "type": "influxdb",
             "uid": "m2unCvxIk"
           },
-          "query": "SELECT last(\"size\") FROM \"app_size\" WHERE (\"type\"='team' and \"app_version\" =~ /^$app_version$/ and \"device_name\" =~ /^$reference_device$/ AND $timeFilter )  GROUP BY \"contributor\"",
+          "query": "SELECT last(\"size\")\nFROM \"app_size\"\nWHERE (\n  \"type\" = 'team'\n  AND \"contributor\" = 'total'\n  AND \"app_version\"  =~ /^$app_version$/\n  AND \"device_name\"  =~ /^$reference_device$/\n  AND $timeFilter\n)\nGROUP BY \"owner\"",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
         }
       ],
       "title": "App Download Size Breakdown by Teams",
-      "type": "piechart"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "m2unCvxIk"
-      },
-      "description": "A list of module names associated with the selected 'Team Name' filter, accompanied by a graph illustrating the contribution of each module to the app download size.\nYou have the option to filter by App Version, Reference Device and Team Name",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "mappings": [],
-          "unit": "bytes"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 15,
-        "w": 12,
-        "x": 12,
-        "y": 17
-      },
-      "id": 6,
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "right",
-          "values": [
-            "percent",
-            "value"
-          ]
-        },
-        "pieType": "pie",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "alias": "$tag_contributor",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "m2unCvxIk"
-          },
-          "query": "SELECT last(\"size\") FROM \"app_size\" WHERE (\"type\" = 'module' AND \"app_version\" =~ /^$app_version$/  and \"device_name\" =~ /^$reference_device$/ and \"owner\"  =~ /^$tf_name$/  ) GROUP BY \"contributor\"",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series"
-        }
-      ],
-      "title": "Team Codebase Breakdown (Select the team name to see the detail)",
       "type": "piechart"
     },
     {
@@ -369,7 +301,7 @@
         "h": 15,
         "w": 24,
         "x": 0,
-        "y": 32
+        "y": 30
       },
       "id": 7,
       "options": {
@@ -416,6 +348,156 @@
         "type": "influxdb",
         "uid": "m2unCvxIk"
       },
+      "description": "A list of module names/libraries associated with the selected 'Team Name' filter, accompanied by a graph illustrating the contribution of each module to the app download size.\nYou have the option to filter by App Version, Reference Device, and Team Name",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 15,
+        "w": 12,
+        "x": 0,
+        "y": 45
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "percent",
+            "value"
+          ]
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "$tag_contributor",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "m2unCvxIk"
+          },
+          "query": "SELECT last(\"size\") FROM \"app_size\"\nWHERE (\"type\" = 'module'\n       AND \"app_version\" =~ /^$app_version$/\n       AND \"device_name\" =~ /^$reference_device$/\n       AND \"owner\"       =~ /^$tf_name$/)\nGROUP BY \"contributor\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "$tag_contributor",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "m2unCvxIk"
+          },
+          "hide": false,
+          "query": "SELECT last(\"size\") FROM \"app_size\"\nWHERE (\"type\" = 'library'\n       AND \"app_version\" =~ /^$app_version$/\n       AND \"device_name\" =~ /^$reference_device$/\n       AND \"owner\"       =~ /^$tf_name$/)\nGROUP BY \"contributor\"",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Team Breakdown (Select the team name to see the detail)",
+      "transformations": [],
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "m2unCvxIk"
+      },
+      "description": "A graph representation of the breakdown of the Team Download Size by individual components. You have the option to filter by App Version, Reference Device, and Team name",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 15,
+        "w": 12,
+        "x": 12,
+        "y": 45
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "percent",
+            "value"
+          ]
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "$tag_contributor",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "m2unCvxIk"
+          },
+          "query": "SELECT last(\"size\")\nFROM \"app_size\"\nWHERE (\n  \"type\"        = 'team'\n  AND \"contributor\" != 'total'\n  AND \"app_version\" =~ /^$app_version$/\n  AND \"owner\" =~ /^$tf_name$/\n  AND \"device_name\" =~ /^$reference_device$/\n  AND $timeFilter\n)\nGROUP BY \"contributor\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Team Breakdown by main Components (Select the team name to see the detail)",
+      "transformations": [],
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "m2unCvxIk"
+      },
       "description": "A list of files exceeding the size threshold as set in the app-sizer configuration. You can apply filters based on App Version and Reference Device.",
       "fieldConfig": {
         "defaults": {
@@ -433,7 +515,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -449,7 +532,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 47
+        "y": 60
       },
       "id": 8,
       "options": {
@@ -505,9 +588,9 @@
     "list": [
       {
         "current": {
-          "selected": false,
-          "text": "1.0.2",
-          "value": "1.0.2"
+          "selected": true,
+          "text": "0.0.1",
+          "value": "0.0.1"
         },
         "datasource": {
           "type": "influxdb",
@@ -529,7 +612,7 @@
       },
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "device-1",
           "value": "device-1"
         },
@@ -585,6 +668,6 @@
   "timezone": "",
   "title": "App Download Size Breakdown",
   "uid": "FBZO0xxSk",
-  "version": 51,
+  "version": 57,
   "weekStart": ""
 }
