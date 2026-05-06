@@ -42,29 +42,32 @@ class MarkdownReportWriter @Inject constructor(
     private val projectInfo: ProjectInfo,
 ) : ReportWriter {
     override fun write(report: Report) {
+        val header = report.createHeader()
         File(File(outputDirectory, projectInfo.deviceName), "${report.id}-report.md").apply {
             initOutPutFile()
             writeText(
-                MarkdownTable(report.createHeader()).apply {
+                MarkdownTable(header).apply {
                     report.rows.forEach { row ->
-                        addRow(row.toMarkDown())
+                        addRow(row.toMarkDown(header.size))
                     }
                 }.generate()
             )
         }
     }
 
-    private fun Row.toMarkDown(): List<String> {
-        return fields.map { field ->
+    private fun Row.toMarkDown(columnCount: Int): List<String> {
+        val values = fields.map { field ->
             when (field.value) {
                 is Long -> (field.value as Long).reportSize()
                 else -> field.value.toString()
             }
         }
+        return if (values.size < columnCount) values + List(columnCount - values.size) { "NA" }
+        else values
     }
 
     private fun Report.createHeader(): List<String> {
-        return rows.firstOrNull()
+        return rows.maxByOrNull { it.fields.size }
             ?.fields
             ?.map { field ->
                 field.name.replaceFirstChar {

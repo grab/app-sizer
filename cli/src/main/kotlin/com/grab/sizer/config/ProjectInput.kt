@@ -66,7 +66,7 @@ class ProjectInputConfigDeserializer(vc: Class<*>? = null) : StdDeserializer<Pro
                 r8MappingFile = if (contains("r8-mapping-file")) File(get("r8-mapping-file").asText()) else null,
                 ownerMappingFile = if (contains("owner-mapping-file")) File(get("owner-mapping-file").asText()) else null,
                 libraryOwnerMappingFile = if (contains("library-owner-mapping-file")) File(get("library-owner-mapping-file").asText()) else null,
-                projectRoot = File(get("project-root-dir").asText()),
+                projectRoot = if (contains("project-root-dir")) File(get("project-root-dir").asText()) else File(get("modules-directory").asText()),
             )
         }
 }
