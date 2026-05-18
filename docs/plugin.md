@@ -294,7 +294,7 @@ java.lang.IllegalStateException: Cannot find matching variant for module-name
 
 #### Impact on Analysis Results
 
-All classes and resources belonging to skipped modules will be automatically attributed to the app module during analysis, which may impact the accuracy of module-wise and team-based size breakdowns.
+Classes and resources belonging to skipped modules may not have module-level ownership metadata available during analysis. In team reports, contributors that cannot be matched to `module-owner.yml` or `library-owner.yml` are reported as `NA` instead of being silently reassigned to the `app` module.
 
 
 ## Troubleshooting

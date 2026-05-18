@@ -27,22 +27,26 @@
 
 package com.grab.sizer.analyzer.mapper
 
+import com.grab.sizer.analyzer.createRawFileInfo
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
 
-import com.grab.sizer.parser.AarFileInfo
-import com.grab.sizer.parser.ApkFileInfo
-import com.grab.sizer.parser.JarFileInfo
-import javax.inject.Inject
+class OtherComponentMapperTest {
+    @Test
+    fun otherAnalyzerShouldPreserveSamePathOthersFromDifferentSplitApks() {
+        val baseOther = createRawFileInfo(path = "/resources.arsc", downloadSize = 10, size = 100)
+        val configOther = createRawFileInfo(path = "/resources.arsc", downloadSize = 20, size = 200)
+        val baseApk = createEmptyApkInfo("base-master.apk").copy(others = setOf(baseOther))
+        val configApk = createEmptyApkInfo("base-en.apk").copy(others = setOf(configOther))
 
-internal class OtherComponentMapper @Inject constructor() : ComponentMapper {
-    override fun Set<ApkFileInfo>.mapTo(aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): ComponentMapperResult {
-        return ComponentMapperResult(
-            contributors = emptyMap(),
-            noOwnerData = flatMap { apk ->
-                apk.others.map { other ->
-                    // Split APKs can have the same internal path, so include the APK name before storing in a Set.
-                    other.copy(path = "${apk.name}:${other.path}")
-                }
-            }.toSet()
-        )
+        val result = OtherComponentMapper().run {
+            setOf(baseApk, configApk).mapTo(emptySet(), emptySet())
+        }
+
+        assertEquals(2, result.noOwnerData.size)
+        assertEquals(30, result.noOwnerData.sumOf { it.downloadSize })
+        assertTrue(result.noOwnerData.any { it.name == "resources.arsc" && it.downloadSize == 10L })
+        assertTrue(result.noOwnerData.any { it.name == "resources.arsc" && it.downloadSize == 20L })
     }
 }

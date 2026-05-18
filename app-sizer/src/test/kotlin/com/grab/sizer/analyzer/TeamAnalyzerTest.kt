@@ -51,7 +51,7 @@ class TeamAnalyzerTest {
         // Verify report structure
         assertEquals("team", report.id)
         assertEquals("team", report.name)
-        assertEquals(16, report.rows.size, "Should have 8 breakdown rows per team * 2 teams = 16 total")
+        assertEquals(24, report.rows.size, "Should have 8 breakdown rows per team * 3 teams = 24 total")
 
         // Verify team1 total size (modules: 103 + libraries: libAar1=15 + libJar=7 = 125 total)
         val team1TotalRow = report.rows.find { row ->
@@ -79,20 +79,26 @@ class TeamAnalyzerTest {
             ownerField?.value == "team2"
         }
         assertEquals(8, team2Rows.size, "team2 should have 8 breakdown rows")
+
+        val unownedRows = report.rows.filter { row ->
+            val ownerField = row.fields.find { it.name == FIELD_KEY_OWNER }
+            ownerField?.value == NOT_AVAILABLE_VALUE
+        }
+        assertEquals(8, unownedRows.size, "unowned contributors should have 8 breakdown rows")
     }
 
     @Test
     fun testTeamAnalyzerShouldReportCorrectNumberOfRows() {
         val report = analyzer.process()
         // Each team should have 8 breakdown rows: total, android-java-libraries, native-libraries, codebase-kotlin-java, codebase-resources, codebase-assets, codebase-native, others
-        assertEquals(16, report.rows.size, "Project1 report should contain 8 rows per team (2 teams * 8 = 16)")
+        assertEquals(24, report.rows.size, "Project1 report should contain 8 rows per team (3 teams * 8 = 24)")
     }
 
     @Test
     fun testTeamAnalyzerShouldReportCorrectRowNames() {
         val report = analyzer.process()
         val teamNames = report.rows.map { it.name }.toSet()
-        val expectedTeamNames = setOf("team1", "team2")
+        val expectedTeamNames = setOf("team1", "team2", NOT_AVAILABLE_VALUE)
         assertEquals(expectedTeamNames, teamNames, "Should report the correct team names")
 
         // Check that we have the correct tags for each team
@@ -111,6 +117,22 @@ class TeamAnalyzerTest {
         }
         assertNotNull(team1TotalRow, "Project1 report should contain team1 total size row")
         assertEquals(125L, team1TotalRow.fields.find { it.name == FIELD_KEY_SIZE }?.value)
+    }
+
+    @Test
+    fun testTeamAnalyzerShouldReportUnownedApkOthers() {
+        val report = analyzer.process()
+        val unownedTotalRow = report.rows.find { row ->
+            row.name == NOT_AVAILABLE_VALUE && row.fields.find { it.name == FIELD_KEY_CONTRIBUTOR }?.value == "total"
+        }
+        assertNotNull(unownedTotalRow, "Project1 report should contain unowned total size row")
+        assertEquals(20L, unownedTotalRow.fields.find { it.name == FIELD_KEY_SIZE }?.value)
+
+        val unownedOthersRow = report.rows.find { row ->
+            row.name == NOT_AVAILABLE_VALUE && row.fields.find { it.name == FIELD_KEY_CONTRIBUTOR }?.value == "others"
+        }
+        assertNotNull(unownedOthersRow, "Project1 report should contain unowned others size row")
+        assertEquals(20L, unownedOthersRow.fields.find { it.name == FIELD_KEY_SIZE }?.value)
     }
 
     @Test
@@ -152,8 +174,8 @@ class TeamAnalyzerTest {
 
         val report = analyzerWithLibs.process()
 
-        // Verify correct number of rows: 2 teams * 8 breakdown rows each = 16 total
-        assertEquals(16, report.rows.size)
+        // Verify correct number of rows: 3 teams * 8 breakdown rows each = 24 total
+        assertEquals(24, report.rows.size)
 
         // Get actual sizes for validation from the total rows
         val team1TotalRow = report.rows.find { row ->
@@ -189,6 +211,19 @@ class TeamAnalyzerTest {
         // Verify the changes are as expected
         assertEquals(-7L, team1Size - originalTeam1Size, "team1 should lose libJar1 (7 bytes)")
         assertEquals(0L, team2Size - originalTeam2Size, "team2 should have same library contribution")
+
+        val unownedTotalRow = report.rows.find { row ->
+            row.name == NOT_AVAILABLE_VALUE && row.fields.find { it.name == FIELD_KEY_CONTRIBUTOR }?.value == "total"
+        }
+        assertNotNull(unownedTotalRow, "Should contain unowned total row")
+        assertEquals(27L, unownedTotalRow.fields.find { it.name == FIELD_KEY_SIZE }?.value)
+
+        val unownedLibrariesRow = report.rows.find { row ->
+            row.name == NOT_AVAILABLE_VALUE &&
+                row.fields.find { it.name == FIELD_KEY_CONTRIBUTOR }?.value == "android-java-libraries"
+        }
+        assertNotNull(unownedLibrariesRow, "Should contain unowned library contribution row")
+        assertEquals(7L, unownedLibrariesRow.fields.find { it.name == FIELD_KEY_SIZE }?.value)
     }
 
     @Test
@@ -203,14 +238,14 @@ class TeamAnalyzerTest {
 
         val report = analyzerLibraryOnly.process()
 
-        // Should have 3 teams * 8 breakdown rows each = 24 total rows
-        assertEquals(24, report.rows.size, "Should include all teams including library-only teams")
+        // Should have 4 teams * 8 breakdown rows each = 32 total rows
+        assertEquals(32, report.rows.size, "Should include all teams including library-only and unowned teams")
 
         val totalRowNames = report.rows.filter { row ->
             row.fields.find { it.name == FIELD_KEY_CONTRIBUTOR }?.value == "total"
         }.map { it.name }.toSet()
-        val expectedTotalRows = setOf("team1", "team2", "libraryTeam")
-        assertEquals(expectedTotalRows, totalRowNames, "Should include total rows for all teams including library-only team")
+        val expectedTotalRows = setOf("team1", "team2", "libraryTeam", NOT_AVAILABLE_VALUE)
+        assertEquals(expectedTotalRows, totalRowNames, "Should include total rows for all teams including library-only and unowned teams")
 
         // Verify library-only team has correct size
         val libraryOnlyTotalRow = report.rows.find { row ->
@@ -235,7 +270,7 @@ class TeamAnalyzerTest {
         val report = project2Analyzer.process()
 
         // Verify basic structure (same as Project1 but with different paths)
-        assertEquals(16, report.rows.size, "Should have 8 breakdown rows per team * 2 teams = 16 total")
+        assertEquals(24, report.rows.size, "Should have 8 breakdown rows per team * 3 teams = 24 total")
 
         // Verify team total sizes are the same as Project1 (since data should be equivalent including libraries)
         val team1TotalRow = report.rows.find { row ->

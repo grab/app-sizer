@@ -108,6 +108,10 @@ Team2:
   - com.google.guava:*
 ```
 
+### Unowned Contributors
+
+APK-level uncategorized files are grouped under `others` and attributed to the synthetic `app` module, so the `app` entry in `module-owner.yml` determines their team owner. Modules or libraries that do not match either owner file are reported as `NA` in team reports.
+
 
 ## Additional Resources
 

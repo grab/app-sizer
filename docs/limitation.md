@@ -26,8 +26,8 @@ The `resources.arsc` file is a special file in Android APKs containing precompil
 - For small Android projects, this can disproportionately impact the data, potentially creating the illusion of an inefficient analysis.
 
 ### Uncategorized Files
-* Any files that cannot be categorized as Java/Kotlin code, resources, native libraries, or assets are automatically distributed to the app module and grouped under the **"Others"** category.
-* Any files/classes that cannot find an owner — i.e. files that don't belong to a module owned in `module-owner.yml` and libraries that don't match any pattern in `library-owner.yml` — are automatically distributed to the `app` module.
+* APK-level files that cannot be categorized as Java/Kotlin code, resources, native libraries, or assets are attributed to the synthetic `app` module and grouped under the **"Others"** category. The owner of these files is resolved through the `app` entry in `module-owner.yml`.
+* Modules and libraries that are present in the analyzed inputs but do not match `module-owner.yml` or `library-owner.yml` are reported as `NA` in team reports. They are not silently reassigned to the `app` module.
 
 ## Inline Functions and Classes
 

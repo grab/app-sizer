@@ -29,6 +29,7 @@ package com.grab.sizer.analyzer.model
 
 import com.grab.sizer.analyzer.ReportItem
 import com.grab.sizer.analyzer.TeamMapping
+import com.grab.sizer.analyzer.NOT_AVAILABLE_VALUE
 import com.grab.sizer.parser.BinaryFileInfo
 
 data class Team(
@@ -76,32 +77,58 @@ data class Module(
         resourcesDownloadSize + nativeLibDownloadSize + assetsDownloadSize + othersDownloadSize + classDownloadSize
 }
 
-internal fun Set<Contributor>.toTeams(teamMapping: TeamMapping?): List<Team> {
-    return teamMapping?.let { mapping ->
-        // Single-pass grouping to avoid O(N×T) complexity
-        val moduleContributorsByTeam = mutableMapOf<String, MutableList<Contributor>>()
-        val libContributorsByTeam = mutableMapOf<String, MutableList<Contributor>>()
+internal fun Set<Contributor>.toTeams(
+    teamMapping: TeamMapping?,
+    includeUnowned: Boolean = false,
+    moduleContributorPaths: Set<String> = emptySet(),
+    libraryContributorPaths: Set<String> = emptySet()
+): List<Team> {
+    if (teamMapping == null && !includeUnowned) return emptyList()
 
-        // Group contributors by team in single pass
-        this.forEach { contributor ->
-            mapping.getModuleOwner(contributor.tag)?.let { teamName ->
-                moduleContributorsByTeam.getOrPut(teamName) { mutableListOf() }.add(contributor)
+    val moduleContributorsByTeam = mutableMapOf<String, MutableList<Contributor>>()
+    val libContributorsByTeam = mutableMapOf<String, MutableList<Contributor>>()
+
+    fun MutableMap<String, MutableList<Contributor>>.addContributor(teamName: String, contributor: Contributor) {
+        getOrPut(teamName) { mutableListOf() }.add(contributor)
+    }
+
+    this.forEach { contributor ->
+        val isModuleContributor = contributor.path in moduleContributorPaths
+        val isLibraryContributor = contributor.path in libraryContributorPaths
+
+        when {
+            isModuleContributor -> {
+                val teamName = teamMapping?.getModuleOwner(contributor.tag)
+                    ?: NOT_AVAILABLE_VALUE.takeIf { includeUnowned }
+                teamName?.let { moduleContributorsByTeam.addContributor(it, contributor) }
             }
-            mapping.getLibraryOwner(contributor.tag)?.let { teamName ->
-                libContributorsByTeam.getOrPut(teamName) { mutableListOf() }.add(contributor)
+
+            isLibraryContributor -> {
+                val teamName = teamMapping?.getLibraryOwner(contributor.tag)
+                    ?: NOT_AVAILABLE_VALUE.takeIf { includeUnowned }
+                teamName?.let { libContributorsByTeam.addContributor(it, contributor) }
+            }
+
+            else -> {
+                val moduleOwner = teamMapping?.getModuleOwner(contributor.tag)
+                val libraryOwner = teamMapping?.getLibraryOwner(contributor.tag)
+                moduleOwner?.let { moduleContributorsByTeam.addContributor(it, contributor) }
+                libraryOwner?.let { libContributorsByTeam.addContributor(it, contributor) }
+                if (moduleOwner == null && libraryOwner == null && includeUnowned) {
+                    moduleContributorsByTeam.addContributor(NOT_AVAILABLE_VALUE, contributor)
+                }
             }
         }
+    }
 
-        // Create teams from grouped contributors
-        val allTeamNames = moduleContributorsByTeam.keys + libContributorsByTeam.keys
-        allTeamNames.map { teamName ->
-            Team(
-                teamName,
-                moduleContributorsByTeam[teamName] ?: emptyList(),
-                libContributorsByTeam[teamName] ?: emptyList()
-            )
-        }
-    } ?: emptyList()
+    val allTeamNames = moduleContributorsByTeam.keys + libContributorsByTeam.keys
+    return allTeamNames.map { teamName ->
+        Team(
+            teamName,
+            moduleContributorsByTeam[teamName] ?: emptyList(),
+            libContributorsByTeam[teamName] ?: emptyList()
+        )
+    }
 }
 
 internal fun List<Team>.sort(): List<Team> {
@@ -138,4 +165,3 @@ internal fun Module.toReportItem(teamMapping: TeamMapping?): ReportItem =
         assetDownloadSize = assetsDownloadSize,
         otherDownloadSize = othersDownloadSize
     )
-

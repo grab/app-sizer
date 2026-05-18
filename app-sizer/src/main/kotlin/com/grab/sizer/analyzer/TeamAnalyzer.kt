@@ -69,7 +69,7 @@ internal class TeamAnalyzer @Inject constructor(
             resources = wholeProject.noOwnerResources.castToRawFile(),
             nativeLibs = wholeProject.noOwnerNativeLibs.castToRawFile(),
             classes = wholeProject.noOwnerClasses.castToClass(),
-            //others = wholeProject.noOwnerOthers.castToRawFile()
+            others = wholeProject.noOwnerOthers.castToRawFile()
         )
 
         // Process all contributors together (modules + libraries) for team analysis
@@ -80,12 +80,29 @@ internal class TeamAnalyzer @Inject constructor(
                 dataParser.getJars()
             )
 
-        return generateTeamReport(allContributorsData.contributors + appContributor)
+        val moduleContributorPaths =
+            (dataParser.moduleAars + dataParser.moduleJars).map { it.path }.toSet() + appContributor.path
+        val libraryContributorPaths = (dataParser.libAars + dataParser.libJars).map { it.path }.toSet()
+
+        return generateTeamReport(
+            contributors = allContributorsData.contributors + appContributor,
+            moduleContributorPaths = moduleContributorPaths,
+            libraryContributorPaths = libraryContributorPaths
+        )
     }
 
-    private fun generateTeamReport(contributors: Set<Contributor>): Report {
+    private fun generateTeamReport(
+        contributors: Set<Contributor>,
+        moduleContributorPaths: Set<String>,
+        libraryContributorPaths: Set<String>
+    ): Report {
         // Convert all contributors to teams (handles both modules and libraries)
-        val teams: List<Team> = contributors.toTeams(teamMapping)
+        val teams: List<Team> = contributors.toTeams(
+            teamMapping = teamMapping,
+            includeUnowned = true,
+            moduleContributorPaths = moduleContributorPaths,
+            libraryContributorPaths = libraryContributorPaths
+        )
 
         val allTeamRows = teams.sortedBy { it.getDownloadSize() }
             .flatMap { it.toDetailedReportRows() }
