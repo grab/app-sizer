@@ -33,6 +33,7 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -50,8 +51,8 @@ internal fun Project.kotlinCommon() {
     }
 
     tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            jvmTarget = BuildConfig.JVM_TARGET
+        compilerOptions {
+            jvmTarget.set(JvmTarget.fromTarget(BuildConfig.JVM_TARGET))
         }
     }
 }

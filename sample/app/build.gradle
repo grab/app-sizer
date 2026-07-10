@@ -29,48 +29,45 @@ plugins {
     id 'com.sample.android.application'
 }
 
+base {
+    archivesName = "sample-bundle-file"
+}
+
 android {
-    namespace 'com.grab.android.sample'
+    namespace = 'com.grab.android.sample'
     defaultConfig {
-        applicationId "com.grab.android.sample"
-        archivesBaseName = "sample-bundle-file"
-        versionCode 1
-        versionName "0.0.1"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    buildTypes {
-        debug {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-
-        release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-    buildFeatures {
-        viewBinding true
+        applicationId = "com.grab.android.sample"
+        versionCode = 1
+        versionName = "0.0.1"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         release {
             // You need to specify these in your local.properties file or
             // as environment variables
-            storeFile file("$rootProject.projectDir/buildsystem/sample-release.keystore")
-            storePassword '12345678'
-            keyAlias 'key0'
-            keyPassword '12345678'
+            storeFile = file("${rootProject.projectDir}/buildsystem/sample-release.keystore")
+            storePassword = '12345678'
+            keyAlias = 'key0'
+            keyPassword = '12345678'
         }
     }
 
     buildTypes {
+        debug {
+            minifyEnabled = false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
         release {
-            signingConfig signingConfigs.release
+            minifyEnabled = true
+            signingConfig = signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
+    buildFeatures {
+        viewBinding = true
+    }
 
     flavorDimensions += "version"
     productFlavors {
@@ -82,7 +79,7 @@ android {
         }
         // flavor for early access
         gea {
-            dimension "service"
+            dimension = "version"
             applicationIdSuffix = ".gea"
             versionNameSuffix = "-gea"
         }
