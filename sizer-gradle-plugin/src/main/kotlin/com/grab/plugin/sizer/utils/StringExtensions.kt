@@ -24,20 +24,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE
  */
-buildscript {
-    apply from: "constants.gradle"
-    dependencies {
-        classpath libs.nexus.gradle.publish.plugin
-    }
-}
 
-plugins {
-    id "com.grab.sizer.build.common"
-    alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.kotlin.kapt) apply false
-    alias(libs.plugins.gradleup.shadow) apply false
-    alias(libs.plugins.gradle.plugin.publish) apply false
-    alias(libs.plugins.dokka.gradle.plugin) apply false
-    alias(libs.plugins.dokka.javadoc) apply false
+package com.grab.plugin.sizer.utils
+
+import java.util.Locale
+
+internal fun String.capitalize(): String = replaceFirstChar {
+    if (it.isLowerCase()) it.titlecase(
+        Locale.getDefault()
+    ) else it.toString()
 }
-apply from: "gradle/publish-root-config.gradle"

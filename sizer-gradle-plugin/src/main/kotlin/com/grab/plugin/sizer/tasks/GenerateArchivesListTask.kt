@@ -28,8 +28,8 @@
 package com.grab.plugin.sizer.tasks
 
 
-import com.android.build.gradle.api.BaseVariant
 import com.grab.plugin.sizer.dependencies.*
+import com.grab.plugin.sizer.utils.capitalize
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
@@ -137,18 +137,18 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
     companion object {
         fun registerTask(
             project: Project,
-            variant: BaseVariant,
+            variantInput: VariantInput,
             flavorMatchingFallbacks: List<String>,
             buildTypeMatchingFallbacks: List<String>,
             enableMatchDebugVariant: Boolean,
         ) = project.tasks.register(
-            "generateArchiveDep${variant.name.capitalize()}",
+            "generateArchiveDep${variantInput.name.capitalize()}",
             GenerateArchivesListTask::class.java
-        ) {
-            this.variantInput.set(variant.toVariantInput())
-            this.buildTypeMatchingFallbacks.set(buildTypeMatchingFallbacks)
-            this.flavorMatchingFallbacks.set(flavorMatchingFallbacks)
-            this.enableMatchDebugVariant.set(enableMatchDebugVariant)
+        ) { task ->
+            task.variantInput.set(variantInput)
+            task.buildTypeMatchingFallbacks.set(buildTypeMatchingFallbacks)
+            task.flavorMatchingFallbacks.set(flavorMatchingFallbacks)
+            task.enableMatchDebugVariant.set(enableMatchDebugVariant)
         }
     }
 }

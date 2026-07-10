@@ -31,7 +31,6 @@ import org.gradle.api.artifacts.*
 import org.gradle.api.artifacts.component.ComponentArtifactIdentifier
 import org.gradle.api.artifacts.component.ComponentIdentifier
 import org.gradle.api.specs.Spec
-import org.gradle.internal.component.AmbiguousVariantSelectionException
 import java.io.File
 
 class FakeResolvedConfiguration(
@@ -56,18 +55,6 @@ class FakeResolvedConfiguration(
     }
 
     override fun rethrowFailure() {
-        TODO("Not yet implemented")
-    }
-
-    override fun getFiles(): MutableSet<File> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getFiles(dependencySpec: Spec<in Dependency>): MutableSet<File> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getFirstLevelModuleDependencies(dependencySpec: Spec<in Dependency>): MutableSet<ResolvedDependency> {
         TODO("Not yet implemented")
     }
 
@@ -169,4 +156,8 @@ class FakeResolvedDependency(
     }
 }
 
-class FakeAmbiguousVariantSelectionException() : AmbiguousVariantSelectionException("Fake Exception")
+/**
+ * Simulates Gradle's internal variant selection failures, which surface to plugin code
+ * as plain RuntimeExceptions since the internal exception types are not public API.
+ */
+class FakeAmbiguousVariantSelectionException : RuntimeException("Fake Exception")

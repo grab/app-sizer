@@ -51,9 +51,8 @@ internal fun Project.kotlinCommon() {
     }
     tasks.withType<KotlinCompilationTask<KotlinCommonCompilerOptions>>().configureEach {
         compilerOptions {
-            apiVersion.set(KotlinVersion.KOTLIN_1_8)
-            languageVersion.set(KotlinVersion.KOTLIN_1_8)
-            freeCompilerArgs.addAll()
+            apiVersion.set(KotlinVersion.KOTLIN_2_1)
+            languageVersion.set(KotlinVersion.KOTLIN_2_1)
         }
     }
 }

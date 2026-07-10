@@ -35,7 +35,6 @@ import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.ResolvedDependency
-import org.gradle.internal.component.AmbiguousVariantSelectionException
 import java.util.*
 import javax.inject.Inject
 
@@ -87,7 +86,16 @@ class DefaultDependencyExtractor @Inject constructor(
         configurationExtractor.runtimeConfigurations(project)
             .flatMap { configuration -> configuration.dependencies }
             .filterIsInstance<ProjectDependency>()
-            .map { it.dependencyProject }
+            // Workaround: ProjectDependency.getDependencyProject() was removed in Gradle 9,
+            // so the Project instance is resolved back from its path. This keeps the
+            // execution-time traversal of other projects working, but that cross-project
+            // access is why the plugin cannot support the configuration cache.
+            // TODO: Replace the project-graph traversal with ArtifactView-based resolution
+            //  (configuration.incoming.artifactView): ProjectComponentIdentifier vs
+            //  ModuleComponentIdentifier distinguishes modules from external libraries and
+            //  provides the artifact files directly, which would remove the
+            //  --no-configuration-cache requirement.
+            .map { project.project(it.path) }
             .forEach { dependencyProject ->
                 try {
                     archiveDependencyStore.add(
@@ -133,8 +141,11 @@ class DefaultDependencyExtractor @Inject constructor(
                         resolvedDep.allModuleArtifacts.forEach { artifact ->
                             archiveDependencyStore.add(artifact.toArchiveDependency())
                         }
-                    } catch (e: AmbiguousVariantSelectionException) {
+                    } catch (e: RuntimeException) {
+                        // Typically a variant selection failure; the internal exception types
+                        // are not part of the public Gradle API
                         logger.warn("Fetching allModuleArtifacts having issue with ${resolvedDep.name}")
+                        logger.debug("Full stack trace for allModuleArtifacts failure:", e)
                     }
                 }
             }

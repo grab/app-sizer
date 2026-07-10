@@ -26,8 +26,8 @@
  */
 
 plugins {
-    id 'java-gradle-plugin'
-    alias(libs.plugins.kotlin.dsl)
+    `java-gradle-plugin`
+    `kotlin-dsl`
 }
 
 repositories {
@@ -36,30 +36,28 @@ repositories {
 }
 
 dependencies {
-    compileOnly libs.kotlin.gradle.plugin
-    compileOnly libs.android.gradle.plugin
+    compileOnly(libs.kotlin.gradle.plugin)
+    compileOnly(libs.android.gradle.plugin)
 }
 
 
 gradlePlugin {
     plugins {
-        androidAppConfigPlugin {
-            id = 'com.sample.android.application'
-            implementationClass = 'com.grab.sample.android.AndroidAppConfigPlugin'
+        register("androidAppConfigPlugin") {
+            id = "com.sample.android.application"
+            implementationClass = "com.grab.sample.android.AndroidAppConfigPlugin"
         }
-        androidLibConfigPlugin {
-            id = 'com.sample.android.library'
-            implementationClass = 'com.grab.sample.android.AndroidLibraryConfigPlugin'
+        register("androidLibConfigPlugin") {
+            id = "com.sample.android.library"
+            implementationClass = "com.grab.sample.android.AndroidLibraryConfigPlugin"
         }
-
-        kotlinKmpConfigPlugin {
-            id = 'com.sample.kotlin.kmp'
-            implementationClass = 'com.grab.sample.jvm.KmpConfigPlugin'
+        register("kotlinKmpConfigPlugin") {
+            id = "com.sample.kotlin.kmp"
+            implementationClass = "com.grab.sample.jvm.KmpConfigPlugin"
         }
-
-        kotlinLibConfigPlugin {
-            id = 'com.sample.kotlin.library'
-            implementationClass = 'com.grab.sample.jvm.KotlinLibraryConfigPlugin'
+        register("kotlinLibConfigPlugin") {
+            id = "com.sample.kotlin.library"
+            implementationClass = "com.grab.sample.jvm.KotlinLibraryConfigPlugin"
         }
     }
 }

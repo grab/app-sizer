@@ -52,11 +52,11 @@ class FakeDependencySet(val dependencies : Set<Dependency>) : DependencySet {
         }
     }
 
-    override fun contains(element: Dependency?): Boolean {
+    override fun contains(element: Dependency): Boolean {
         TODO("Not yet implemented")
     }
 
-    override fun add(element: Dependency?): Boolean {
+    override fun add(element: Dependency): Boolean {
         TODO("Not yet implemented")
     }
 
@@ -69,7 +69,7 @@ class FakeDependencySet(val dependencies : Set<Dependency>) : DependencySet {
     }
 
 
-    override fun remove(element: Dependency?): Boolean {
+    override fun remove(element: Dependency): Boolean {
         TODO("Not yet implemented")
     }
 
@@ -97,15 +97,15 @@ class FakeDependencySet(val dependencies : Set<Dependency>) : DependencySet {
         TODO("Not yet implemented")
     }
 
-    override fun <S : Dependency?> withType(type: Class<S>): DomainObjectSet<S> {
+    override fun <S : Dependency> withType(type: Class<S>): DomainObjectSet<S> {
         TODO("Not yet implemented")
     }
 
-    override fun <S : Dependency?> withType(type: Class<S>, configureAction: Action<in S>): DomainObjectCollection<S> {
+    override fun <S : Dependency> withType(type: Class<S>, configureAction: Action<in S>): DomainObjectCollection<S> {
         TODO("Not yet implemented")
     }
 
-    override fun <S : Dependency?> withType(type: Class<S>, configureClosure: Closure<*>): DomainObjectCollection<S> {
+    override fun <S : Dependency> withType(type: Class<S>, configureClosure: Closure<*>): DomainObjectCollection<S> {
         TODO("Not yet implemented")
     }
 

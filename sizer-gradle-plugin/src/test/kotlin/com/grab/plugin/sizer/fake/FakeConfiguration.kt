@@ -151,7 +151,7 @@ class FakeConfiguration(
         TODO("Not yet implemented")
     }
 
-    override fun extendsFrom(vararg superConfigs: Configuration?): Configuration {
+    override fun extendsFrom(vararg superConfigs: Configuration): Configuration {
         TODO("Not yet implemented")
     }
 
@@ -176,34 +176,6 @@ class FakeConfiguration(
     }
 
     override fun resolve(): MutableSet<File> {
-        TODO("Not yet implemented")
-    }
-
-    override fun files(dependencySpecClosure: Closure<*>): MutableSet<File> {
-        TODO("Not yet implemented")
-    }
-
-    override fun files(dependencySpec: Spec<in Dependency>): MutableSet<File> {
-        TODO("Not yet implemented")
-    }
-
-    override fun files(vararg dependencies: Dependency?): MutableSet<File> {
-        TODO("Not yet implemented")
-    }
-
-    override fun fileCollection(dependencySpec: Spec<in Dependency>): FileCollection {
-        TODO("Not yet implemented")
-    }
-
-    override fun fileCollection(dependencySpecClosure: Closure<*>): FileCollection {
-        TODO("Not yet implemented")
-    }
-
-    override fun fileCollection(vararg dependencies: Dependency?): FileCollection {
-        TODO("Not yet implemented")
-    }
-
-    override fun getUploadTaskName(): String {
         TODO("Not yet implemented")
     }
 
@@ -244,10 +216,6 @@ class FakeConfiguration(
     }
 
     override fun withDependencies(action: Action<in DependencySet>): Configuration {
-        TODO("Not yet implemented")
-    }
-
-    override fun getAll(): MutableSet<Configuration> {
         TODO("Not yet implemented")
     }
 

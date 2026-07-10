@@ -1,19 +1,18 @@
 [versions]
-gradle-plugin-publish = "0.14.0"
-android-gradle-plugin = "8.5.1"
-kotlin = "1.9.22"
-kotlin-dsl = "4.3.1"
+gradle-plugin-publish = "2.1.1"
+android-gradle-plugin = "9.0.1"
+kotlin = "2.3.21"
 dagger = "2.60.1"
 dexlib2 = "2.5.2"
 clikt = "4.4.0"
-bundletool = "1.14.1"
-apkanalyzer = "31.5.1"
-common = "31.5.1"
+bundletool = "1.18.1"
+apkanalyzer = "32.0.1"
+common = "32.0.1"
 jackson = "2.15.0"
 guava = "33.2.1-jre"
 gson = "2.10.1"
 influxdbClient = "2.24"
-shadow-jar = "7.0.0"
+shadow-jar = "9.0.2"
 nexus = "2.0.0"
 dokka = "2.1.0"
 
@@ -43,11 +42,10 @@ nexus-gradle-publish-plugin = { module = "io.github.gradle-nexus:publish-plugin"
 junit = { module = "junit:junit", version.ref = "junit" }
 
 [plugins]
-kotlin-dsl = { id = "org.gradle.kotlin.kotlin-dsl", version.ref = "kotlin-dsl" }
 gradle-plugin-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-plugin-publish" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
-johnrengelman-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow-jar" }
+gradleup-shadow = { id = "com.gradleup.shadow", version.ref = "shadow-jar" }
 dokka-gradle-plugin = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 dokka-javadoc = { id = "org.jetbrains.dokka-javadoc", version.ref = "dokka" }
 

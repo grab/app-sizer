@@ -118,7 +118,8 @@ internal class DefaultApkFileParser @Inject constructor(
         downloadSize = getFullApkDownloadSize(path),
         size = getFullApkDownloadSize(path),
         downloadFileSizeMap = getDownloadSizePerFile(path),
-        rawFileSizeMap = getRawSizePerFile(path)
+        // getRawSizePerFile was replaced by getInfoPerFile in newer apkanalyzer versions
+        rawFileSizeMap = getInfoPerFile(path).mapValues { (_, info) -> info.size }
     )
 }
 

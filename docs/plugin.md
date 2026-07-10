@@ -1,6 +1,13 @@
 # App Sizer Plugin
 App Sizer provide a gradle plugin as the option to seamlessly integrates with your Android Gradle project. This option is recommended.
 
+## Compatibility
+
+| App Sizer Plugin | Android Gradle Plugin | Gradle | JDK |
+|------------------|-----------------------|--------|-----|
+| Latest | 9.0+ | 9.1+ | 17+ |
+| 0.1.0-alpha03 and below | 8.x | 8.x | 17+ |
+
 ## Getting Started
 
 There are two ways to integrate the App Sizer plugin into your project:

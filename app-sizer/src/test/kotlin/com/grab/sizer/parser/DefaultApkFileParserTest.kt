@@ -1,6 +1,7 @@
 package com.grab.sizer.parser
 
 import com.android.tools.apk.analyzer.ApkSizeCalculator
+import com.android.tools.apk.analyzer.ZipEntryInfo
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -189,6 +190,11 @@ class DefaultApkFileParserTest {
 
         override fun getDownloadSizePerFile(apk: Path): Map<String, Long> = mockApkSizeInfo?.downloadFileSizeMap ?: emptyMap()
 
-        override fun getRawSizePerFile(apk: Path): Map<String, Long> = mockApkSizeInfo?.rawFileSizeMap ?: emptyMap()
+        override fun getInfoPerFile(apk: Path): Map<String, ZipEntryInfo> =
+            mockApkSizeInfo?.rawFileSizeMap
+                ?.mapValues { (_, size) ->
+                    ZipEntryInfo(size, ZipEntryInfo.Alignment.ALIGNMENT_NONE, false, false, 0)
+                }
+                ?: emptyMap()
     }
 }

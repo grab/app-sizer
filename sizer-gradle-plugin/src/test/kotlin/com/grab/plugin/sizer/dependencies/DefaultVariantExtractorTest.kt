@@ -45,7 +45,7 @@ class DefaultVariantExtractorTest {
     @Before
     fun setup() {
         rootProject = TestProjectCreator.createRootProject()
-        variantInput = VariantInput("flavor1Debug", "flavor1", "debug", "1.0")
+        variantInput = VariantInput("flavor1Debug", "flavor1", "debug")
         extractor = DefaultVariantExtractor(
             variantInput,
             listOf("flavor1", "flavor2"),
@@ -89,7 +89,7 @@ class DefaultVariantExtractorTest {
     @Test
     fun `findMatchVariant with enableMatchDebugVariant true for library`() {
         val project = TestProjectCreator.createAndroidLibraryProject(rootProject, "lib")
-        val variantInput = VariantInput("flavor1Release", "flavor1", "release", "1.0")
+        val variantInput = VariantInput("flavor1Release", "flavor1", "release")
         val extractorWithDebugEnabled =
             DefaultVariantExtractor(variantInput, listOf("flavor1", "flavor2"), listOf("debug", "release"), true)
         val result = extractorWithDebugEnabled.findMatchVariant(project)
@@ -100,7 +100,7 @@ class DefaultVariantExtractorTest {
     fun `extractVariant returns full match when available for library`() {
         val project =
             TestProjectCreator.createAndroidLibraryProject(rootProject, "lib", flavors = listOf("flavor1", "flavor2"))
-        val variantInput = VariantInput("flavor1Release", "flavor1", "release", "1.0")
+        val variantInput = VariantInput("flavor1Release", "flavor1", "release")
         val extractor = createExtractor(variantInput)
         val result = extractor.findMatchVariant(project)
 
@@ -111,7 +111,7 @@ class DefaultVariantExtractorTest {
     fun `extractVariant matches flavor and build type separately when no full match for library`() {
         val project =
             TestProjectCreator.createAndroidLibraryProject(rootProject, "lib", flavors = listOf("flavor1", "flavor2"))
-        val variantInput = VariantInput("flavor2Release", "flavor2", "release", "1.0")
+        val variantInput = VariantInput("flavor2Release", "flavor2", "release")
         val extractor = createExtractor(variantInput)
 
         val result = extractor.findMatchVariant(project)
@@ -123,7 +123,7 @@ class DefaultVariantExtractorTest {
     fun `extractVariant uses build type fallback when flavor matches but build type doesn't for library`() {
         val project =
             TestProjectCreator.createAndroidLibraryProject(rootProject, "lib", flavors = listOf("flavor1", "flavor2"))
-        val variantInput = VariantInput("flavor1CustomBuildType", "flavor1", "customBuildType", "1.0")
+        val variantInput = VariantInput("flavor1CustomBuildType", "flavor1", "customBuildType")
         val extractor = createExtractor(variantInput, buildTypeFallbacks = listOf("release", "debug"))
 
         val result = extractor.findMatchVariant(project)
@@ -135,7 +135,7 @@ class DefaultVariantExtractorTest {
     fun `extractVariant uses flavor fallback when build type matches but flavor doesn't for library`() {
         val project =
             TestProjectCreator.createAndroidLibraryProject(rootProject, "lib", flavors = listOf("flavor1", "flavor2"))
-        val variantInput = VariantInput("customFlavorDebug", "customFlavor", "debug", "1.0")
+        val variantInput = VariantInput("customFlavorDebug", "customFlavor", "debug")
         val extractor = createExtractor(variantInput, flavorFallbacks = listOf("flavor2", "flavor1"))
 
         val result = extractor.findMatchVariant(project)
@@ -147,7 +147,7 @@ class DefaultVariantExtractorTest {
     fun `extractVariant falls back to debug when no match found for library`() {
         val project =
             TestProjectCreator.createAndroidLibraryProject(rootProject, "lib", flavors = listOf("flavor1", "flavor2"))
-        val variantInput = VariantInput("customFlavorCustomBuildType", "customFlavor", "customBuildType", "1.0")
+        val variantInput = VariantInput("customFlavorCustomBuildType", "customFlavor", "customBuildType")
         val extractor = createExtractor(variantInput)
 
         val result = extractor.findMatchVariant(project)
