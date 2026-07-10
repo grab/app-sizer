@@ -27,10 +27,8 @@
 
 package com.grab.plugin.sizer.dependencies
 
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.LibraryPlugin
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.internal.project.DefaultProject
 import org.gradle.api.plugins.JavaPlugin
@@ -42,33 +40,24 @@ object TestProjectCreator {
         return ProjectBuilder.builder().build()
     }
 
-    fun createAndroidLibraryProject(rootProject: Project, name: String, flavors: List<String> = listOf("flavor1", "flavor2")): Project {
+    fun createAndroidLibraryProject(
+        rootProject: Project,
+        name: String,
+        flavors: List<String> = listOf("flavor1", "flavor2")
+    ): Project {
         val project = ProjectBuilder.builder().withName(name).withParent(rootProject).build()
-        project.pluginManager.apply(LibraryPlugin::class.java)
+        project.pluginManager.apply("com.android.library")
 
         val android = project.extensions.getByType(LibraryExtension::class.java)
-        android.compileSdkVersion(30)
+        android.compileSdk = 30
         android.namespace = "com.example.${project.name}"
-        android.defaultConfig {
-            minSdk = 21
-            targetSdk = 30
-        }
-        android.buildTypes {
-            getByName("debug") {
-                isMinifyEnabled = false
-            }
-            getByName("release") {
-                isMinifyEnabled = true
-            }
-        }
+        android.defaultConfig.minSdk = 21
+        android.buildTypes.getByName("debug") { it.isMinifyEnabled = false }
+        android.buildTypes.getByName("release") { it.isMinifyEnabled = true }
         if (flavors.isNotEmpty()) {
-            android.flavorDimensions("version")
-            android.productFlavors {
-                flavors.forEach { flavor ->
-                    create(flavor) {
-                        dimension = "version"
-                    }
-                }
+            android.flavorDimensions += "version"
+            flavors.forEach { flavor ->
+                android.productFlavors.create(flavor) { it.dimension = "version" }
             }
         }
 
@@ -78,9 +67,9 @@ object TestProjectCreator {
 
     fun createAndroidAppProject(rootProject: Project, name: String): Project {
         val project = ProjectBuilder.builder().withName(name).withParent(rootProject).build()
-        project.pluginManager.apply(AppPlugin::class.java)
+        project.pluginManager.apply("com.android.application")
 
-        val android = project.extensions.getByType(AppExtension::class.java)
+        val android = project.extensions.getByType(ApplicationExtension::class.java)
         configureAndroidAppExtension(android, project.name)
 
         project.doEvaluate()
@@ -94,34 +83,22 @@ object TestProjectCreator {
         return project
     }
 
-    private fun configureAndroidAppExtension(android: AppExtension, projectName: String) {
-        android.compileSdkVersion(30)
+    private fun configureAndroidAppExtension(android: ApplicationExtension, projectName: String) {
+        android.compileSdk = 30
         android.namespace = "com.example.$projectName"
-        android.defaultConfig {
+        android.defaultConfig.apply {
             applicationId = "com.example.$projectName"
-            minSdkVersion(21)
-            targetSdkVersion(30)
+            minSdk = 21
+            targetSdk = 30
             versionCode = 1
             versionName = "1.0"
         }
 
-        android.buildTypes {
-            getByName("debug") {
-                isMinifyEnabled = false
-            }
-            getByName("release") {
-                isMinifyEnabled = true
-            }
-        }
-        android.flavorDimensions("version")
-        android.productFlavors {
-            create("flavor1") {
-                dimension = "version"
-            }
-            create("flavor2") {
-                dimension = "version"
-            }
-        }
+        android.buildTypes.getByName("debug") { it.isMinifyEnabled = false }
+        android.buildTypes.getByName("release") { it.isMinifyEnabled = true }
+        android.flavorDimensions += "version"
+        android.productFlavors.create("flavor1") { it.dimension = "version" }
+        android.productFlavors.create("flavor2") { it.dimension = "version" }
     }
 }
 

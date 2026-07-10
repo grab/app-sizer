@@ -35,7 +35,6 @@
  */
 plugins {
     id "com.grab.sizer.build.kotlin"
-    alias(libs.plugins.kotlin.dsl)
     alias(libs.plugins.gradle.plugin.publish)
     id "maven-publish"
 }
@@ -56,12 +55,6 @@ dependencies {
     testImplementation libs.android.gradle.api
 }
 
-pluginBundle {
-    mavenCoordinates {
-        groupId = project.group
-        artifactId = project.name
-    }
-}
 gradlePlugin {
     website = 'https://grab.github.io/app-sizer/'
     vcsUrl = 'https://github.com/grab/app-sizer.git'

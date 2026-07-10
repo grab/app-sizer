@@ -28,14 +28,14 @@
 package com.grab.plugin.sizer.tasks
 
 
-import com.android.build.gradle.api.BaseVariant
+import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.variant.ApplicationVariant
 import com.grab.plugin.sizer.AppSizePluginExtension
 import com.grab.plugin.sizer.configuration.InfluxDBExtension
 import com.grab.plugin.sizer.configuration.RetentionPolicyExtension
 import com.grab.plugin.sizer.dependencies.ArchiveDependencyManager
 import com.grab.plugin.sizer.dependencies.ArchiveDependencyStore
 import com.grab.plugin.sizer.dependencies.VariantInput
-import com.grab.plugin.sizer.dependencies.toVariantInput
 import com.grab.plugin.sizer.params
 import com.grab.plugin.sizer.utils.DefaultPluginLogger
 import com.grab.plugin.sizer.utils.PluginInputProvider
@@ -60,6 +60,10 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
 
     @get:Input
     abstract val variantInput: Property<VariantInput>
+
+    @get:Input
+    @get:Optional
+    abstract val versionName: Property<String>
 
     @get:Input
     abstract val customProperties: MapProperty<String, String>
@@ -119,7 +123,7 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
         apkDirectories.forEach { apkDirectory ->
             val projectInfo = ProjectInfo(
                 projectName = project.rootProject.name,
-                versionName = variantInput.get().versionName ?: "NA",
+                versionName = versionName.getOrElse("NA"),
                 deviceName = apkDirectory.nameWithoutExtension,
                 buildType = variantInput.get().name
             )
@@ -164,40 +168,41 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
     companion object {
         fun registerTask(
             project: Project,
-            variant: BaseVariant,
+            variant: ApplicationVariant,
+            variantInput: VariantInput,
             pluginExtension: AppSizePluginExtension,
             generateApkTask: TaskProvider<GenerateApkTask>,
             generateArchivesListTask: TaskProvider<GenerateArchivesListTask>,
         ): TaskProvider<AppSizeAnalysisTask> {
             return project.tasks.register(
-                "appSizeAnalysis${variant.name.capitalize()}", AppSizeAnalysisTask::class.java
-            ) {
-                this.variantInput.set(variant.toVariantInput())
-                this.apkDirectories.setFrom(generateApkTask.map { it.outputDirectories })
-                this.archiveDepJsonFile.set(generateArchivesListTask.map { it.archiveDepFile.get() })
-                this.libName.set(project.params().libraryName())
-                this.option.set(project.params().option())
+                "appSizeAnalysis${variantInput.name.capitalize()}", AppSizeAnalysisTask::class.java
+            ) { task ->
+                task.variantInput.set(variantInput)
+                task.versionName.set(variant.outputs.first().versionName)
+                task.apkDirectories.setFrom(generateApkTask.map { it.outputDirectories })
+                task.archiveDepJsonFile.set(generateArchivesListTask.map { it.archiveDepFile.get() })
+                task.libName.set(project.params().libraryName())
+                task.option.set(project.params().option())
                 if (pluginExtension.metrics.influxDBExtension.url.isPresent) {
-                    this.influxDBConfig.set(pluginExtension.metrics.influxDBExtension.toInfluxDBConfig())
+                    task.influxDBConfig.set(pluginExtension.metrics.influxDBExtension.toInfluxDBConfig())
                 }
-                this.customProperties.set(pluginExtension.metrics.customAttributes)
+                task.customProperties.set(pluginExtension.metrics.customAttributes)
                 if (pluginExtension.metrics.localExtension.outputDirectory.isPresent) {
-                    this.outputDirectory.set(pluginExtension.metrics.localExtension.outputDirectory)
+                    task.outputDirectory.set(pluginExtension.metrics.localExtension.outputDirectory)
                 } else {
-                    this.outputDirectory.set(project.layout.buildDirectory.dir("sizer/reports/${variant.name}"))
+                    task.outputDirectory.set(project.layout.buildDirectory.dir("sizer/reports/${variantInput.name}"))
                 }
 
                 if (pluginExtension.input.teamMappingFile.isPresent) {
-                    this.teamMappingFile.set(pluginExtension.input.teamMappingFile)
+                    task.teamMappingFile.set(pluginExtension.input.teamMappingFile)
                 }
                 if (pluginExtension.input.libraryOwnershipFile.isPresent) {
-                    this.libraryOwnershipFile.set(pluginExtension.input.libraryOwnershipFile)
+                    task.libraryOwnershipFile.set(pluginExtension.input.libraryOwnershipFile)
                 }
 
-                this.largeFileThreshold.set(pluginExtension.input.largeFileThreshold)
-                if (variant.mappingFileProvider.isPresent && variant.buildType.isMinifyEnabled) {
-                    this.r8MappingFile.set(variant.mappingFileProvider.get().files.first())
-                }
+                task.largeFileThreshold.set(pluginExtension.input.largeFileThreshold)
+                // Absent when minification is disabled for the variant; the input is optional
+                task.r8MappingFile.set(variant.artifacts.get(SingleArtifact.OBFUSCATION_MAPPING_FILE))
             }
         }
     }

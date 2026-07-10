@@ -27,9 +27,10 @@
 
 package com.grab.plugin.sizer.tasks
 
-import com.android.build.gradle.api.ApplicationVariant
-import com.android.build.gradle.internal.tasks.FinalizeBundleTask
-import com.android.builder.model.SigningConfig
+import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.dsl.ApkSigningConfig
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.variant.ApplicationVariant
 import com.grab.plugin.sizer.AppSizePluginExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -40,8 +41,10 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
+import org.gradle.process.ExecOperations
 import java.io.File
 import java.util.*
+import javax.inject.Inject
 
 private const val DEFAULT_DEVICE_SPEC = """
     {
@@ -54,8 +57,17 @@ private const val DEFAULT_DEVICE_SPEC = """
 
 internal const val DEFAULT_DEVICE_NAME = "default_device"
 
+/**
+ * Grants a task access to the [ExecOperations] service. Direct `@Inject` on the task breaks
+ * the Dagger annotation processor (abstract members with `@Inject` are rejected), so the
+ * service is obtained through this injectable holder via [org.gradle.api.model.ObjectFactory].
+ */
+internal open class ExecOperationsHolder @Inject constructor(val execOperations: ExecOperations)
+
 @CacheableTask
 internal abstract class GenerateApkTask : DefaultTask() {
+
+    private val execOperations = project.objects.newInstance(ExecOperationsHolder::class.java).execOperations
     @get:InputFile
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val bundleToolFile: RegularFileProperty
@@ -78,6 +90,8 @@ internal abstract class GenerateApkTask : DefaultTask() {
     @get:OutputDirectories
     abstract val outputDirectories: ListProperty<Directory>
 
+    private val buildDirectory = project.layout.buildDirectory
+
     init {
         group = "build"
         description = "Generates APKs from App Bundle for different device specifications"
@@ -86,7 +100,7 @@ internal abstract class GenerateApkTask : DefaultTask() {
             // Add the provider to ensure the deviceSpecFiles values has set
             project.provider {
                 deviceSpecs.map { specFile ->
-                    project.layout.buildDirectory
+                    buildDirectory
                         .dir("sizer/apk/${variantName.get()}/${specFile.nameWithoutExtension}")
                         .get()
                 }
@@ -122,7 +136,7 @@ internal abstract class GenerateApkTask : DefaultTask() {
     private val deviceSpecs: Iterable<File> by lazy {
         if (deviceSpecFiles.isEmpty) {
             setOf(
-                project.layout.buildDirectory
+                buildDirectory
                     .file("sizer/device-specs/$DEFAULT_DEVICE_NAME.json")
                     .get()
                     .asFile
@@ -140,8 +154,8 @@ internal abstract class GenerateApkTask : DefaultTask() {
     }
 
     private fun extractApksToDirectory(apksTempFile: File, deviceSpec: String, outputDirectory: File) {
-        project.exec {
-            commandLine(
+        execOperations.exec {
+            it.commandLine(
                 "java",
                 "-jar",
                 bundleToolFile.asFile.get().path,
@@ -157,8 +171,8 @@ internal abstract class GenerateApkTask : DefaultTask() {
     private fun generateApksFile(apksTempFile: File, deviceSpec: String) {
         val realSigningConfig = signingConfig.get()
 
-        project.exec {
-            commandLine(
+        execOperations.exec {
+            it.commandLine(
                 "java",
                 "-jar",
                 bundleToolFile.asFile.get().path,
@@ -188,24 +202,33 @@ internal abstract class GenerateApkTask : DefaultTask() {
         fun registerTask(
             project: Project,
             extension: AppSizePluginExtension,
-            variant: ApplicationVariant
+            variant: ApplicationVariant,
+            android: ApplicationExtension,
         ): TaskProvider<GenerateApkTask> {
-            val bundleTask = project.tasks.named("sign${variant.name.capitalize()}Bundle")
+            val dslSigningConfig = variant.resolveDslSigningConfig(android)
             val task = project.tasks.register("generateApk${variant.name.capitalize()}", GenerateApkTask::class.java) {
-                deviceSpecFiles.setFrom(extension.input.apk.deviceSpecs)
-                bundleToolFile.set(extension.input.apk.bundleToolFile)
-                appBundleFile.set(
-                    bundleTask.map {
-                        (it as FinalizeBundleTask).finalBundleFile.get()
-                    }
-                )
-                if (variant.signingConfig != null) {
-                    signingConfig.set(variant.signingConfig.toInternalSigningConfig())
+                it.deviceSpecFiles.setFrom(extension.input.apk.deviceSpecs)
+                it.bundleToolFile.set(extension.input.apk.bundleToolFile)
+                it.appBundleFile.set(variant.artifacts.get(SingleArtifact.BUNDLE))
+                if (dslSigningConfig != null) {
+                    it.signingConfig.set(dslSigningConfig.toInternalSigningConfig())
                 }
-                variantName.set(variant.name)
+                it.variantName.set(variant.name)
             }
             return task
         }
+
+        /**
+         * The new Variant API does not expose keystore details, so the signing config is
+         * resolved from the DSL following AGP's merge order: build type first, then
+         * product flavors, then defaultConfig.
+         */
+        private fun ApplicationVariant.resolveDslSigningConfig(android: ApplicationExtension): ApkSigningConfig? =
+            buildType?.let { android.buildTypes.findByName(it)?.signingConfig }
+                ?: productFlavors.firstNotNullOfOrNull { (_, flavorName) ->
+                    android.productFlavors.findByName(flavorName)?.signingConfig
+                }
+                ?: android.defaultConfig.signingConfig
     }
 }
 
@@ -215,7 +238,7 @@ internal fun String.capitalize(): String = replaceFirstChar {
     ) else it.toString()
 }
 
-private fun SigningConfig.toInternalSigningConfig(): InternalSigningConfig = InternalSigningConfig(
+private fun ApkSigningConfig.toInternalSigningConfig(): InternalSigningConfig = InternalSigningConfig(
     storeFile = storeFile?.path ?: "",
     storePassword = storePassword ?: "",
     keyAlias = keyAlias ?: "",

@@ -27,16 +27,14 @@
 
 package com.grab.plugin.sizer.dependencies
 
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.api.BaseVariant
+import com.android.build.api.dsl.CommonExtension
+import com.grab.plugin.sizer.tasks.capitalize
 import com.grab.plugin.sizer.utils.*
-import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.jvm.tasks.Jar
-import org.gradle.kotlin.dsl.the
 import java.io.File
 import java.io.Serializable
 import javax.inject.Inject
@@ -48,6 +46,8 @@ internal const val BUILD_FLAVOR = "BUILD_FLAVOR"
 internal const val ENABLE_MATCH_DEBUG_VARIANT = "ENABLE_MATCH_DEBUG_VARIANT"
 internal const val BUILD_TYPE_DEBUG = "debug"
 internal const val KMP_JAR_TASK = "jvmJar"
+private const val RUNTIME_CLASSPATH_SUFFIX = "RuntimeClasspath"
+private const val ANDROID_EXTENSION = "android"
 
 internal interface VariantExtractor {
     /**
@@ -74,16 +74,62 @@ data class VariantInput(
     val name: String,
     val flavorName: String,
     val buildTypeName: String,
-    val versionName: String?
 ) : Serializable
 
-internal fun BaseVariant.toVariantInput() = VariantInput(
-    name = name,
-    flavorName = flavorName,
-    buildTypeName = buildType.name,
-    versionName = mergedFlavor.versionName,
+/**
+ * A build variant reconstructed from the Android DSL.
+ *
+ * AGP 9 removed the old variant API (`applicationVariants`/`libraryVariants`), so variants can
+ * no longer be queried from a project after evaluation. Instead, candidates are computed from
+ * the `android` DSL (product flavor combinations x build types) and validated against the
+ * variant's `RuntimeClasspath` configuration, which AGP creates for every active variant.
+ */
+internal data class AndroidVariantCandidate(
+    val name: String,
+    val flavorName: String,
+    val buildTypeName: String
 )
 
+internal val AndroidVariantCandidate.runtimeClasspathName: String
+    get() = "$name$RUNTIME_CLASSPATH_SUFFIX"
+
+internal val AndroidVariantCandidate.assembleTaskName: String
+    get() = "assemble${name.capitalize()}"
+
+/**
+ * Computes the list of variants for an Android project from its DSL extension.
+ * Only variants backed by an existing runtime classpath configuration are returned,
+ * so variants disabled through `beforeVariants` are filtered out.
+ */
+internal fun Project.androidVariantCandidates(): List<AndroidVariantCandidate> {
+    val android = extensions.getByName(ANDROID_EXTENSION) as CommonExtension
+    val buildTypeNames = android.buildTypes.names.toList()
+    val dimensions = android.flavorDimensions.toList().ifEmpty {
+        android.productFlavors.mapNotNull { it.dimension }.distinct()
+    }
+    val flavorsByDimension = dimensions
+        .map { dimension -> android.productFlavors.filter { it.dimension == dimension }.map { it.name } }
+        .filter { it.isNotEmpty() }
+
+    val flavorCombinations: List<List<String>> =
+        flavorsByDimension.fold(listOf(emptyList())) { combinations, flavors ->
+            combinations.flatMap { combination -> flavors.map { combination + it } }
+        }
+
+    return flavorCombinations.flatMap { combination ->
+        buildTypeNames.map { buildTypeName ->
+            AndroidVariantCandidate(
+                name = combination.plus(buildTypeName).toCamelCase(),
+                flavorName = combination.toCamelCase(),
+                buildTypeName = buildTypeName
+            )
+        }
+    }.filter { configurations.findByName(it.runtimeClasspathName) != null }
+}
+
+private fun List<String>.toCamelCase(): String =
+    mapIndexed { index, part -> if (index == 0) part else part.capitalize() }
+        .joinToString(separator = "")
 
 /**
  * DefaultVariantExtractor class is designed to extract matching variant and debug variant from various project types.
@@ -127,12 +173,9 @@ internal class DefaultVariantExtractor @Inject constructor(
     @Throws(UnsupportedOperationException::class, IllegalStateException::class)
     private fun defaultFindMatchVariant(project: Project): AppSizeVariant {
         return when {
-            project.isAndroidApplication -> AndroidAppSizeVariant(
-                project.extractVariant(project.the<AppExtension>().applicationVariants)
-            )
-
-            project.isAndroidLibrary -> AndroidAppSizeVariant(
-                project.extractVariant(project.the<LibraryExtension>().libraryVariants)
+            project.isAndroidApplication || project.isAndroidLibrary -> AndroidAppSizeVariant(
+                project,
+                project.extractVariant(project.androidVariantCandidates())
             )
 
             project.isJava || project.isKotlinJvm -> JarAppSizeVariant(project)
@@ -157,12 +200,9 @@ internal class DefaultVariantExtractor @Inject constructor(
     @Throws(UnsupportedOperationException::class, IllegalStateException::class)
     private fun findMatchDebugVariant(project: Project): AppSizeVariant {
         return when {
-            project.isAndroidApplication -> AndroidAppSizeVariant(
-                findDebugVariant(project.the<AppExtension>().applicationVariants)
-            )
-
-            project.isAndroidLibrary -> AndroidAppSizeVariant(
-                findDebugVariant(project.the<LibraryExtension>().libraryVariants)
+            project.isAndroidApplication || project.isAndroidLibrary -> AndroidAppSizeVariant(
+                project,
+                findDebugVariant(project.androidVariantCandidates())
             )
 
             project.isJava || project.isKotlinJvm -> JarAppSizeVariant(project)
@@ -178,15 +218,15 @@ internal class DefaultVariantExtractor @Inject constructor(
     /**
      * This function finds the debug variant that matches the flavor of the base variant.
      *
-     * @param variants DomainObjectSet of BaseVariants that should be searched.
-     * @return BaseVariant that is the debug variant matching the flavor of the base variant.
+     * @param variants the list of variant candidates that should be searched.
+     * @return AndroidVariantCandidate that is the debug variant matching the flavor of the base variant.
      * @throws IllegalStateException if no matching debug variant can be found.
      */
     @Throws(IllegalStateException::class)
-    private fun findDebugVariant(variants: DomainObjectSet<out BaseVariant>): BaseVariant {
+    private fun findDebugVariant(variants: List<AndroidVariantCandidate>): AndroidVariantCandidate {
         // Filter out the debug variants from the provided set of variants.
         val debugVariants = variants.filter { variant ->
-            variant.buildType.name == BUILD_TYPE_DEBUG
+            variant.buildTypeName == BUILD_TYPE_DEBUG
         }
         // Try finding a debug variant that matches the flavor of the base variant.
         val matchFlavor = debugVariants.find { variant ->
@@ -217,11 +257,11 @@ internal class DefaultVariantExtractor @Inject constructor(
      * This function extracts a variant that matches the base variant's flavor and build type.
      *
      * @receiver Project The project from which to extract the variant.
-     * @return BaseVariant that is the variant matching the flavor and build type of the base variant.
+     * @return AndroidVariantCandidate that is the variant matching the flavor and build type of the base variant.
      * @throws IllegalStateException if no matching variant can be found.
      */
     @Throws(IllegalStateException::class)
-    private fun Project.extractVariant(variants: DomainObjectSet<out BaseVariant>): BaseVariant {
+    private fun Project.extractVariant(variants: List<AndroidVariantCandidate>): AndroidVariantCandidate {
 
         // Try to find a variant that fully matches the base variant
         val fullMatch = variants.find { variant ->
@@ -241,21 +281,21 @@ internal class DefaultVariantExtractor @Inject constructor(
             // Find the build type that matches the base variant
             matchFlavorVariant.forEach {
                 // match both, buildType & flavor
-                if (it.buildType.name == variantInput.buildTypeName)
+                if (it.buildTypeName == variantInput.buildTypeName)
                     return it
             }
 
             // If no full match is found, match just by build type with our fallbacks
             buildTypeMatchingFallbacks.forEach { fallback ->
                 matchFlavorVariant.forEach { variant ->
-                    if (variant.buildType.name == fallback) return variant
+                    if (variant.buildTypeName == fallback) return variant
                 }
             }
         }
 
         // If no variant with matching flavor is found, filter by build type
         val matchBuildType = variants.filter { variant ->
-            variant.buildType.name == variantInput.buildTypeName
+            variant.buildTypeName == variantInput.buildTypeName
         }
 
         // If found, return; if there are multiple matches, find the first match flavor by our fallbacks
@@ -270,7 +310,7 @@ internal class DefaultVariantExtractor @Inject constructor(
 
         // When no flavor or build type match, return debug by default
         val matchDefaultBuildType = variants.filter { variant ->
-            variant.buildType.name == BUILD_TYPE_DEBUG
+            variant.buildTypeName == BUILD_TYPE_DEBUG
         }
 
         // If found, return; if there are multiple matches, find the first match flavor by our fallbacks
@@ -329,14 +369,30 @@ internal class KmpJarAppSizeVariant(
 
 
 internal class AndroidAppSizeVariant(
-    val baseVariant: BaseVariant
+    private val project: Project,
+    val variant: AndroidVariantCandidate
 ) : AppSizeVariant {
     override val binaryOutPut: File
-        get() = baseVariant.outputs.first().outputFile
+        get() = when {
+            project.isAndroidLibrary -> {
+                // BundleAar is an archive task, its archive file is the exact AAR output
+                val bundleAar =
+                    project.tasks.getByName("bundle${variant.name.capitalize()}Aar") as AbstractArchiveTask
+                bundleAar.archiveFile.get().asFile
+            }
+
+            else -> {
+                // The conventional APK output directory of the variant
+                val variantPath = listOf(variant.flavorName, variant.buildTypeName)
+                    .filter { it.isNotEmpty() }
+                    .joinToString(separator = "/")
+                project.layout.buildDirectory.dir("outputs/apk/$variantPath").get().asFile
+            }
+        }
     override val runtimeConfiguration: Configuration
-        get() = baseVariant.runtimeConfiguration
+        get() = project.configurations.getByName(variant.runtimeClasspathName)
     override val buildType: String
-        get() = baseVariant.buildType.name
+        get() = variant.buildTypeName
     override val buildFlavor: String
-        get() = baseVariant.flavorName
+        get() = variant.flavorName
 }

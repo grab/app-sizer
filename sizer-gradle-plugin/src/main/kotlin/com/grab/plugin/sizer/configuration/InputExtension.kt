@@ -27,9 +27,7 @@
 
 package com.grab.plugin.sizer.configuration
 
-import com.android.build.gradle.api.BaseVariant
-import com.android.builder.model.BuildType
-import com.android.builder.model.ProductFlavor
+import com.android.build.api.variant.Variant
 import org.gradle.api.Action
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
@@ -59,20 +57,29 @@ open class InputExtension @Inject constructor(objects: ObjectFactory) {
     }
 }
 
+/**
+ * Filter used to exclude build variants from the app size analysis.
+ *
+ * The values mirror the app variant being configured, as reported by
+ * [com.android.build.api.variant.Variant]:
+ * - [name] is the full variant name, e.g. "proRelease"
+ * - [buildType] is the variant's build type name, e.g. "debug" or "release"
+ * - [flavors] holds the variant's product flavor names, one per flavor dimension, e.g. ["pro"]
+ */
 interface VariantFilter {
     fun setIgnore(ignore: Boolean)
-    val buildType: BuildType
-    val flavors: List<ProductFlavor>
+    val buildType: String
+    val flavors: List<String>
     val name: String
 }
 
-internal class DefaultVariantFilter(variant: BaseVariant) : VariantFilter {
+internal class DefaultVariantFilter(variant: Variant) : VariantFilter {
     var ignored: Boolean = false
     override fun setIgnore(ignore: Boolean) {
         ignored = ignore
     }
 
-    override val buildType: BuildType = variant.buildType
-    override val flavors: List<ProductFlavor> = variant.productFlavors
+    override val buildType: String = variant.buildType.orEmpty()
+    override val flavors: List<String> = variant.productFlavors.map { it.second }
     override val name: String = variant.name
 }

@@ -35,7 +35,7 @@ plugins {
     id "com.grab.sizer.build.common"
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.kapt) apply false
-    alias(libs.plugins.johnrengelman.shadow) apply false
+    alias(libs.plugins.gradleup.shadow) apply false
     alias(libs.plugins.gradle.plugin.publish) apply false
     alias(libs.plugins.dokka.gradle.plugin) apply false
     alias(libs.plugins.dokka.javadoc) apply false

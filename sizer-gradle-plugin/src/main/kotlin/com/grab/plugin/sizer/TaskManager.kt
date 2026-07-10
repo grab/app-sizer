@@ -27,11 +27,9 @@
 
 package com.grab.plugin.sizer
 
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.api.BaseVariant
-import com.android.build.gradle.internal.dsl.BuildType
-import com.android.build.gradle.internal.dsl.ProductFlavor
-import com.android.build.gradle.internal.tasks.factory.dependsOn
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.ApplicationVariant
 import com.grab.plugin.sizer.configuration.DefaultVariantFilter
 import com.grab.plugin.sizer.dependencies.*
 import com.grab.plugin.sizer.tasks.AppSizeAnalysisTask
@@ -43,7 +41,6 @@ import org.gradle.api.Task
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.the
 
 /*
  * This internal `TaskManager` class is used for configuring tasks for the Plugin
@@ -57,57 +54,81 @@ internal class TaskManager(
     private val logger: PluginLogger
 ) {
     fun configTasks() {
-        project.rootProject.gradle.projectsEvaluated {
-            if (pluginExtension.enabled && project.isAndroidApplication) {
-                configAppSizeTask(project)
-            }
-        }
-    }
-
-    private fun configAppSizeTask(project: Project) {
-        with(project.the<AppExtension>()) {
-            applicationVariants.forEach { variant ->
-                val variantFilter = DefaultVariantFilter(variant)
-                pluginExtension.input.variantFilter?.execute(variantFilter)
-                if (!variantFilter.ignored) {
-                    val generateApkTask = GenerateApkTask.registerTask(
-                        project,
-                        pluginExtension,
-                        variant
-                    )
-
-                    val generateArchivesListTask = GenerateArchivesListTask.registerTask(
-                        project,
-                        variant = variant,
-                        flavorMatchingFallbacks = getProductFlavor(variant)?.matchingFallbacks ?: emptyList(),
-                        buildTypeMatchingFallbacks = getOriginalBuildType(variant).matchingFallbacks,
-                        enableMatchDebugVariant = pluginExtension.input.enableMatchDebugVariant
-                    )
-
-                    val appSizeAnalysisTask = AppSizeAnalysisTask.registerTask(
-                        project,
-                        variant,
-                        pluginExtension,
-                        generateApkTask,
-                        generateArchivesListTask,
-                    )
-                    registerAppSizeTaskDep(project, variant, this, appSizeAnalysisTask)
+        project.pluginManager.withPlugin(ANDROID_APPLICATION_PLUGIN) {
+            val androidComponents =
+                project.extensions.getByType(ApplicationAndroidComponentsExtension::class.java)
+            androidComponents.onVariants { variant ->
+                // onVariants callbacks run after the build script is evaluated,
+                // so the appSizer extension is fully configured at this point
+                if (pluginExtension.enabled) {
+                    configAppSizeTask(project, variant)
                 }
             }
         }
     }
 
+    private fun configAppSizeTask(project: Project, variant: ApplicationVariant) {
+        val variantFilter = DefaultVariantFilter(variant)
+        pluginExtension.input.variantFilter?.execute(variantFilter)
+        if (variantFilter.ignored) return
+
+        val android = project.extensions.getByType(ApplicationExtension::class.java)
+        val variantInput = variant.toVariantInput()
+        val flavorMatchingFallbacks = variant.flavorMatchingFallbacks(android)
+        val buildTypeMatchingFallbacks = variant.buildTypeMatchingFallbacks(android)
+
+        val generateApkTask = GenerateApkTask.registerTask(
+            project,
+            pluginExtension,
+            variant,
+            android
+        )
+
+        val generateArchivesListTask = GenerateArchivesListTask.registerTask(
+            project,
+            variantInput = variantInput,
+            flavorMatchingFallbacks = flavorMatchingFallbacks,
+            buildTypeMatchingFallbacks = buildTypeMatchingFallbacks,
+            enableMatchDebugVariant = pluginExtension.input.enableMatchDebugVariant
+        )
+
+        val appSizeAnalysisTask = AppSizeAnalysisTask.registerTask(
+            project,
+            variant,
+            variantInput,
+            pluginExtension,
+            generateApkTask,
+            generateArchivesListTask,
+        )
+
+        /*
+         * The analysis task consumes the AAR/JAR binaries of all dependency projects. Their task
+         * dependencies are wired after every project has been evaluated so the whole project
+         * graph (plugins & configurations) is known.
+         */
+        project.rootProject.gradle.projectsEvaluated {
+            registerAppSizeTaskDep(
+                project,
+                variantInput,
+                flavorMatchingFallbacks,
+                buildTypeMatchingFallbacks,
+                appSizeAnalysisTask
+            )
+        }
+    }
+
     private fun registerAppSizeTaskDep(
         project: Project,
-        variant: BaseVariant,
-        appExtension: AppExtension,
+        variantInput: VariantInput,
+        flavorMatchingFallbacks: List<String>,
+        buildTypeMatchingFallbacks: List<String>,
         depTask: TaskProvider<out Task>
     ) {
         val dependenciesComponent = DaggerDependenciesComponent.factory().create(
             project = project,
-            variantInput = variant.toVariantInput(),
-            flavorMatchingFallbacks = appExtension.getProductFlavor(variant)?.matchingFallbacks ?: emptyList(),
-            buildTypeMatchingFallbacks = appExtension.getOriginalBuildType(variant).matchingFallbacks,
+            variantInput = variantInput,
+            flavorMatchingFallbacks = flavorMatchingFallbacks,
+            buildTypeMatchingFallbacks = buildTypeMatchingFallbacks,
             enableMatchDebugVariant = pluginExtension.input.enableMatchDebugVariant
         )
         val markAsChecked = mutableSetOf<String>()
@@ -128,7 +149,7 @@ internal class TaskManager(
             .flatMap { configuration ->
                 configuration.dependencies.withType(ProjectDependency::class.java)
             }.forEach {
-                dfs(it.dependencyProject, markAsChecked, dependenciesComponent, depTask)
+                dfs(project.project(it.path), markAsChecked, dependenciesComponent, depTask)
             }
     }
 
@@ -142,7 +163,8 @@ internal class TaskManager(
                 try {
                     val variant = variantExtractor.findMatchVariant(project)
                     if (variant is AndroidAppSizeVariant) {
-                        task.dependsOn(variant.baseVariant.assembleProvider)
+                        val assembleTask = project.tasks.named(variant.variant.assembleTaskName)
+                        task.configure { it.dependsOn(assembleTask) }
                     }
                 } catch (e: UnsupportedOperationException) {
                     logger.warn("Unsupported project type for Android library project ${project.name}: ${e.message}")
@@ -153,16 +175,14 @@ internal class TaskManager(
                 }
             }
 
-            project.isKotlinJvm -> {
-                task.dependsOn(project.tasks.named(JavaPlugin.JAR_TASK_NAME))
-            }
-
-            project.isJava -> {
-                task.dependsOn(project.tasks.named(JavaPlugin.JAR_TASK_NAME))
+            project.isKotlinJvm || project.isJava -> {
+                val jarTask = project.tasks.named(JavaPlugin.JAR_TASK_NAME)
+                task.configure { it.dependsOn(jarTask) }
             }
 
             project.isKotlinMultiplatform -> {
-                task.dependsOn(project.tasks.named(KMP_JAR_TASK))
+                val jarTask = project.tasks.named(KMP_JAR_TASK)
+                task.configure { it.dependsOn(jarTask) }
             }
 
             else -> {
@@ -174,10 +194,16 @@ internal class TaskManager(
     }
 }
 
-internal fun AppExtension.getProductFlavor(variant: BaseVariant): ProductFlavor? = productFlavors.find {
-    it.name == variant.flavorName
-}
+internal fun ApplicationVariant.toVariantInput() = VariantInput(
+    name = name,
+    flavorName = flavorName.orEmpty(),
+    buildTypeName = buildType.orEmpty(),
+)
 
-internal fun AppExtension.getOriginalBuildType(variant: BaseVariant): BuildType = buildTypes.first {
-    it.name == variant.buildType.name
-}
+internal fun ApplicationVariant.flavorMatchingFallbacks(android: ApplicationExtension): List<String> =
+    productFlavors.firstNotNullOfOrNull { (_, flavorName) ->
+        android.productFlavors.findByName(flavorName)?.matchingFallbacks?.takeIf { it.isNotEmpty() }
+    } ?: emptyList()
+
+internal fun ApplicationVariant.buildTypeMatchingFallbacks(android: ApplicationExtension): List<String> =
+    buildType?.let { android.buildTypes.findByName(it)?.matchingFallbacks } ?: emptyList()
