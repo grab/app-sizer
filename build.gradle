@@ -38,5 +38,6 @@ plugins {
     alias(libs.plugins.johnrengelman.shadow) apply false
     alias(libs.plugins.gradle.plugin.publish) apply false
     alias(libs.plugins.dokka.gradle.plugin) apply false
+    alias(libs.plugins.dokka.javadoc) apply false
 }
 apply from: "gradle/publish-root-config.gradle"

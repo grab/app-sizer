@@ -33,7 +33,6 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
-import org.gradle.kotlin.dsl.property
 import javax.inject.Inject
 
 open class MetricExtension @Inject constructor(project: Project) {
@@ -65,19 +64,19 @@ open class MetricExtension @Inject constructor(project: Project) {
 }
 
 open class RetentionPolicyExtension @Inject constructor(objects: ObjectFactory) {
-    val name: Property<String> = objects.property<String>()
-    val duration: Property<String> = objects.property<String>()
-    val shardDuration: Property<String> = objects.property<String>()
-    val replicationFactor: Property<Int> = objects.property<Int>()
-    val setAsDefault: Property<Boolean> = objects.property<Boolean>().convention(false)
+    val name: Property<String> = objects.property(String::class.java)
+    val duration: Property<String> = objects.property(String::class.java)
+    val shardDuration: Property<String> = objects.property(String::class.java)
+    val replicationFactor: Property<Int> = objects.property(Int::class.java)
+    val setAsDefault: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 }
 
 open class InfluxDBExtension @Inject constructor(private val objects: ObjectFactory) {
-    val dbName: Property<String> = objects.property<String>()
-    val url: Property<String> = objects.property<String>()
-    val username: Property<String> = objects.property<String>()
-    val password: Property<String> = objects.property<String>()
-    val reportTableName: Property<String> = objects.property<String>()
+    val dbName: Property<String> = objects.property(String::class.java)
+    val url: Property<String> = objects.property(String::class.java)
+    val username: Property<String> = objects.property(String::class.java)
+    val password: Property<String> = objects.property(String::class.java)
+    val reportTableName: Property<String> = objects.property(String::class.java)
     val retentionPolicy: RetentionPolicyExtension = objects.newInstance(RetentionPolicyExtension::class.java)
 
     fun retentionPolicy(closure: Closure<*>) {
