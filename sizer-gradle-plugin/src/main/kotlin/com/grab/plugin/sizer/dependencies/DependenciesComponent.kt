@@ -29,54 +29,37 @@ package com.grab.plugin.sizer.dependencies
 
 import com.grab.plugin.sizer.utils.DefaultPluginLogger
 import com.grab.plugin.sizer.utils.PluginLogger
-import com.grab.sizer.utils.Logger
-import dagger.Binds
-import dagger.BindsInstance
-import dagger.Component
-import dagger.Module
 import org.gradle.api.Project
-import javax.inject.Named
-import javax.inject.Scope
 
-@Scope
-@Retention(AnnotationRetention.RUNTIME)
-internal annotation class DependenciesScope
+/**
+ * Hand-wired object graph for the dependency extraction of one variant, replacing the
+ * previous Dagger component. Dagger was removed from the plugin because the buildscript
+ * classpath offers no dependency isolation, so another plugin's Dagger version can clash
+ * with the generated code at runtime.
+ */
+internal class DependenciesComponent(
+    project: Project,
+    variantInput: VariantInput,
+    flavorMatchingFallbacks: List<String>,
+    buildTypeMatchingFallbacks: List<String>,
+    enableMatchDebugVariant: Boolean,
+) {
+    private val logger: PluginLogger = DefaultPluginLogger(project)
 
-@Component(
-    modules = [DependenciesModule::class]
-)
-@DependenciesScope
-internal interface DependenciesComponent {
-    fun dependencyExtractor(): DependencyExtractor
-    fun configurationExtractor(): ConfigurationExtractor
-    fun variantExtractor(): VariantExtractor
+    val variantExtractor: VariantExtractor = DefaultVariantExtractor(
+        variantInput = variantInput,
+        flavorMatchingFallbacks = flavorMatchingFallbacks,
+        buildTypeMatchingFallbacks = buildTypeMatchingFallbacks,
+        enableMatchDebugVariant = enableMatchDebugVariant,
+    )
 
-    @Component.Factory
-    interface Factory {
-        fun create(
-            @BindsInstance project: Project,
-            @BindsInstance variantInput: VariantInput,
-            @BindsInstance @Named(BUILD_FLAVOR) flavorMatchingFallbacks: List<String>,
-            @BindsInstance @Named(BUILD_TYPE) buildTypeMatchingFallbacks: List<String>,
-            @BindsInstance @Named(ENABLE_MATCH_DEBUG_VARIANT) enableMatchDebugVariant: Boolean
-        ): DependenciesComponent
-    }
-}
+    val configurationExtractor: ConfigurationExtractor =
+        DefaultConfigurationExtractor(variantExtractor, logger)
 
-@Module
-internal interface DependenciesModule {
-    @Binds
-    fun bindArchiveExtractor(extractor: DefaultArchiveExtractor): ArchiveExtractor
-
-    @Binds
-    fun bindConfigurationExtractor(extractor: DefaultConfigurationExtractor): ConfigurationExtractor
-
-    @Binds
-    fun bindDependencyExtractor(extractor: DefaultDependencyExtractor): DependencyExtractor
-
-    @Binds
-    fun bindVariantExtractor(extractor: DefaultVariantExtractor): VariantExtractor
-
-    @Binds
-    fun bindLogger(logger: DefaultPluginLogger): PluginLogger
+    val dependencyExtractor: DependencyExtractor = DefaultDependencyExtractor(
+        appProject = project,
+        configurationExtractor = configurationExtractor,
+        archiveExtractor = DefaultArchiveExtractor(variantExtractor),
+        logger = logger,
+    )
 }

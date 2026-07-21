@@ -32,14 +32,12 @@ import com.grab.plugin.sizer.utils.debug
 import com.grab.plugin.sizer.utils.warn
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import javax.inject.Inject
 
 interface ConfigurationExtractor {
     fun runtimeConfigurations(project: Project): Sequence<Configuration>
 }
 
-@DependenciesScope
-internal class DefaultConfigurationExtractor @Inject constructor(
+internal class DefaultConfigurationExtractor(
     private val variantExtractor: VariantExtractor,
     private val logger: PluginLogger
 ) : ConfigurationExtractor {

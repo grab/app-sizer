@@ -101,11 +101,11 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
              * accommodating potential build type incompatibilities.
              */
             val modules = createDependenciesComponent(true)
-                .dependencyExtractor()
+                .dependencyExtractor
                 .extract()
                 .filter { it !is ExternalDependency }
             val libraries = createDependenciesComponent(false)
-                .dependencyExtractor()
+                .dependencyExtractor
                 .extract()
                 .filterIsInstance<ExternalDependency>()
 
@@ -117,7 +117,7 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
         } else {
             createDependenciesComponent(false).run {
                 ArchiveDependencyManager().writeToJsonFile(
-                    dependencyExtractor().extract(),
+                    dependencyExtractor.extract(),
                     archiveDepFile.get().asFile
                 )
             }
@@ -126,7 +126,7 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
     }
 
     private fun createDependenciesComponent(enableMatchDebugVariant: Boolean): DependenciesComponent =
-        DaggerDependenciesComponent.factory().create(
+        DependenciesComponent(
             project,
             variantInput.get(),
             flavorMatchingFallbacks.get(),

@@ -36,13 +36,8 @@ import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.jvm.tasks.Jar
 import java.io.File
 import java.io.Serializable
-import javax.inject.Inject
-import javax.inject.Named
 
 
-internal const val BUILD_TYPE = "BUILD_TYPE"
-internal const val BUILD_FLAVOR = "BUILD_FLAVOR"
-internal const val ENABLE_MATCH_DEBUG_VARIANT = "ENABLE_MATCH_DEBUG_VARIANT"
 internal const val BUILD_TYPE_DEBUG = "debug"
 internal const val KMP_JAR_TASK = "jvmJar"
 private const val RUNTIME_CLASSPATH_SUFFIX = "RuntimeClasspath"
@@ -141,14 +136,10 @@ private fun List<String>.toCamelCase(): String =
  * @property buildTypeMatchingFallbacks references list of build types to be used as fallbacks.
  * @property enableMatchDebugVariant specifies whether to match debug variant.
  */
-@DependenciesScope
-internal class DefaultVariantExtractor @Inject constructor(
+internal class DefaultVariantExtractor(
     private val variantInput: VariantInput,
-    @Named(BUILD_FLAVOR)
     private val flavorMatchingFallbacks: List<String>,
-    @Named(BUILD_TYPE)
     private val buildTypeMatchingFallbacks: List<String>,
-    @Named(ENABLE_MATCH_DEBUG_VARIANT)
     private val enableMatchDebugVariant: Boolean,
 ) : VariantExtractor {
 

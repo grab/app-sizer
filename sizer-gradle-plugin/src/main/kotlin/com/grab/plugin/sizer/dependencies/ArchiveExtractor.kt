@@ -33,7 +33,6 @@ import com.grab.plugin.sizer.utils.isJava
 import com.grab.plugin.sizer.utils.isKotlinJvm
 import com.grab.plugin.sizer.utils.isKotlinMultiplatform
 import org.gradle.api.Project
-import javax.inject.Inject
 
 interface ArchiveExtractor {
     /**
@@ -48,8 +47,7 @@ interface ArchiveExtractor {
     fun extract(project: Project): ArchiveDependency
 }
 
-@DependenciesScope
-internal class DefaultArchiveExtractor @Inject constructor(
+internal class DefaultArchiveExtractor(
     private val variantExtractor: VariantExtractor
 ) : ArchiveExtractor {
     @Throws(UnsupportedOperationException::class, IllegalStateException::class)

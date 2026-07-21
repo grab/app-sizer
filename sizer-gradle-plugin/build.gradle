@@ -45,9 +45,7 @@ dependencies {
     compileOnly libs.android.gradle.api
 
     implementation project(':app-sizer')
-    implementation libs.google.dagger
     implementation libs.gson
-    kapt libs.dagger.compiler
 
     testImplementation libs.junit
     testImplementation gradleTestKit()

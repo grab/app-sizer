@@ -36,7 +36,6 @@ import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.ResolvedDependency
 import java.util.*
-import javax.inject.Inject
 
 typealias ArchiveDependencyStore = HashSet<ArchiveDependency>
 
@@ -47,8 +46,7 @@ interface DependencyExtractor {
 
 private const val INTERNAL_DEP_VERSION = "unspecified"
 
-@DependenciesScope
-class DefaultDependencyExtractor @Inject constructor(
+class DefaultDependencyExtractor(
     private val appProject: Project,
     private val configurationExtractor: ConfigurationExtractor,
     private val archiveExtractor: ArchiveExtractor,

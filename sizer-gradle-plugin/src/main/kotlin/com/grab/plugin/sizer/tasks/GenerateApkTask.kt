@@ -57,17 +57,12 @@ private const val DEFAULT_DEVICE_SPEC = """
 
 internal const val DEFAULT_DEVICE_NAME = "default_device"
 
-/**
- * Grants a task access to the [ExecOperations] service. Direct `@Inject` on the task breaks
- * the Dagger annotation processor (abstract members with `@Inject` are rejected), so the
- * service is obtained through this injectable holder via [org.gradle.api.model.ObjectFactory].
- */
-internal open class ExecOperationsHolder @Inject constructor(val execOperations: ExecOperations)
-
 @CacheableTask
 internal abstract class GenerateApkTask : DefaultTask() {
 
-    private val execOperations = project.objects.newInstance(ExecOperationsHolder::class.java).execOperations
+    @get:Inject
+    abstract val execOperations: ExecOperations
+
     private val buildDirectory = project.layout.buildDirectory
 
     @get:InputFile

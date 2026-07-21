@@ -124,7 +124,7 @@ internal class TaskManager(
         buildTypeMatchingFallbacks: List<String>,
         depTask: TaskProvider<out Task>
     ) {
-        val dependenciesComponent = DaggerDependenciesComponent.factory().create(
+        val dependenciesComponent = DependenciesComponent(
             project = project,
             variantInput = variantInput,
             flavorMatchingFallbacks = flavorMatchingFallbacks,
@@ -143,8 +143,8 @@ internal class TaskManager(
     ) {
         if (markAsChecked.contains(project.path)) return
         markAsChecked.add(project.path)
-        handleSubProject(project, depTask, dependenciesComponent.variantExtractor())
-        dependenciesComponent.configurationExtractor()
+        handleSubProject(project, depTask, dependenciesComponent.variantExtractor)
+        dependenciesComponent.configurationExtractor
             .runtimeConfigurations(project)
             .flatMap { configuration ->
                 configuration.dependencies.withType(ProjectDependency::class.java)
