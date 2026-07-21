@@ -25,35 +25,12 @@
  * SOFTWARE
  */
 
-package com.grab.sizer.jvm
+package com.grab.plugin.sizer.utils
 
-import org.gradle.api.Project
-import org.gradle.kotlin.dsl.the
-import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
-import org.gradle.api.JavaVersion
-import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.kotlin.dsl.configure
+import java.util.Locale
 
-fun Project.javaCommon() {
-    configure<JavaPluginExtension> {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
+internal fun String.capitalize(): String = replaceFirstChar {
+    if (it.isLowerCase()) it.titlecase(
+        Locale.getDefault()
+    ) else it.toString()
 }
-
-internal fun Project.kotlinCommon() {
-    the<KotlinProjectExtension>().apply {
-        jvmToolchain(17)
-    }
-    tasks.withType<KotlinCompilationTask<KotlinCommonCompilerOptions>>().configureEach {
-        compilerOptions {
-            apiVersion.set(KotlinVersion.KOTLIN_2_1)
-            languageVersion.set(KotlinVersion.KOTLIN_2_1)
-        }
-    }
-}
-

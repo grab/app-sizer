@@ -29,6 +29,7 @@ package com.grab.plugin.sizer.tasks
 
 
 import com.grab.plugin.sizer.dependencies.*
+import com.grab.plugin.sizer.utils.capitalize
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty

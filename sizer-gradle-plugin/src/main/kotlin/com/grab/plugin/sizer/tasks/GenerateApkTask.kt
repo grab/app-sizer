@@ -32,6 +32,7 @@ import com.android.build.api.dsl.ApkSigningConfig
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.ApplicationVariant
 import com.grab.plugin.sizer.AppSizePluginExtension
+import com.grab.plugin.sizer.utils.capitalize
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
@@ -43,7 +44,6 @@ import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
 import org.gradle.process.ExecOperations
 import java.io.File
-import java.util.*
 import javax.inject.Inject
 
 private const val DEFAULT_DEVICE_SPEC = """
@@ -68,6 +68,8 @@ internal open class ExecOperationsHolder @Inject constructor(val execOperations:
 internal abstract class GenerateApkTask : DefaultTask() {
 
     private val execOperations = project.objects.newInstance(ExecOperationsHolder::class.java).execOperations
+    private val buildDirectory = project.layout.buildDirectory
+
     @get:InputFile
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val bundleToolFile: RegularFileProperty
@@ -89,8 +91,6 @@ internal abstract class GenerateApkTask : DefaultTask() {
 
     @get:OutputDirectories
     abstract val outputDirectories: ListProperty<Directory>
-
-    private val buildDirectory = project.layout.buildDirectory
 
     init {
         group = "build"
@@ -230,12 +230,6 @@ internal abstract class GenerateApkTask : DefaultTask() {
                 }
                 ?: android.defaultConfig.signingConfig
     }
-}
-
-internal fun String.capitalize(): String = replaceFirstChar {
-    if (it.isLowerCase()) it.titlecase(
-        Locale.getDefault()
-    ) else it.toString()
 }
 
 private fun ApkSigningConfig.toInternalSigningConfig(): InternalSigningConfig = InternalSigningConfig(

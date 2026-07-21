@@ -163,7 +163,7 @@ internal class TaskManager(
                 try {
                     val variant = variantExtractor.findMatchVariant(project)
                     if (variant is AndroidAppSizeVariant) {
-                        val assembleTask = project.tasks.named(variant.variant.assembleTaskName)
+                        val assembleTask = project.tasks.named(variant.candidate.assembleTaskName)
                         task.configure { it.dependsOn(assembleTask) }
                     }
                 } catch (e: UnsupportedOperationException) {
@@ -200,10 +200,17 @@ internal fun ApplicationVariant.toVariantInput() = VariantInput(
     buildTypeName = buildType.orEmpty(),
 )
 
+/**
+ * Reads the `matchingFallbacks` declared in the DSL for this variant's product flavors.
+ * The first flavor (in flavor-dimension order) that declares a non-empty list wins.
+ */
 internal fun ApplicationVariant.flavorMatchingFallbacks(android: ApplicationExtension): List<String> =
     productFlavors.firstNotNullOfOrNull { (_, flavorName) ->
         android.productFlavors.findByName(flavorName)?.matchingFallbacks?.takeIf { it.isNotEmpty() }
     } ?: emptyList()
 
+/**
+ * Reads the `matchingFallbacks` declared in the DSL for this variant's build type.
+ */
 internal fun ApplicationVariant.buildTypeMatchingFallbacks(android: ApplicationExtension): List<String> =
     buildType?.let { android.buildTypes.findByName(it)?.matchingFallbacks } ?: emptyList()

@@ -28,7 +28,6 @@
 package com.grab.plugin.sizer.dependencies
 
 import com.android.build.api.dsl.CommonExtension
-import com.grab.plugin.sizer.tasks.capitalize
 import com.grab.plugin.sizer.utils.*
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -370,29 +369,29 @@ internal class KmpJarAppSizeVariant(
 
 internal class AndroidAppSizeVariant(
     private val project: Project,
-    val variant: AndroidVariantCandidate
+    val candidate: AndroidVariantCandidate
 ) : AppSizeVariant {
     override val binaryOutPut: File
         get() = when {
             project.isAndroidLibrary -> {
                 // BundleAar is an archive task, its archive file is the exact AAR output
                 val bundleAar =
-                    project.tasks.getByName("bundle${variant.name.capitalize()}Aar") as AbstractArchiveTask
+                    project.tasks.getByName("bundle${candidate.name.capitalize()}Aar") as AbstractArchiveTask
                 bundleAar.archiveFile.get().asFile
             }
 
             else -> {
                 // The conventional APK output directory of the variant
-                val variantPath = listOf(variant.flavorName, variant.buildTypeName)
+                val variantPath = listOf(candidate.flavorName, candidate.buildTypeName)
                     .filter { it.isNotEmpty() }
                     .joinToString(separator = "/")
                 project.layout.buildDirectory.dir("outputs/apk/$variantPath").get().asFile
             }
         }
     override val runtimeConfiguration: Configuration
-        get() = project.configurations.getByName(variant.runtimeClasspathName)
+        get() = project.configurations.getByName(candidate.runtimeClasspathName)
     override val buildType: String
-        get() = variant.buildTypeName
+        get() = candidate.buildTypeName
     override val buildFlavor: String
-        get() = variant.flavorName
+        get() = candidate.flavorName
 }

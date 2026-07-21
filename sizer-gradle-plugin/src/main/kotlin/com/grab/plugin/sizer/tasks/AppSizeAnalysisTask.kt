@@ -38,6 +38,7 @@ import com.grab.plugin.sizer.dependencies.ArchiveDependencyStore
 import com.grab.plugin.sizer.dependencies.VariantInput
 import com.grab.plugin.sizer.params
 import com.grab.plugin.sizer.utils.DefaultPluginLogger
+import com.grab.plugin.sizer.utils.capitalize
 import com.grab.plugin.sizer.utils.PluginInputProvider
 import com.grab.plugin.sizer.utils.PluginOutputProvider
 import com.grab.sizer.AnalyticsOption

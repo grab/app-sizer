@@ -151,7 +151,7 @@ class FakeConfiguration(
         TODO("Not yet implemented")
     }
 
-    override fun extendsFrom(vararg superConfigs: Configuration?): Configuration {
+    override fun extendsFrom(vararg superConfigs: Configuration): Configuration {
         TODO("Not yet implemented")
     }
 
