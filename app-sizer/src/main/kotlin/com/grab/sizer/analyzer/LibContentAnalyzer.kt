@@ -30,14 +30,11 @@ package com.grab.sizer.analyzer
 import com.grab.sizer.analyzer.mapper.ApkComponentProcessor
 import com.grab.sizer.analyzer.model.Contributor
 import com.grab.sizer.analyzer.model.FileInfo
-import com.grab.sizer.di.NAMED_LIB_NAME
 import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.Row
 import com.grab.sizer.report.size
 import java.io.File
-import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * A specific implementation of the Analyzer interface with a focus on analysis a library content.
@@ -46,10 +43,9 @@ import javax.inject.Named
  * @property apkComponentProcessor Responsible for processing APK, AAR, or JAR files to compile a list of contributors.
  * @property dataParser Parse APK, AAR, or JAR files.
  */
-internal class LibContentAnalyzer @Inject constructor(
+internal class LibContentAnalyzer(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
-    @Named(NAMED_LIB_NAME)
     private val libName: String?
 ) : Analyzer {
     override fun process(): Report {

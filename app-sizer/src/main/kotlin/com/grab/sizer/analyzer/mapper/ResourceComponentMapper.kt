@@ -33,14 +33,13 @@ import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.BinaryFileInfo
 import com.grab.sizer.parser.JarFileInfo
 import java.io.File
-import javax.inject.Inject
 
 private const val RESOURCE_VERSION_EXTENSION = "-v\\d\\d"
 
 /**
  * Analyzes, maps and creates a ComponentMapperResult focusing on resource.
  */
-internal class ResourceComponentMapper @Inject constructor() : ComponentMapper {
+internal class ResourceComponentMapper : ComponentMapper {
     override fun Set<ApkFileInfo>.mapTo(
         aars: Set<AarFileInfo>,
         jars: Set<JarFileInfo>

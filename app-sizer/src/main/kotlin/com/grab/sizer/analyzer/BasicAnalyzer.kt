@@ -32,7 +32,6 @@ import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.Row
 import com.grab.sizer.report.size
-import javax.inject.Inject
 
 /**
  * A specialized implementation of the Analyzer interface that focuses on basic APK analysis.
@@ -46,7 +45,7 @@ import javax.inject.Inject
  *
  * @property dataParser Parses APK, AAR and JAR for analysis.
  **/
-internal class BasicApkAnalyzer @Inject constructor(
+internal class BasicApkAnalyzer(
     private val dataParser: DataParser
 ) : Analyzer {
     override fun process(): Report {

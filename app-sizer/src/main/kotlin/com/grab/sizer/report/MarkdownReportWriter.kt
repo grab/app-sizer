@@ -29,16 +29,14 @@ package com.grab.sizer.report
 
 import java.io.File
 import java.util.*
-import javax.inject.Inject
-import javax.inject.Named
 
 private const val KILO_BYTE = 1024L
 private const val MEGA_BYTE = 1024L * 1024L
 
 internal const val NAMED_OUTPUT_DIR = "output_dir"
 
-class MarkdownReportWriter @Inject constructor(
-    @Named(NAMED_OUTPUT_DIR) private val outputDirectory: File,
+class MarkdownReportWriter(
+    private val outputDirectory: File,
     private val projectInfo: ProjectInfo,
 ) : ReportWriter {
     override fun write(report: Report) {

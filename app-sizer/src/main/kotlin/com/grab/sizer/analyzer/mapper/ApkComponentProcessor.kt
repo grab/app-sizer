@@ -36,7 +36,6 @@ import com.grab.sizer.parser.AarFileInfo
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.BinaryFileInfo
 import com.grab.sizer.parser.JarFileInfo
-import javax.inject.Inject
 
 
 internal interface ApkComponentProcessor {
@@ -73,7 +72,7 @@ internal data class ComponentProcessorResult(
     val noOwnerOthers: Set<FileInfo>,
 )
 
-internal class DefaultApkComponentProcessor @Inject constructor(private val mappers: Map<AnalyzerClass, @JvmSuppressWildcards ComponentMapper>) :
+internal class DefaultApkComponentProcessor(private val mappers: Map<AnalyzerClass, @JvmSuppressWildcards ComponentMapper>) :
     ApkComponentProcessor {
 
     override fun process(

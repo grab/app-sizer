@@ -34,7 +34,6 @@ import com.grab.sizer.parser.getAars
 import com.grab.sizer.parser.getJars
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.size
-import javax.inject.Inject
 
 
 /**
@@ -47,7 +46,7 @@ import javax.inject.Inject
  * @property dataParser Parses APK, AAR, and JAR files for analysis.
  * @property teamMapping Maps module to their corresponding team and vise versa
  */
-internal class ModuleAnalyzer @Inject constructor(
+internal class ModuleAnalyzer(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
     private val teamMapping: TeamMapping?,

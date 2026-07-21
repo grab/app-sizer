@@ -33,12 +33,11 @@ import com.grab.sizer.parser.AarFileInfo
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.BinaryFileInfo
 import com.grab.sizer.parser.JarFileInfo
-import javax.inject.Inject
 
 /**
  * Analyzes, maps and creates a ComponentMapperResult focusing on assets.
  */
-internal class AssetComponentMapper @Inject constructor() : ComponentMapper {
+internal class AssetComponentMapper : ComponentMapper {
     override fun Set<ApkFileInfo>.mapTo(aars: Set<AarFileInfo>, jars: Set<JarFileInfo>): ComponentMapperResult {
         val apkAssets = flatMap { apk -> apk.assets }
 

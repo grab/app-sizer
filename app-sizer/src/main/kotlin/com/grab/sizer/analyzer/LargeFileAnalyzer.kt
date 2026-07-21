@@ -35,8 +35,6 @@ import com.grab.sizer.parser.getJars
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.Row
 import com.grab.sizer.report.size
-import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * A specific implementation of the Analyzer interface with a focus on identifying large files in the project.
@@ -49,11 +47,10 @@ import javax.inject.Named
  * @property teamMapping Handles the bi-directional mapping between modules and teams.
  * @property largeFileThreshold threshold value for large file identification.
  */
-internal class LargeFileAnalyzer @Inject constructor(
+internal class LargeFileAnalyzer(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
     private val teamMapping: TeamMapping?,
-    @Named("largeFileThreshold")
     private val largeFileThreshold: Long
 ) : Analyzer {
     override fun process(): Report {

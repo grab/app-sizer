@@ -36,7 +36,6 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.nio.file.Files
 import java.text.ParseException
-import javax.inject.Inject
 
 
 /**
@@ -48,7 +47,7 @@ interface ProguardFileParser {
     fun parse(proguardFile: File?): ProguardMap
 }
 
-class DefaultProguardFileParser @Inject constructor(
+class DefaultProguardFileParser(
     private val logger: Logger
 ) : ProguardFileParser {
     override fun parse(proguardFile: File?): ProguardMap = ProguardMap().apply {

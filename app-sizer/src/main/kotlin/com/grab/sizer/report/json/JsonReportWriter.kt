@@ -31,13 +31,11 @@ import com.google.gson.Gson
 import com.grab.sizer.report.*
 import java.io.File
 import java.io.FileWriter
-import javax.inject.Inject
-import javax.inject.Named
 
 typealias ReportField = com.grab.sizer.report.Field
 
-class JsonReportWriter @Inject constructor(
-    @Named(NAMED_OUTPUT_DIR) private val outputDirectory: File,
+class JsonReportWriter(
+    private val outputDirectory: File,
     private val projectInfo: ProjectInfo,
     private val customProperties: CustomProperties,
     private val gson: Gson = Gson()

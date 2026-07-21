@@ -29,10 +29,8 @@ package com.grab.sizer.parser
 
 import com.grab.sizer.analyzer.model.FileType
 import com.grab.sizer.analyzer.model.RawFileInfo
-import com.grab.sizer.di.AppScope
 import com.grab.sizer.utils.SizerInputFile
 import java.util.zip.ZipFile
-import javax.inject.Inject
 
 /**
  * The AarFileParser interface provides the method to parse a sequence of AAR files into a set of [AarFileInfo].
@@ -47,8 +45,7 @@ interface AarFileParser {
  * Default implementation of [AarFileParser].
  * For more about the AAR file format, see: http://tools.android.com/tech-docs/new-build-system/aar-format
  */
-@AppScope
-class DefaultAarFileParser @Inject constructor(private val jarParser: JarStreamParser) : AarFileParser {
+class DefaultAarFileParser(private val jarParser: JarStreamParser) : AarFileParser {
 
     private fun parse(sizerInputFile: SizerInputFile): AarFileInfo {
         ZipFile(sizerInputFile.file).use { zipFile ->

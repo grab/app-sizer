@@ -33,12 +33,11 @@ import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.BinaryFileInfo
 import com.grab.sizer.parser.JarFileInfo
 import java.io.File
-import javax.inject.Inject
 
 /**
  * Analyzes, maps and creates a ComponentMapperResult focusing on native libraries.
  */
-internal class NativeLibComponentMapper @Inject constructor() : ComponentMapper {
+internal class NativeLibComponentMapper : ComponentMapper {
     override fun Set<ApkFileInfo>.mapTo(
         aars: Set<AarFileInfo>,
         jars: Set<JarFileInfo>

@@ -32,9 +32,8 @@ import com.grab.sizer.utils.OutputProvider
 import org.influxdb.InfluxDB
 import org.influxdb.InfluxDBIOException
 import java.net.ConnectException
-import javax.inject.Inject
 
-class DbReportDaoFactory @Inject constructor(
+class DbReportDaoFactory(
     private val outputProvider: OutputProvider,
     private val logger: Logger
 ) {

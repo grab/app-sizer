@@ -29,7 +29,6 @@ package com.grab.sizer.parser
 
 
 import com.grab.sizer.analyzer.model.ClassFileInfo
-import com.grab.sizer.di.AppScope
 import com.grab.sizer.utils.Logger
 import com.grab.sizer.utils.log
 import org.jf.dexlib2.dexbacked.DexBackedClassDef
@@ -38,7 +37,6 @@ import shadow.bundletool.com.android.tools.proguard.ProguardMap
 import java.io.BufferedInputStream
 import java.io.InputStream
 import java.util.zip.ZipEntry
-import javax.inject.Inject
 
 
 /**
@@ -61,8 +59,7 @@ internal interface DexFileParser {
  * DefaultDexFileParser is the default implementation of the DexFileParser interface.
  * It utilizes the DexBackedDexFile class from the 'org.smali:dexlib2' library to perform dex file parsing.
  */
-@AppScope
-internal class DefaultDexFileParser @Inject constructor(
+internal class DefaultDexFileParser(
     private val logger: Logger
 ) : DexFileParser {
     override fun parse(

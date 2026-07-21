@@ -42,10 +42,8 @@ dependencies {
     implementation libs.org.smali.dexlib2
     implementation libs.android.tools.apkanalyzer
     implementation libs.guava
-    implementation libs.google.dagger
     implementation libs.gson
 
-    kapt libs.dagger.compiler
 
     testImplementation libs.kotlin.test
     testImplementation libs.android.tools.bundletool

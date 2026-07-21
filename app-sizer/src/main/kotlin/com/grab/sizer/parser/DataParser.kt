@@ -27,9 +27,7 @@
 
 package com.grab.sizer.parser
 
-import com.grab.sizer.di.AppScope
 import com.grab.sizer.utils.InputProvider
-import javax.inject.Inject
 
 
 /**
@@ -59,8 +57,7 @@ internal fun DataParser.getJars() = libJars + moduleJars
  * This default implementation of [DataParser] will cache all the binaries content after parsed.
  * The parsed values will be reused by different [com.grab.sizer.analyzer.Analyzer]
  */
-@AppScope
-internal class DefaultDataParser @Inject constructor(
+internal class DefaultDataParser(
     private val apkFileParser: ApkFileParser,
     private val aarFileParser: AarFileParser,
     private val jarFileParser: JarFileParser,

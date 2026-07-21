@@ -35,7 +35,6 @@ import com.grab.sizer.parser.getAars
 import com.grab.sizer.parser.getJars
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.Row
-import javax.inject.Inject
 
 
 /**
@@ -47,7 +46,7 @@ import javax.inject.Inject
  * @property apkComponentProcessor Processes APK, AAR, or JAR files to produce a list of contributors.
  * @property teamMapping Optional team mapping for modules and libraries.
  */
-internal class TeamAnalyzer @Inject constructor(
+internal class TeamAnalyzer(
     private val dataParser: DataParser,
     private val apkComponentProcessor: ApkComponentProcessor,
     private val teamMapping: TeamMapping?,

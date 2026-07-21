@@ -28,10 +28,8 @@
 package com.grab.sizer.report
 
 import com.grab.sizer.report.db.ReportDao
-import dagger.Lazy
-import javax.inject.Inject
 
-class DatabaseReportWriter @Inject constructor(
+class DatabaseReportWriter(
     private val reportDaoSet: Lazy<Set<ReportDao>>,
     private val projectInfo: ProjectInfo,
     private val customProperties: CustomProperties
@@ -47,7 +45,7 @@ class DatabaseReportWriter @Inject constructor(
                 )
             }
         )
-        reportDaoSet.get().forEach {
+        reportDaoSet.value.forEach {
             it.addReport(addedCommonValueReport)
         }
     }

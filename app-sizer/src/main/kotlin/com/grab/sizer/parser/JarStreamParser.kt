@@ -30,11 +30,9 @@ package com.grab.sizer.parser
 import com.grab.sizer.analyzer.model.ClassFileInfo
 import com.grab.sizer.analyzer.model.FileType
 import com.grab.sizer.analyzer.model.RawFileInfo
-import com.grab.sizer.di.AppScope
 import java.io.InputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
-import javax.inject.Inject
 
 
 /**
@@ -51,8 +49,7 @@ interface JarStreamParser {
     fun parse(jarEntry: ZipEntry, inputStream: InputStream): JarFileInfo
 }
 
-@AppScope
-class DefaultJarStreamParser @Inject constructor() : JarStreamParser {
+class DefaultJarStreamParser : JarStreamParser {
     override fun parse(jarEntry: ZipEntry, inputStream: InputStream): JarFileInfo {
         ZipInputStream(inputStream).use { entries ->
             val others = mutableSetOf<RawFileInfo>()

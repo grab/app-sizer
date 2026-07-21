@@ -37,7 +37,6 @@ import com.grab.sizer.report.apksSizeReport
 import com.grab.sizer.report.size
 import com.grab.sizer.report.toReportField
 import java.io.File
-import javax.inject.Inject
 
 internal const val CODE_BASE_ID = "Codebase"
 
@@ -55,7 +54,7 @@ internal const val CODE_BASE_ID = "Codebase"
  * @property apkComponentProcessor Responsible for processing APK, AAR or JAR files to generate the contributors
  * @property dataParser to parse APK, AAR or JAR files.
  */
-internal class ApkAnalyzer @Inject constructor(
+internal class ApkAnalyzer(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser
 ) : Analyzer {

@@ -39,7 +39,6 @@ import org.influxdb.dto.QueryResult
 import org.influxdb.impl.Preconditions
 import java.io.Serializable
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 private const val SHOW_DATABASE_COMMAND = "SHOW DATABASES"
 private const val DEFAULT_TABLE = "app_size"
@@ -92,7 +91,7 @@ class InfluxDBFactory {
     }
 }
 
-class InfluxDbReportDao @Inject constructor(
+class InfluxDbReportDao(
     private val influxDB: InfluxDB,
     private val config: InfluxDBConfig
 ) : ReportDao {

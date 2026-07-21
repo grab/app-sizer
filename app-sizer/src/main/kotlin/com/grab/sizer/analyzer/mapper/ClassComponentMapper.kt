@@ -33,7 +33,6 @@ import com.grab.sizer.parser.AarFileInfo
 import com.grab.sizer.parser.ApkFileInfo
 import com.grab.sizer.parser.BinaryFileInfo
 import com.grab.sizer.parser.JarFileInfo
-import javax.inject.Inject
 
 private const val AUTO_GENERATION_LAMBDA = "-\$\$Lambda\$"
 private const val AUTO_GENERATION_LAMBDA2 = "$"
@@ -41,7 +40,7 @@ private const val AUTO_GENERATION_LAMBDA2 = "$"
 /**
  * Analyzes, maps and creates a ComponentMapperResult focusing on classes.
  */
-internal class ClassComponentMapper @Inject constructor() : ComponentMapper {
+internal class ClassComponentMapper : ComponentMapper {
     override fun Set<ApkFileInfo>.mapTo(
         aars: Set<AarFileInfo>,
         jars: Set<JarFileInfo>

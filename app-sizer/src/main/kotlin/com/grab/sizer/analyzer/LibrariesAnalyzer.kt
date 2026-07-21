@@ -33,7 +33,6 @@ import com.grab.sizer.parser.DataParser
 import com.grab.sizer.report.Report
 import com.grab.sizer.report.size
 import java.io.File
-import javax.inject.Inject
 
 
 /**
@@ -45,7 +44,7 @@ import javax.inject.Inject
  * @property dataParser Parses APK, AAR, and JAR files for analysis.
  * @property teamMapping Optional team ownership mapping for libraries.
  */
-internal class LibrariesAnalyzer @Inject constructor(
+internal class LibrariesAnalyzer(
     private val apkComponentProcessor: ApkComponentProcessor,
     private val dataParser: DataParser,
     private val teamMapping: TeamMapping?

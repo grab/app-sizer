@@ -30,13 +30,11 @@ package com.grab.sizer.parser
 import com.android.tools.apk.analyzer.ApkSizeCalculator
 import com.grab.sizer.analyzer.model.FileType
 import com.grab.sizer.analyzer.model.RawFileInfo
-import com.grab.sizer.di.AppScope
 import shadow.bundletool.com.android.tools.proguard.ProguardMap
 import java.io.File
 import java.nio.file.Path
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-import javax.inject.Inject
 
 
 internal interface ApkFileParser {
@@ -52,8 +50,7 @@ internal interface ApkFileParser {
     fun parseApks(apks: Sequence<File>, proguardMap: ProguardMap): Set<ApkFileInfo>
 }
 
-@AppScope
-internal class DefaultApkFileParser @Inject constructor(
+internal class DefaultApkFileParser(
     private val dexFileParser: DexFileParser,
     private val apkSizeCalculator: ApkSizeCalculator
 ) : ApkFileParser {

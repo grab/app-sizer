@@ -29,14 +29,13 @@ package com.grab.sizer.utils
 
 import java.io.File
 import java.io.IOException
-import javax.inject.Inject
 
 
 interface FileQuery {
     fun query(dir: File, vararg extensions: String): Sequence<File>
 }
 
-class DefaultFileQuery @Inject constructor() : FileQuery {
+class DefaultFileQuery : FileQuery {
 
     @Throws(IOException::class)
     override fun query(dir: File, vararg extensions: String): Sequence<File> {
