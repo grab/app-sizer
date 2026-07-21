@@ -35,6 +35,5 @@ class KotlinPlugin : ConfigurablePlugin({
     apply<JavaPlugin>()
     javaCommon()
     apply(plugin = "org.jetbrains.kotlin.jvm")
-    apply(plugin = "org.jetbrains.kotlin.kapt")
     kotlinCommon()
 })

@@ -333,17 +333,14 @@ If modules appear to be missing from your analysis reports:
 1. **Check Warning Logs**: Look for "Skipping project" messages in build output
 2. **Enable Debug Mode**: Run with `--debug` to get detailed variant matching information
 
-### Dagger NoSuchMethodError
+### Dagger NoSuchMethodError (plugin versions up to 0.2.0-alpha01)
 If you encounter this exception:
 ```java
 NoSuchMethodError: 'java.lang.Object dagger.internal.Preconditions.checkNotNullFromProvides'
 ```
-This error typically occurs due to a version conflict between the Android build tools and the App-Sizer plugin's Dagger dependencies. To resolve:
-
-1. Ensure the App-Sizer plugin is added to the classpath in the root build.gradle before applying it to your app module
-2. If step 1 doesn't resolve the issue, you might have to resolve the Dagger version conflict by adding this to your classpath
+It was caused by a Dagger version conflict with another build tool on the buildscript classpath. The plugin no longer depends on Dagger, so this error cannot occur on newer versions: upgrade the App Sizer plugin. If you are pinned to an affected version, force a recent Dagger on the root buildscript classpath as a workaround:
 ```
-classpath "com.google.dagger:dagger:2.47"
+classpath "com.google.dagger:dagger:2.60.1"
 ```
 
 ### Debug Mode Analysis

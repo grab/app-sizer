@@ -2,7 +2,6 @@
 gradle-plugin-publish = "2.1.1"
 android-gradle-plugin = "9.0.1"
 kotlin = "2.3.21"
-dagger = "2.60.1"
 dexlib2 = "2.5.2"
 clikt = "4.4.0"
 bundletool = "1.18.1"
@@ -24,8 +23,6 @@ android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref
 android-gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "android-gradle-plugin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-google-dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
-dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
 org-smali-dexlib2 = { module = "org.smali:dexlib2", version.ref = "dexlib2" }
 clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
 android-tools-bundletool = { module = "com.android.tools.build:bundletool", version.ref = "bundletool" }
@@ -44,7 +41,6 @@ junit = { module = "junit:junit", version.ref = "junit" }
 [plugins]
 gradle-plugin-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-plugin-publish" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 gradleup-shadow = { id = "com.gradleup.shadow", version.ref = "shadow-jar" }
 dokka-gradle-plugin = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 dokka-javadoc = { id = "org.jetbrains.dokka-javadoc", version.ref = "dokka" }
