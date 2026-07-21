@@ -126,8 +126,12 @@ afterEvaluate {
 
                 from components.java
 
-                artifact sourcesJar
-                artifact javadocJar
+                // plugin-publish already adds sources/javadoc jars to the java component;
+                // attaching them again would create duplicate artifacts in the publication
+                if (!project.plugins.hasPlugin("com.gradle.plugin-publish")) {
+                    artifact sourcesJar
+                    artifact javadocJar
+                }
 
                 configurePom(publication)
             }

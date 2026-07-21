@@ -5,7 +5,7 @@ App Sizer provide a gradle plugin as the option to seamlessly integrates with yo
 
 | App Sizer Plugin | Android Gradle Plugin | Gradle | JDK |
 |------------------|-----------------------|--------|-----|
-| Latest | 9.0+ | 9.1+ | 17+ |
+| 0.2.0-alpha01 and above | 9.0+ | 9.1+ | 17+ |
 | 0.1.0-alpha03 and below | 8.x | 8.x | 17+ |
 
 ## Getting Started
@@ -25,13 +25,13 @@ pluginManagement {
 2. Add the plugin to your project classpath (root's build.gradle):
 ```groovy
 plugins {
-    id "com.grab.sizer" version "0.1.0-alpha02" apply false
+    id "com.grab.sizer" version "0.2.0-alpha01" apply false
 }
 ```
 3. Apply and configure the plugin to your app module's build.gradle:
 ```groovy
 plugins {
-    id "com.grab.sizer" version "0.1.0-alpha02"
+    id "com.grab.sizer" version "0.2.0-alpha01"
 }
 
 appSizer {
@@ -47,7 +47,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.grab.sizer:sizer-gradle-plugin:0.1.0-alpha02"
+        classpath "com.grab.sizer:sizer-gradle-plugin:0.2.0-alpha01"
     }
 }
 ```
