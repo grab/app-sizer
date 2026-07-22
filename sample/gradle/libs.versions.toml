@@ -1,6 +1,6 @@
 [versions]
 app-sizer-version = "SNAPSHOT"
-android-gradle-plugin = "9.0.1"
+android-gradle-plugin = "8.13.2"
 coreKtx = "1.13.1"
 kotlin = "2.3.21"
 appcompat = "1.7.0"
@@ -25,5 +25,6 @@ junit = { module = "junit:junit", version.ref = "junit" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
