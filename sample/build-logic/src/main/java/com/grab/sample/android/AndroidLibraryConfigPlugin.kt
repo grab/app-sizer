@@ -30,14 +30,13 @@ package com.grab.sample.android
 import com.android.build.api.dsl.LibraryExtension
 import com.grab.sample.BuildConfig
 import com.grab.sample.gradle.ConfigurablePlugin
+import com.grab.sample.jvm.kotlinCommon
 import org.gradle.kotlin.dsl.configure
 
-/**
- * AGP 9 ships built-in Kotlin support, so the `org.jetbrains.kotlin.android` plugin is no
- * longer applied. The Kotlin jvmTarget defaults to `compileOptions.targetCompatibility`.
- */
 class AndroidLibraryConfigPlugin : ConfigurablePlugin({
     plugins.apply("com.android.library")
+    // AGP 8.x has no built-in Kotlin support, so the Kotlin Android plugin is applied
+    plugins.apply("org.jetbrains.kotlin.android")
 
     extensions.configure<LibraryExtension> {
         compileSdk = BuildConfig.COMPILE_SDK
@@ -53,4 +52,6 @@ class AndroidLibraryConfigPlugin : ConfigurablePlugin({
             targetCompatibility = BuildConfig.JAVA_VERSION
         }
     }
+
+    kotlinCommon()
 })
