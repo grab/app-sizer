@@ -29,8 +29,8 @@ package com.grab.plugin.sizer.utils
 
 import com.grab.sizer.utils.DEFAULT_TAG
 import com.grab.sizer.utils.Logger
-import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
+import org.gradle.api.logging.Logger as GradleLogger
 
 
 interface PluginLogger : Logger {
@@ -58,15 +58,15 @@ fun PluginLogger.debug(message: String, e: Exception) {
 }
 
 
-class DefaultPluginLogger(private val project: Project) : PluginLogger {
-    override fun log(tag: String, message: String) = project.logger.log(LogLevel.QUIET, "$tag: $message")
+class DefaultPluginLogger(private val logger: GradleLogger) : PluginLogger {
+    override fun log(tag: String, message: String) = logger.log(LogLevel.QUIET, "$tag: $message")
     override fun log(tag: String, message: String, e: Exception) =
-        project.logger.log(LogLevel.DEBUG, "$tag: $message", e)
+        logger.log(LogLevel.DEBUG, "$tag: $message", e)
 
-    override fun warn(tag: String, message: String) = project.logger.warn("$tag: $message")
+    override fun warn(tag: String, message: String) = logger.warn("$tag: $message")
 
-    override fun warn(tag: String, message: String, e: Exception) = project.logger.warn("$tag: $message", e)
+    override fun warn(tag: String, message: String, e: Exception) = logger.warn("$tag: $message", e)
 
-    override fun debug(tag: String, message: String) = project.logger.debug("$tag: $message")
-    override fun debug(tag: String, message: String, e: Exception) = project.logger.debug("$tag: $message", e)
+    override fun debug(tag: String, message: String) = logger.debug("$tag: $message")
+    override fun debug(tag: String, message: String, e: Exception) = logger.debug("$tag: $message", e)
 }

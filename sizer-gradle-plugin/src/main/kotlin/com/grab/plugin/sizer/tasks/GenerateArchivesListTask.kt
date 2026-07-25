@@ -28,37 +28,29 @@
 package com.grab.plugin.sizer.tasks
 
 
-import com.grab.plugin.sizer.dependencies.*
+import com.grab.plugin.sizer.dependencies.ArchiveDependency
+import com.grab.plugin.sizer.dependencies.ArchiveDependencyManager
+import com.grab.plugin.sizer.dependencies.VariantArtifacts
 import com.grab.plugin.sizer.utils.capitalize
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.UntrackedTask
 
 /**
- * This task is used to generate the list of the [com.grab.plugin.sizer.dependencies.ArchiveDependency] to a json file
- * The file will be consumed by the [AppSizeAnalysisTask] as the input for the list of aar/jar files
- * This task is currently non-cacheable
+ * Writes the list of [ArchiveDependency] contributing to a variant to a json file, which
+ * [AppSizeAnalysisTask] consumes as the inventory of AAR/JAR files.
+ *
+ * The entries are resolved lazily from the variant's runtime classpath (see
+ * [VariantArtifacts]); this task only serializes the result.
  */
-@UntrackedTask(because = "If there is any dependencies updated, the task cache should be invalidated")
 internal abstract class GenerateArchivesListTask : DefaultTask() {
-    @get:Input
-    abstract val variantInput: Property<VariantInput>
 
     @get:Input
-    abstract val flavorMatchingFallbacks: ListProperty<String>
-
-    @get:Input
-    abstract val buildTypeMatchingFallbacks: ListProperty<String>
-
-    @get:Input
-    abstract val enableMatchDebugVariant: Property<Boolean>
-
+    abstract val archiveDependencies: ListProperty<ArchiveDependency>
 
     @get:OutputFile
     abstract val archiveDepFile: RegularFileProperty
@@ -66,89 +58,30 @@ internal abstract class GenerateArchivesListTask : DefaultTask() {
     init {
         group = "build"
         description = "Generates list of archive dependencies for app size analysis"
-
-        // Set property conventions
-        flavorMatchingFallbacks.convention(emptyList())
-        buildTypeMatchingFallbacks.convention(emptyList())
-        enableMatchDebugVariant.convention(false)
-        archiveDepFile.convention {
-            project.layout.buildDirectory
-                .file("sizer/dep/${variantInput.get().name}/dependencies.json")
-                .get().asFile
-        }
-
     }
 
     @TaskAction
     fun run() {
-        logger.info("Starting archive dependency generation for ${variantInput.get().name}")
-        if (enableMatchDebugVariant.get()) {
-            /**
-             * Extracts and manages project dependencies, separating modules from external libraries.
-             *
-             * This code performs the following steps:
-             * 1. Extracts module dependencies:
-             *    - Uses createDependenciesComponent(true) to enable matching debug variants.
-             *    - This is a workaround for cases where modules cannot be compiled in release build type.
-             *    - When enabled, it fetches module AAR/JAR files from the debug variant.
-             * 2. Extracts library dependencies:
-             *    - Uses createDependenciesComponent(false) to fetch libraries from the input variant.
-             * 3. Combines and processes dependencies:
-             *    - Filters out external dependencies from modules.
-             *    - Filters to include only external dependencies for libraries.
-             *
-             * This approach ensures proper handling of both module and external library dependencies,
-             * accommodating potential build type incompatibilities.
-             */
-            val modules = createDependenciesComponent(true)
-                .dependencyExtractor
-                .extract()
-                .filter { it !is ExternalDependency }
-            val libraries = createDependenciesComponent(false)
-                .dependencyExtractor
-                .extract()
-                .filterIsInstance<ExternalDependency>()
-
-            ArchiveDependencyManager().writeToJsonFile(
-                (modules + libraries).toHashSet(),
-                archiveDepFile.get().asFile
-            )
-
-        } else {
-            createDependenciesComponent(false).run {
-                ArchiveDependencyManager().writeToJsonFile(
-                    dependencyExtractor.extract(),
-                    archiveDepFile.get().asFile
-                )
-            }
-        }
+        ArchiveDependencyManager().writeToJsonFile(
+            archiveDependencies.get().toHashSet(),
+            archiveDepFile.get().asFile
+        )
         logger.info("Successfully generated archive dependencies")
     }
-
-    private fun createDependenciesComponent(enableMatchDebugVariant: Boolean): DependenciesComponent =
-        DependenciesComponent(
-            project,
-            variantInput.get(),
-            flavorMatchingFallbacks.get(),
-            buildTypeMatchingFallbacks.get(),
-            enableMatchDebugVariant
-        )
 
     companion object {
         fun registerTask(
             project: Project,
-            variantInput: VariantInput,
-            flavorMatchingFallbacks: List<String>,
-            buildTypeMatchingFallbacks: List<String>,
-            enableMatchDebugVariant: Boolean,
+            variantName: String,
+            variantArtifacts: VariantArtifacts,
         ) = project.tasks.register(
-            "generateArchiveDep${variantInput.name.capitalize()}",
+            "generateArchiveDep${variantName.capitalize()}",
             GenerateArchivesListTask::class.java
         ) { task ->
-            task.variantInput.set(variantInput)
-            task.buildTypeMatchingFallbacks.set(buildTypeMatchingFallbacks)
-            task.flavorMatchingFallbacks.set(flavorMatchingFallbacks)
-            task.enableMatchDebugVariant.set(enableMatchDebugVariant)
+            task.archiveDependencies.set(variantArtifacts.archiveDependencies)
+            task.archiveDepFile.set(
+                project.layout.buildDirectory.file("sizer/dep/$variantName/dependencies.json")
+            )
         }
     }
 }

@@ -38,6 +38,6 @@ class AppSizerPlugin : Plugin<Project> {
         TaskManager(
             project,
             project.extensions.create(PLUGIN_EXTENSION, AppSizePluginExtension::class.java),
-            DefaultPluginLogger(project)
+            DefaultPluginLogger(project.logger)
         ).configTasks()
 }

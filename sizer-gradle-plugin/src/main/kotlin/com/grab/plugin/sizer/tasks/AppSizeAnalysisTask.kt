@@ -35,7 +35,6 @@ import com.grab.plugin.sizer.configuration.InfluxDBExtension
 import com.grab.plugin.sizer.configuration.RetentionPolicyExtension
 import com.grab.plugin.sizer.dependencies.ArchiveDependencyManager
 import com.grab.plugin.sizer.dependencies.ArchiveDependencyStore
-import com.grab.plugin.sizer.dependencies.VariantInput
 import com.grab.plugin.sizer.params
 import com.grab.plugin.sizer.utils.DefaultPluginLogger
 import com.grab.plugin.sizer.utils.capitalize
@@ -49,6 +48,7 @@ import com.grab.sizer.report.db.InfluxDBConfig
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.MapProperty
@@ -60,7 +60,10 @@ import java.io.File
 internal abstract class AppSizeAnalysisTask : DefaultTask() {
 
     @get:Input
-    abstract val variantInput: Property<VariantInput>
+    abstract val variantName: Property<String>
+
+    @get:Input
+    abstract val projectName: Property<String>
 
     @get:Input
     @get:Optional
@@ -76,6 +79,15 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val apkDirectories: ConfigurableFileCollection
+
+    /**
+     * The archive files listed in [archiveDepJsonFile]. Declaring them as an input makes
+     * Gradle build the module AARs/JARs before the analysis and re-run it when their
+     * contents change.
+     */
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val archiveFiles: ConfigurableFileCollection
 
     @get:Input
     abstract val option: Property<AnalyticsOption>
@@ -123,17 +135,17 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
         validateInputs()
         apkDirectories.forEach { apkDirectory ->
             val projectInfo = ProjectInfo(
-                projectName = project.rootProject.name,
+                projectName = projectName.get(),
                 versionName = versionName.getOrElse("NA"),
                 deviceName = apkDirectory.nameWithoutExtension,
-                buildType = variantInput.get().name
+                buildType = variantName.get()
             )
             val archiveDependencyStore = ArchiveDependencyManager().readFromJsonFile(archiveDepJsonFile.asFile.get())
             AppSizer(
                 inputProvider = createInputProvider(archiveDependencyStore, apkDirectory),
                 outputProvider = createOutputProvider(projectInfo),
                 libName = libName.orNull,
-                logger = DefaultPluginLogger(project),
+                logger = DefaultPluginLogger(logger),
             ).process(option.get())
         }
 
@@ -170,18 +182,20 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
         fun registerTask(
             project: Project,
             variant: ApplicationVariant,
-            variantInput: VariantInput,
             pluginExtension: AppSizePluginExtension,
             generateApkTask: TaskProvider<GenerateApkTask>,
             generateArchivesListTask: TaskProvider<GenerateArchivesListTask>,
+            archiveFiles: FileCollection,
         ): TaskProvider<AppSizeAnalysisTask> {
             return project.tasks.register(
-                "appSizeAnalysis${variantInput.name.capitalize()}", AppSizeAnalysisTask::class.java
+                "appSizeAnalysis${variant.name.capitalize()}", AppSizeAnalysisTask::class.java
             ) { task ->
-                task.variantInput.set(variantInput)
+                task.variantName.set(variant.name)
+                task.projectName.set(project.rootProject.name)
+                task.archiveFiles.setFrom(archiveFiles)
                 task.versionName.set(variant.outputs.first().versionName)
                 task.apkDirectories.setFrom(generateApkTask.map { it.outputDirectories })
-                task.archiveDepJsonFile.set(generateArchivesListTask.map { it.archiveDepFile.get() })
+                task.archiveDepJsonFile.set(generateArchivesListTask.flatMap { it.archiveDepFile })
                 task.libName.set(project.params().libraryName())
                 task.option.set(project.params().option())
                 if (pluginExtension.metrics.influxDBExtension.url.isPresent) {
@@ -191,7 +205,7 @@ internal abstract class AppSizeAnalysisTask : DefaultTask() {
                 if (pluginExtension.metrics.localExtension.outputDirectory.isPresent) {
                     task.outputDirectory.set(pluginExtension.metrics.localExtension.outputDirectory)
                 } else {
-                    task.outputDirectory.set(project.layout.buildDirectory.dir("sizer/reports/${variantInput.name}"))
+                    task.outputDirectory.set(project.layout.buildDirectory.dir("sizer/reports/${variant.name}"))
                 }
 
                 if (pluginExtension.input.teamMappingFile.isPresent) {

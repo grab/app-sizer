@@ -63,7 +63,7 @@ appSizer {
 ### Run the analysis
 
 ```bash
-./gradlew app:appSizeAnalysis[Release|Debug] --no-configure-on-demand --no-configuration-cache
+./gradlew app:appSizeAnalysis[Release|Debug] --no-configure-on-demand
 ```
 
 ## Configuration
@@ -80,7 +80,7 @@ appSizer {
     }
 }
 ```
-* **enabled**: Given the App Sizer Plugin has not supported configuration on demand & configuration catching. We provide you an option to turned of the plugin just in case it impact your gradle configuration performance.
+* **enabled**: Turns the plugin off entirely, in case it impacts your Gradle configuration performance. The plugin supports the configuration cache; configuration on demand is not supported.
 
 ### Project Input
 Configure the input for the project:

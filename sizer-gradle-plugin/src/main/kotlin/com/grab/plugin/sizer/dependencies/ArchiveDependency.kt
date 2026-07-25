@@ -28,7 +28,9 @@
 package com.grab.plugin.sizer.dependencies
 
 
-interface ArchiveDependency {
+typealias ArchiveDependencyStore = HashSet<ArchiveDependency>
+
+interface ArchiveDependency : java.io.Serializable {
     val name: String
     val pathToArtifact: String
 }
