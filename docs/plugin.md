@@ -6,7 +6,10 @@ App Sizer provide a gradle plugin as the option to seamlessly integrates with yo
 | App Sizer Plugin | Android Gradle Plugin | Gradle | JDK |
 |------------------|-----------------------|--------|-----|
 | 0.2.0-alpha01 and above | 9.0+ | 9.1+ | 17+ |
+| 0.1.0-alpha05 | 8.13.2+ | 8.13+ | 17+ |
 | 0.1.0-alpha03 and below | 8.x | 8.x | 17+ |
+
+The `0.1.0-alpha05` release ships the same features as `0.2.0-alpha01` (including configuration cache support) built against AGP 8.x, for projects that have not migrated to AGP 9 yet. It is maintained on the `support/agp-8.x` branch.
 
 ## Getting Started
 
