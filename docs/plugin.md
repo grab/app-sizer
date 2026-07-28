@@ -146,7 +146,7 @@ Pattern matching is evaluated in this order; the first match wins:
 2. **Group wildcard** using `:*` — e.g. `androidx.core:*` (matches any artifact under `androidx.core`)
 3. **Group wildcard** using `.*` — e.g. `androidx.*` (matches any group beginning with `androidx.`)
 
-Libraries that do not match any pattern are attributed to the `app` module (see [Limitations](./limitation.md)).
+Libraries that do not match any pattern are reported as `NA` in team reports (see [Limitations](./limitation.md)).
 
 ### APK Generation
 
@@ -231,7 +231,7 @@ appSizer {
             variant.setIgnore(variant.flavors.contains("gea"))
         }
         enableMatchDebugVariant = true
-        largeFileThreshold = 10
+        largeFileThreshold = 10240
         teamMappingFile = file("${rootProject.rootDir}/module-owner.yml")
         libraryOwnershipFile = file("${rootProject.rootDir}/library-owner.yml")
     }
@@ -268,60 +268,39 @@ appSizer {
 
 ## Known Limitations
 
-### Variant Matching and Module Skipping
+### Variant Matching
 
-The App Sizer plugin uses sophisticated variant matching to analyze dependencies across different project types. However, some scenarios may result in modules being skipped during analysis, which can impact the accuracy of the final results.
+For every Android library module, the plugin selects the build variant matching the analyzed application variant: full name first, then flavor with build type fallbacks, then build type with flavor fallbacks, then the debug build type. The selected variant's `bundle<Variant>Aar` task provides the module's AAR.
 
-#### When Modules Are Skipped
-
-The plugin may skip modules in the following scenarios:
-
-1. **Unsupported Project Types**: Projects that don't match any supported type (Android app/library, Java/Kotlin JVM, Kotlin Multiplatform)
-2. **Missing Build Variants**: Android library modules that lack variants matching the main app's flavor/buildType configuration
-4. **Custom Build Logic**: Modules using non-standard build configurations that the plugin cannot interpret
-
-
-#### Error Handling Behavior
-
-The plugin uses defensive error handling to maintain build stability while logging informative warnings:
+When no variant can be matched, the module is **not skipped**: it is analyzed from the granular artifacts Gradle resolves for it (its classes JAR) instead of its assembled AAR, and a warning is logged:
 
 ```
-AppSize: Skipping project module-name - variant extraction failed: Cannot find matching variant for module-name
-AppSize: Skipping dependency project library-name - unsupported type: Project type not supported: library-name
-AppSize: Could not find matching variant for Android library project module-name: Cannot find matching variant for module-name
-AppSize: Unsupported project type for Android library project module-name: Project type not supported: module-name
+AppSize: Could not match a variant for Android library :module-name; it is analyzed from its granular artifacts instead of its AAR
 ```
 
-When debug logging is enabled (`--debug` flag), full stack traces are available for detailed troubleshooting:
+The module's classes are still measured and attributed; its resources and assets may not be attributed to it in that mode. Android library modules that are reachable only through an unmatched module fall back to their classes JARs as well, without an individual warning.
 
-```
-AppSize: Full stack trace for variant extraction failure:
-java.lang.IllegalStateException: Cannot find matching variant for module-name
-    at com.grab.plugin.sizer.dependencies.DefaultVariantExtractor.extractVariant(VariantExtractor.kt:284)
-    at com.grab.plugin.sizer.dependencies.DefaultVariantExtractor.defaultFindMatchVariant(VariantExtractor.kt:132)
-    [... full stack trace ...]
-```
+### Unmatched Contributors
 
-#### Impact on Analysis Results
+In team reports, contributors that cannot be matched to `module-owner.yml` or `library-owner.yml` are reported as `NA` instead of being silently reassigned to the `app` module. Module names in `module-owner.yml` must use the full Gradle project path with `:` separators (for example `sample-group:android-module-level2`).
 
-Classes and resources belonging to skipped modules may not have module-level ownership metadata available during analysis. In team reports, contributors that cannot be matched to `module-owner.yml` or `library-owner.yml` are reported as `NA` instead of being silently reassigned to the `app` module.
+### Configuration on Demand
 
+The plugin resolves dependencies across all modules, so [configuration on demand](https://docs.gradle.org/current/userguide/multi_project_configuration_and_execution.html) is not supported. Run the analysis with `--no-configure-on-demand` if your project enables it. The configuration cache is supported.
 
 ## Troubleshooting
 
-### Common Variant Matching Issues
+1. **"Could not match a variant for Android library [module-name]"**
+   - **Cause**: The library module lacks a variant matching the app's flavor/buildType configuration
+   - **Solution**: Add `matchingFallbacks` to the library module or ensure consistent flavor/buildType naming; otherwise the module is analyzed from its classes JAR (see Known Limitations)
 
-1. **"Cannot find matching variant for [module-name]"**
-   - **Cause**: Library module lacks a variant matching the app's configuration
-   - **Solution**: Add `matchingFallbacks` to the library module or ensure consistent flavor/buildType naming
+2. **"enableMatchDebugVariant is set but the [configuration] does not exist"**
+   - **Cause**: The debug runtime classpath for the matched flavor is missing
+   - **Solution**: Module archives fall back to the analyzed variant automatically; disable `enableMatchDebugVariant` if this is unexpected
 
-2. **"Unsupported project type: [project-name]"**
-   - **Cause**: Project doesn't use a supported plugin type  
-   - **Solution**: Verify the project applies Android, Java, or Kotlin plugin correctly
-
-3. **"Skipping dependency project [library-name]"**
-   - **Cause**: External or internal dependency has configuration issues
-   - **Solution**: Check dependency's build configuration and ensure it's compatible
+3. **Modules show `NA` owners in the team report**
+   - **Cause**: The contributor name does not match any entry in `teamMappingFile`/`libraryOwnershipFile`
+   - **Solution**: Use full project paths (`group:module`) in `module-owner.yml` and group-anchored patterns (`com.example:*`) in `library-owner.yml`
 
 ### Resource Verification Failures
 If you encounter issues with the `verifyResourceRelease` task, try these solutions:
@@ -333,7 +312,7 @@ If you encounter issues with the `verifyResourceRelease` task, try these solutio
 
 If modules appear to be missing from your analysis reports:
 
-1. **Check Warning Logs**: Look for "Skipping project" messages in build output
+1. **Check Warning Logs**: Look for "analyzed from its granular artifacts" messages in build output
 2. **Enable Debug Mode**: Run with `--debug` to get detailed variant matching information
 
 ### Dagger NoSuchMethodError (plugin versions up to 0.2.0-alpha01)
@@ -351,7 +330,7 @@ classpath "com.google.dagger:dagger:2.60.1"
 Run with debug logging to get detailed information about module processing, variant matching, and potential issues:
 
 ```bash
-./gradlew appSizeAnalysisRelease --debug 2>&1 | grep -E "(Skipping|variant|extraction)"
+./gradlew appSizeAnalysisRelease --debug 2>&1 | grep -E "(AppSize|variant)"
 ```
 
 This will filter the output to show only variant matching and module processing information.

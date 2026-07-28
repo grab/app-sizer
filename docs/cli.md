@@ -5,7 +5,7 @@ App Sizer provides a Command Line Interface (CLI) to cater to non-Gradle build s
 
 ## Getting Started
 
-1. Download our [Latest Release][latest_release_link] from GitHub (support Java 11+)
+1. Download our [Latest Release][latest_release_link] from GitHub (requires Java 17+)
 
 2. Create your config file following [this template][cli-template-link].
 
@@ -78,7 +78,7 @@ Pattern matching is evaluated in this order; the first match wins:
 2. **Group wildcard** using `:*` — e.g. `androidx.core:*` (matches any artifact under `androidx.core`)
 3. **Group wildcard** using `.*` — e.g. `androidx.*` (matches any group beginning with `androidx.`)
 
-Libraries that do not match any pattern are attributed to the `app` module (see [Limitations](./limitation.md)).
+Libraries that do not match any pattern are reported as `NA` in team reports (see [Limitations](./limitation.md)).
 
 ### APK Generation
 

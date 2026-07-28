@@ -8,8 +8,10 @@ This sample project demonstrates the integration and usage of the App Sizer tool
 sample/
 ├── app/
 ├── android-module-level1/
-├── android-module-level2/
+├── sample-group/
+│   └── android-module-level2/
 ├── kotlin-module/
+├── kotlin-multiplatform-module/
 ```
 
 ## Using App Sizer

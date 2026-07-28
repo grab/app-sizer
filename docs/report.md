@@ -16,7 +16,6 @@ We provide a Docker image with InfluxDB (1.x) and Grafana pre-configured to show
 docker run -d \
   --name sizer-influxdb-grafana \
   -p 3003:3003 \
-  -p 3004:8083 \
   -p 8086:8086 \
   -v /path/for/influxdb:/var/lib/influxdb \
   -v /path/for/grafana:/var/lib/grafana \
@@ -36,20 +35,22 @@ Markdown tables provide a convenient format for local analysis. The report is sa
 
 ### Example: Module-wise Size Contribution
 
-| Contributor | Owner | Size | 
-|-------------|-------|------|
-| app | Platform | 90.078 KB | 
-| android-module-level2 | Team2 | 123.968 KB | 
-| android-module-level1 | Team1 | 124.042 KB | 
-| kotlin-module | Team2 | 248.326 KB | 
+| Contributor | Size | Owner |
+|-------------|------|-------|
+| app | 90.078 KB | Platform |
+| sample-group:android-module-level2 | 123.968 KB | Team2 |
+| android-module-level1 | 124.042 KB | Team1 |
+| kotlin-module | 248.326 KB | Team2 |
 
 ### Example: Library-wise Size Contribution
 
-| Contributor | Owner | Size |
-|-------------|-------|------|
-| androidx.appcompat:appcompat:1.7.0 | Platform | 166.844 KB |
-| com.google.android.material:material:1.4.0-beta01 | Team1 | 164.000 KB |
-| org.jetbrains.kotlin:kotlin-stdlib:1.8.22 | Team2 | 58.547 KB |
+| Contributor | Size | Owner |
+|-------------|------|-------|
+| androidx.appcompat:appcompat:1.7.0 | 166.844 KB | Platform |
+| com.google.android.material:material:1.4.0-beta01 | 164.000 KB | Team1 |
+| org.jetbrains.kotlin:kotlin-stdlib:1.8.22 | 58.547 KB | Team2 |
+
+*The Owner column appears when `teamMappingFile`/`libraryOwnershipFile` are configured; contributors that match no mapping are reported as `NA`.*
 
 ## JSON Report
 
