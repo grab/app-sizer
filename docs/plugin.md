@@ -28,13 +28,13 @@ pluginManagement {
 2. Add the plugin to your project classpath (root's build.gradle):
 ```groovy
 plugins {
-    id "com.grab.sizer" version "0.2.0-alpha01" apply false
+    id "com.grab.sizer" version "0.2.0-alpha02" apply false
 }
 ```
 3. Apply and configure the plugin to your app module's build.gradle:
 ```groovy
 plugins {
-    id "com.grab.sizer" version "0.2.0-alpha01"
+    id "com.grab.sizer" version "0.2.0-alpha02"
 }
 
 appSizer {
@@ -50,7 +50,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.grab.sizer:sizer-gradle-plugin:0.2.0-alpha01"
+        classpath "com.grab.sizer:sizer-gradle-plugin:0.2.0-alpha02"
     }
 }
 ```
