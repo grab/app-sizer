@@ -35,8 +35,9 @@ App Sizer provides two flexible integration methods:
 
 ## Report Types
 
-App Sizer currently supports three types of reports:
+App Sizer currently supports four types of reports:
 
+* HTML dashboard - a single self-contained file per device for interactive local analysis, no server required.
 * InfluxDB database (1.x) - It is suitable for CI tracking and enabling the creation of customized dashboards (with visualization tools like Grafana). We provide an InfluxDB and Grafana setup; see our [Docker Setup Guide][grafana_docker_doc].
 * Markdown table for convenient local analysis.
 * JSON data for compatibility with other platforms.

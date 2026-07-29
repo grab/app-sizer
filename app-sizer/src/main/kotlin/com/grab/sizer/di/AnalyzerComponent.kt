@@ -57,6 +57,7 @@ import com.grab.sizer.report.DatabaseReportWriter
 import com.grab.sizer.report.MarkdownReportWriter
 import com.grab.sizer.report.ReportWriter
 import com.grab.sizer.report.db.DbReportDaoFactory
+import com.grab.sizer.report.html.HtmlReportWriter
 import com.grab.sizer.report.json.JsonReportWriter
 import com.grab.sizer.utils.InputProvider
 import com.grab.sizer.utils.Logger
@@ -150,6 +151,11 @@ class AnalyzerComponent(
             projectInfo = outputProvider.provideProjectInfo(),
         ),
         JsonReportWriter(
+            outputDirectory = outputProvider.provideOutPutDirectory(),
+            projectInfo = outputProvider.provideProjectInfo(),
+            customProperties = outputProvider.provideCustomProperties(),
+        ),
+        HtmlReportWriter(
             outputDirectory = outputProvider.provideOutPutDirectory(),
             projectInfo = outputProvider.provideProjectInfo(),
             customProperties = outputProvider.provideCustomProperties(),

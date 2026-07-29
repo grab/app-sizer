@@ -1,10 +1,28 @@
 # Reports
 
-App Sizer supports three types of reports to cater to different use cases and environments:
+App Sizer supports four types of reports to cater to different use cases and environments:
 
-1. InfluxDB database (1.x)
-2. Markdown tables
-3. JSON data
+1. HTML dashboard
+2. InfluxDB database (1.x)
+3. Markdown tables
+4. JSON data
+
+## HTML Dashboard
+
+Every analysis writes a self-contained `index.html` dashboard into each device's report folder, next to the markdown and JSON reports:
+
+* Gradle plugin: `[outputDirectory]/[device]/index.html` (default `app/build/sizer/reports/[variant]/[device]/index.html`)
+* CLI: `[output-directory]/[device]/index.html`
+
+It has no external dependencies, so it can be opened offline, shared as a single file, or viewed straight from a CI artifact browser; any static file server serves it automatically when the folder is opened.
+
+The dashboard includes:
+
+* Header tiles with the total download size and the code/resources/native/assets split
+* Download size by component (stacked bar with legend)
+* Download size by team, with a per-team drill-down into its components, modules, and libraries
+* Searchable tables for all modules, libraries, and large files
+* Light and dark themes (follows the system setting, with a manual toggle)
 
 ## InfluxDB Database
 

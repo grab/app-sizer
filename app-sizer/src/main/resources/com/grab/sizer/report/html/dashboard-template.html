@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Size Dashboard</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --border: rgba(11, 11, 11, 0.10);
+    --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+    --s5: #e87ba4; --s6: #008300; --s7: #4a3aa7; --s8: #e34948;
+    --bar: var(--s1);
+    --bar-muted: #c9c8c1;
+    --wash: rgba(11, 11, 11, 0.04);
+    --wash-selected: rgba(42, 120, 214, 0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page: #0d0d0d;
+      --surface: #1a1a19;
+      --ink: #ffffff;
+      --ink-2: #c3c2b7;
+      --muted: #898781;
+      --grid: #2c2c2a;
+      --border: rgba(255, 255, 255, 0.10);
+      --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+      --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+      --bar-muted: #45443f;
+      --wash: rgba(255, 255, 255, 0.06);
+      --wash-selected: rgba(57, 135, 229, 0.16);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --border: rgba(255, 255, 255, 0.10);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+    --bar-muted: #45443f;
+    --wash: rgba(255, 255, 255, 0.06);
+    --wash-selected: rgba(57, 135, 229, 0.16);
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 20px;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 16px; }
+  header h1 { font-size: 20px; font-weight: 650; }
+  header .meta { color: var(--ink-2); font-size: 13px; }
+  #theme-toggle {
+    margin-left: auto; border: 1px solid var(--border); background: var(--surface);
+    color: var(--ink-2); border-radius: 6px; padding: 4px 10px; cursor: pointer; font: inherit; font-size: 12px;
+  }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .tile { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .tile .label { color: var(--ink-2); font-size: 12px; }
+  .tile .value { font-size: 24px; font-weight: 600; margin-top: 2px; }
+  .tile.hero .value { font-size: 34px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .card h2 { font-size: 15px; font-weight: 650; margin-bottom: 2px; }
+  .card .sub { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+
+  /* stacked bar */
+  .stack { display: flex; gap: 2px; height: 22px; border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
+  .stack .seg { min-width: 1px; }
+  .stack .seg:hover { filter: brightness(1.15); }
+  .legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 4px 16px; }
+  .legend .item { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 2px 0; }
+  .legend .swatch { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+  .legend .name { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .legend .val { margin-left: auto; font-variant-numeric: tabular-nums; }
+  .legend .pct { color: var(--muted); width: 40px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* horizontal bar list */
+  .bars .row { display: grid; grid-template-columns: 230px 1fr 90px; align-items: center; gap: 10px; padding: 3px 6px; border-radius: 6px; }
+  .bars .row.clickable { cursor: pointer; grid-template-columns: 230px 1fr 90px 14px; }
+  .bars .row.clickable:hover { background: var(--wash); }
+  .bars .row.clickable:hover .name { color: var(--ink); }
+  .bars .row.clickable:hover .chevron { color: var(--ink-2); transform: translateX(2px); }
+  .bars .row.clickable:focus-visible { outline: 2px solid var(--s1); outline-offset: 2px; }
+  .bars .row.selected { background: var(--wash-selected); }
+  .bars .row.selected .name { color: var(--ink); font-weight: 600; }
+  .bars .chevron { color: var(--muted); font-size: 14px; line-height: 1; transition: transform 0.1s; }
+  .bars .name { color: var(--ink-2); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; }
+  .bars .track { height: 16px; display: flex; align-items: center; }
+  .bars .fill { height: 16px; background: var(--bar); border-radius: 0 4px 4px 0; min-width: 2px; }
+  .bars .fill.na { background: var(--bar-muted); }
+  .bars .val { color: var(--ink-2); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+  /* tables */
+  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+  .toolbar input {
+    flex: 1; max-width: 320px; background: var(--page); color: var(--ink);
+    border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font: inherit; font-size: 13px;
+  }
+  .toolbar .count { color: var(--muted); font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--muted); font-weight: 500; font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--grid); }
+  th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td { padding: 5px 8px; border-bottom: 1px solid var(--grid); color: var(--ink-2); }
+  td:first-child { color: var(--ink); word-break: break-all; }
+  tr:last-child td { border-bottom: none; }
+  .empty { color: var(--muted); font-size: 13px; padding: 8px 0; }
+  .show-more { margin-top: 8px; background: none; border: 1px solid var(--border); color: var(--ink-2);
+    border-radius: 6px; padding: 5px 12px; cursor: pointer; font: inherit; font-size: 12px; }
+
+  /* team detail */
+  #team-detail { border-left: 3px solid var(--s1); }
+  #team-detail .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 800px) { #team-detail .grid { grid-template-columns: 1fr; } }
+  #team-detail h3 { font-size: 13px; font-weight: 600; margin: 10px 0 6px; }
+  #team-detail .close { float: right; background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; }
+
+  #tooltip {
+    position: fixed; pointer-events: none; z-index: 10; display: none;
+    background: var(--ink); color: var(--page); border-radius: 6px; padding: 6px 10px;
+    font-size: 12px; max-width: 340px;
+  }
+  footer { color: var(--muted); font-size: 12px; text-align: center; padding: 8px 0 16px; }
+  footer a { color: var(--ink-2); }
+</style>
+</head>
+<body>
+<script type="application/json" id="dashboard-data">__DASHBOARD_DATA__</script>
+
+<header>
+  <h1>App Size Dashboard</h1>
+  <span class="meta" id="header-meta"></span>
+  <button id="theme-toggle" type="button">Theme</button>
+</header>
+
+<div class="tiles" id="tiles"></div>
+
+<div class="card" id="components-card">
+  <h2>Download size by component</h2>
+  <div class="sub">Share of the total app download size</div>
+  <div class="stack" id="component-stack"></div>
+  <div class="legend" id="component-legend"></div>
+</div>
+
+<div class="card" id="teams-card">
+  <h2>Download size by team</h2>
+  <div class="sub">Select a team to see its components, modules, and libraries</div>
+  <div class="bars" id="team-bars"></div>
+</div>
+
+<div class="card" id="team-detail" hidden>
+  <button class="close" type="button" title="Close">&times;</button>
+  <h2 id="team-detail-title"></h2>
+  <div class="sub" id="team-detail-sub"></div>
+  <div class="stack" id="team-stack"></div>
+  <div class="legend" id="team-legend"></div>
+  <div class="grid">
+    <div>
+      <h3>Modules</h3>
+      <div id="team-modules"></div>
+    </div>
+    <div>
+      <h3>Libraries</h3>
+      <div id="team-libraries"></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" id="modules-card">
+  <h2>Modules</h2>
+  <div class="sub">Download size contribution per project module</div>
+  <div class="toolbar">
+    <input type="search" id="module-search" placeholder="Filter modules…" aria-label="Filter modules">
+    <span class="count" id="module-count"></span>
+  </div>
+  <div id="module-table"></div>
+</div>
+
+<div class="card" id="libraries-card">
+  <h2>Libraries</h2>
+  <div class="sub">Download size contribution per external dependency</div>
+  <div class="toolbar">
+    <input type="search" id="library-search" placeholder="Filter libraries…" aria-label="Filter libraries">
+    <span class="count" id="library-count"></span>
+  </div>
+  <div id="library-table"></div>
+</div>
+
+<div class="card" id="large-files-card">
+  <h2>Large files</h2>
+  <div class="sub">Resources and assets above the configured threshold</div>
+  <div class="toolbar">
+    <input type="search" id="large-file-search" placeholder="Filter files…" aria-label="Filter files">
+    <span class="count" id="large-file-count"></span>
+  </div>
+  <div id="large-files-table"></div>
+</div>
+
+<div id="tooltip" role="presentation"></div>
+<footer>Generated by <a href="https://github.com/grab/app-sizer">App Sizer</a></footer>
+
+<script>
+(function () {
+  "use strict";
+  var DATA = JSON.parse(document.getElementById("dashboard-data").textContent);
+  var reports = DATA.reports || {};
+  var project = DATA.project || {};
+
+  /* Fixed identity -> palette slot mapping; color follows the entity. */
+  var COMPONENT_SLOTS = {
+    "codebase-kotlin-java": "--s1",
+    "android-java-libraries": "--s2",
+    "native-libraries": "--s3",
+    "codebase-resources": "--s4",
+    "codebase-assets": "--s5",
+    "others": "--s6",
+    "codebase-native": "--s7"
+  };
+  var COMPONENT_LABELS = {
+    "codebase-kotlin-java": "Codebase: Kotlin/Java",
+    "android-java-libraries": "Libraries: Kotlin/Java",
+    "native-libraries": "Libraries: native",
+    "codebase-resources": "Codebase: resources",
+    "codebase-assets": "Codebase: assets",
+    "codebase-native": "Codebase: native",
+    "others": "Others"
+  };
+
+  function fmt(bytes) {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
+    if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + " MB";
+    return (bytes / 1073741824).toFixed(2) + " GB";
+  }
+  function pct(part, total) { return total > 0 ? (100 * part / total).toFixed(part / total < 0.005 && part > 0 ? 1 : 0) + "%" : "0%"; }
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  function bySizeDesc(a, b) { return b.size - a.size; }
+
+  /* ---------- tooltip ---------- */
+  var tooltip = document.getElementById("tooltip");
+  function bindTooltip(node, textProvider) {
+    node.addEventListener("mousemove", function (e) {
+      tooltip.textContent = textProvider();
+      tooltip.style.display = "block";
+      var x = Math.min(e.clientX + 12, window.innerWidth - tooltip.offsetWidth - 8);
+      tooltip.style.left = x + "px";
+      tooltip.style.top = (e.clientY + 14) + "px";
+    });
+    node.addEventListener("mouseleave", function () { tooltip.style.display = "none"; });
+  }
+
+  /* ---------- theme toggle ---------- */
+  var root = document.documentElement;
+  var stored = null;
+  try { stored = localStorage.getItem("sizer-theme"); } catch (e) { /* sandboxed viewers */ }
+  if (stored) root.setAttribute("data-theme", stored);
+  document.getElementById("theme-toggle").addEventListener("click", function () {
+    var dark = root.getAttribute("data-theme") === "dark" ||
+      (!root.getAttribute("data-theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    var next = dark ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("sizer-theme", next); } catch (e) { /* ignore */ }
+  });
+
+  /* ---------- header & tiles ---------- */
+  var meta = [project.name, project.variant, project.device, project.version ? "v" + project.version : null]
+    .filter(Boolean).join(" · ");
+  if (project.generatedAt) meta += " · " + new Date(project.generatedAt).toLocaleString();
+  document.getElementById("header-meta").textContent = meta;
+
+  var basic = {};
+  (reports.apk_basic || []).forEach(function (r) { basic[r.name] = r.size; });
+  var tiles = document.getElementById("tiles");
+  function tile(label, value, hero) {
+    var t = el("div", "tile" + (hero ? " hero" : ""));
+    t.appendChild(el("div", "label", label));
+    t.appendChild(el("div", "value", value));
+    tiles.appendChild(t);
+  }
+  if (basic.apk !== undefined) tile("Total download size", fmt(basic.apk), true);
+  if (basic.code !== undefined) tile("Code", fmt(basic.code));
+  if (basic.resource !== undefined) tile("Resources", fmt(basic.resource));
+  if (basic.native_lib !== undefined) tile("Native libraries", fmt(basic.native_lib));
+  if (basic.asset !== undefined) tile("Assets", fmt(basic.asset));
+  if (reports.module) tile("Modules", String(reports.module.length));
+  if (reports.library) tile("Libraries", String(reports.library.length));
+
+  /* ---------- stacked component bar (part-to-whole) ---------- */
+  function renderStack(stackNode, legendNode, rows) {
+    stackNode.textContent = "";
+    legendNode.textContent = "";
+    var visible = rows.filter(function (r) { return r.size > 0; }).sort(bySizeDesc);
+    var total = visible.reduce(function (sum, r) { return sum + r.size; }, 0);
+    visible.forEach(function (r) {
+      var seg = el("div", "seg");
+      seg.style.flexGrow = String(r.size);
+      seg.style.background = "var(" + (COMPONENT_SLOTS[r.name] || "--bar-muted") + ")";
+      bindTooltip(seg, function () {
+        return (COMPONENT_LABELS[r.name] || r.name) + ": " + fmt(r.size) + " (" + pct(r.size, total) + ")";
+      });
+      stackNode.appendChild(seg);
+    });
+    rows.slice().sort(bySizeDesc).forEach(function (r) {
+      var item = el("div", "item");
+      var swatch = el("span", "swatch");
+      swatch.style.background = "var(" + (COMPONENT_SLOTS[r.name] || "--bar-muted") + ")";
+      item.appendChild(swatch);
+      item.appendChild(el("span", "name", COMPONENT_LABELS[r.name] || r.name));
+      item.appendChild(el("span", "val", fmt(r.size)));
+      item.appendChild(el("span", "pct", pct(r.size, total)));
+      legendNode.appendChild(item);
+    });
+  }
+  /* The apk report carries the total alongside the components; only components are stacked. */
+  var componentRows = (reports.apk || []).filter(function (r) { return r.name !== "total" && r.name !== "apk"; });
+  if (componentRows.length) {
+    renderStack(document.getElementById("component-stack"), document.getElementById("component-legend"), componentRows);
+  } else {
+    document.getElementById("components-card").hidden = true;
+  }
+
+  /* ---------- bar list (magnitude, single hue) ---------- */
+  function renderBars(node, entries, options) {
+    node.textContent = "";
+    var max = entries.reduce(function (m, e) { return Math.max(m, e.size); }, 0);
+    entries.forEach(function (entry) {
+      var row = el("div", "row" + (options && options.onSelect ? " clickable" : ""));
+      row.appendChild(el("span", "name", entry.name));
+      var track = el("div", "track");
+      var fill = el("div", "fill" + (entry.name === "NA" ? " na" : ""));
+      fill.style.width = (max > 0 ? Math.max(100 * entry.size / max, 0.5) : 0) + "%";
+      track.appendChild(fill);
+      row.appendChild(track);
+      row.appendChild(el("span", "val", fmt(entry.size)));
+      bindTooltip(row, function () { return entry.name + ": " + fmt(entry.size); });
+      if (options && options.onSelect) {
+        row.appendChild(el("span", "chevron", "\u203a"));
+        row.setAttribute("role", "button");
+        row.setAttribute("tabindex", "0");
+        var select = function () {
+          node.querySelectorAll(".row.selected").forEach(function (r) { r.classList.remove("selected"); });
+          row.classList.add("selected");
+          options.onSelect(entry.name);
+        };
+        row.addEventListener("click", select);
+        row.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            select();
+          }
+        });
+      }
+      node.appendChild(row);
+    });
+  }
+
+  /* ---------- teams ---------- */
+  var teamRows = reports.team || [];
+  var teamTotals = teamRows.filter(function (r) { return r.name === "total" && r.owner; })
+    .map(function (r) { return { name: r.owner, size: r.size }; })
+    .sort(bySizeDesc);
+  if (teamTotals.length) {
+    renderBars(document.getElementById("team-bars"), teamTotals, { onSelect: showTeamDetail });
+  } else {
+    document.getElementById("teams-card").hidden = true;
+  }
+
+  var detail = document.getElementById("team-detail");
+  detail.querySelector(".close").addEventListener("click", function () {
+    detail.hidden = true;
+    document.querySelectorAll("#team-bars .row.selected").forEach(function (r) { r.classList.remove("selected"); });
+  });
+
+  function simpleTable(node, entries, nameHeader, limit) {
+    node.textContent = "";
+    if (!entries.length) {
+      node.appendChild(el("div", "empty", "Nothing to show"));
+      return;
+    }
+    var table = el("table");
+    var head = el("tr");
+    head.appendChild(el("th", null, nameHeader));
+    head.appendChild(el("th", "num", "Size"));
+    table.appendChild(head);
+    entries.slice(0, limit).forEach(function (entry) {
+      var tr = el("tr");
+      tr.appendChild(el("td", null, entry.name));
+      tr.appendChild(el("td", "num", fmt(entry.size)));
+      table.appendChild(tr);
+    });
+    node.appendChild(table);
+    if (entries.length > limit) node.appendChild(el("div", "empty", "+" + (entries.length - limit) + " more, see the full tables below"));
+  }
+
+  function showTeamDetail(team) {
+    var components = teamRows.filter(function (r) { return r.owner === team && r.name !== "total"; });
+    var modules = (reports.module || []).filter(function (r) { return r.owner === team; }).sort(bySizeDesc);
+    var libraries = (reports.library || []).filter(function (r) { return r.owner === team; }).sort(bySizeDesc);
+    var total = teamTotals.filter(function (t) { return t.name === team; })[0];
+    document.getElementById("team-detail-title").textContent = team;
+    document.getElementById("team-detail-sub").textContent =
+      (total ? fmt(total.size) + " total · " : "") + modules.length + " modules · " + libraries.length + " libraries";
+    renderStack(document.getElementById("team-stack"), document.getElementById("team-legend"), components);
+    simpleTable(document.getElementById("team-modules"), modules, "Module", 15);
+    simpleTable(document.getElementById("team-libraries"), libraries, "Library", 15);
+    detail.hidden = false;
+    detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  /* ---------- searchable tables ---------- */
+  function renderSearchTable(config) {
+    var entries = (reports[config.report] || []).slice().sort(bySizeDesc);
+    if (!entries.length) {
+      document.getElementById(config.card).hidden = true;
+      return;
+    }
+    var container = document.getElementById(config.table);
+    var count = document.getElementById(config.count);
+    var input = document.getElementById(config.search);
+    var hasOwner = entries.some(function (e) { return e.owner !== undefined; });
+    var hasTag = entries.some(function (e) { return e.tag !== undefined; });
+    var shown = config.pageSize;
+
+    function render() {
+      var query = input.value.trim().toLowerCase();
+      var filtered = query
+        ? entries.filter(function (e) {
+            return e.name.toLowerCase().indexOf(query) >= 0 ||
+              (e.owner || "").toLowerCase().indexOf(query) >= 0 ||
+              (e.tag || "").toLowerCase().indexOf(query) >= 0;
+          })
+        : entries;
+      count.textContent = query ? filtered.length + " of " + entries.length : String(entries.length);
+      container.textContent = "";
+      var table = el("table");
+      var head = el("tr");
+      head.appendChild(el("th", null, config.nameHeader));
+      head.appendChild(el("th", "num", "Size"));
+      if (hasOwner) head.appendChild(el("th", null, "Owner"));
+      if (hasTag) head.appendChild(el("th", null, "Module"));
+      table.appendChild(head);
+      filtered.slice(0, shown).forEach(function (entry) {
+        var tr = el("tr");
+        tr.appendChild(el("td", null, entry.name));
+        tr.appendChild(el("td", "num", fmt(entry.size)));
+        if (hasOwner) tr.appendChild(el("td", null, entry.owner || "NA"));
+        if (hasTag) tr.appendChild(el("td", null, entry.tag || ""));
+        table.appendChild(tr);
+      });
+      container.appendChild(table);
+      if (filtered.length > shown) {
+        var more = el("button", "show-more", "Show all " + filtered.length);
+        more.type = "button";
+        more.addEventListener("click", function () { shown = filtered.length; render(); });
+        container.appendChild(more);
+      }
+    }
+    input.addEventListener("input", function () { shown = config.pageSize; render(); });
+    render();
+  }
+
+  renderSearchTable({
+    report: "module", card: "modules-card", table: "module-table",
+    count: "module-count", search: "module-search", nameHeader: "Module", pageSize: 25
+  });
+  renderSearchTable({
+    report: "library", card: "libraries-card", table: "library-table",
+    count: "library-count", search: "library-search", nameHeader: "Library", pageSize: 25
+  });
+
+  /* ---------- large files ---------- */
+  if ((reports.large_file || []).length) {
+    renderSearchTable({
+      report: "large_file", card: "large-files-card", table: "large-files-table",
+      count: "large-file-count", search: "large-file-search", nameHeader: "File", pageSize: 25
+    });
+  } else {
+    document.querySelector("#large-files-card .toolbar").hidden = true;
+    document.getElementById("large-files-table")
+      .appendChild(el("div", "empty", "No resources or assets above the configured threshold"));
+  }
+})();
+</script>
+</body>
+</html>

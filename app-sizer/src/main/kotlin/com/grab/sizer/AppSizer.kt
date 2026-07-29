@@ -31,6 +31,8 @@ import com.grab.sizer.di.AnalyzerComponent
 import com.grab.sizer.utils.InputProvider
 import com.grab.sizer.utils.Logger
 import com.grab.sizer.utils.OutputProvider
+import com.grab.sizer.utils.log
+import java.io.File
 
 class AppSizer(
     private val inputProvider: InputProvider,
@@ -67,5 +69,14 @@ class AppSizer(
                 }
             }
         }
+        logReportLocation()
+    }
+
+    private fun logReportLocation() {
+        val reportDirectory = File(
+            outputProvider.provideOutPutDirectory(),
+            outputProvider.provideProjectInfo().deviceName
+        )
+        logger.log("Reports generated at ${reportDirectory.toPath().toUri()}")
     }
 }
