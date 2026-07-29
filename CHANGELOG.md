@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0-alpha03] - 2026-07-29
+
+### Added
+- Self-contained HTML dashboard report: every analysis writes an `index.html` per device next to the markdown and JSON reports, with size tiles, a component breakdown, per-team drill-downs, and searchable module/library/large-file tables. Works offline and from CI artifact browsers, in light and dark themes
+- The analysis logs the report folder location per device on completion
+
+[0.2.0-alpha03]:
+https://github.com/grab/app-sizer/releases/tag/v0.2.0-alpha03
+
+## [0.1.0-alpha06] - 2026-07-29
+Maintenance release for projects on AGP 8.x, cut from the `support/agp-8.x` branch. Same feature set as 0.2.0-alpha03.
+
+### Added
+- Self-contained HTML dashboard report (see 0.2.0-alpha03)
+- The analysis logs the report folder location per device on completion
+
+[0.1.0-alpha06]:
+https://github.com/grab/app-sizer/releases/tag/v0.1.0-alpha06
+
 ## [0.2.0-alpha02] - 2026-07-28
 
 ### Added
