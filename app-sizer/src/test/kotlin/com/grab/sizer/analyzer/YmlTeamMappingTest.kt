@@ -142,6 +142,31 @@ class YmlTeamMappingTest {
     }
 
     @Test
+    fun testLibraryOwnershipVersionlessCoordinate() {
+        val moduleYml = tempFolder.newFile("modules.yml").apply {
+            writeText("Team1:\n  - :module1")
+        }
+        val libraryYml = tempFolder.newFile("libraries.yml").apply {
+            writeText("""
+                Media:
+                  - com.example.media:player
+                Messaging:
+                  - com.example.media:chat-ui
+            """.trimIndent())
+        }
+
+        val teamMapping = YmlTeamMapping(moduleYml, libraryYml)
+
+        // A version-less group:artifact pattern matches any version of that artifact
+        assertEquals("Media", teamMapping.getLibraryOwner("com.example.media:player:1.2.3"))
+        assertEquals("Media", teamMapping.getLibraryOwner("com.example.media:player:2.0.0"))
+        assertEquals("Messaging", teamMapping.getLibraryOwner("com.example.media:chat-ui:0.9.0"))
+        // It must not match a different artifact sharing the name as a prefix, nor siblings
+        assertNull(teamMapping.getLibraryOwner("com.example.media:player-extras:1.0.0"))
+        assertNull(teamMapping.getLibraryOwner("com.example.media:contacts:1.0.0"))
+    }
+
+    @Test
     fun testLibraryOwnershipArtifactWildcard() {
         val moduleYml = tempFolder.newFile("modules.yml").apply {
             writeText("Team1:\n  - :module1")

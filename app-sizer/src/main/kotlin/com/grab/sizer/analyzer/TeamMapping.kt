@@ -118,10 +118,16 @@ class YmlTeamMapping(
 
 
     private fun findBestPatternMatch(coordinate: String, teamMapping: Map<String, List<String>>): String? {
-        // Priority: exact > artifact wildcard > group wildcard
+        // Within a team: exact > version-less coordinate > artifact wildcard > group wildcard.
+        // Teams are checked in file order; the first team with any matching pattern wins.
         for ((team, patterns) in teamMapping) {
             // Check exact match first
             if (coordinate in patterns) return team
+
+            // Check version-less coordinates (com.example:library): any version of exactly that artifact
+            patterns.filter { !it.contains("*") && it.count { c -> c == ':' } == 1 }.forEach { pattern ->
+                if (coordinate.startsWith("$pattern:")) return team
+            }
 
             // Check artifact wildcards (com.example:library:*)
             patterns.filter { it.contains(":*") }.forEach { pattern ->

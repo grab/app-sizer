@@ -143,8 +143,9 @@ Team2:
 Pattern matching is evaluated in this order; the first match wins:
 
 1. **Exact coordinate** — e.g. `androidx.core:core-ktx:1.13.1`
-2. **Group wildcard** using `:*` — e.g. `androidx.core:*` (matches any artifact under `androidx.core`)
-3. **Group wildcard** using `.*` — e.g. `androidx.*` (matches any group beginning with `androidx.`)
+2. **Version-less coordinate** — e.g. `androidx.core:core-ktx` (matches any version of that artifact)
+3. **Group wildcard** using `:*` — e.g. `androidx.core:*` (matches any artifact under `androidx.core`)
+4. **Group wildcard** using `.*` — e.g. `androidx.*` (matches any group beginning with `androidx.`)
 
 Libraries that do not match any pattern are reported as `NA` in team reports (see [Limitations](./limitation.md)).
 
