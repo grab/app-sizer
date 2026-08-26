@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- CLI: declare the `com.android:zipflinger` runtime dependency that `apkanalyzer` uses but does not publish in its POM. Since the tools 32.x upgrade, analysing an APK crashed with `NoClassDefFoundError: com/android/zipflinger/ZipRepo` in `GzipSizeCalculator`
 - Library ownership: version-less `group:artifact` patterns now match any version of the artifact. Previously they matched nothing, silently leaving such libraries unattributed (`NA`), since real coordinates always carry a version
 
 ## [0.2.0-alpha03] - 2026-07-29

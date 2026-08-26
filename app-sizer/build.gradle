@@ -41,6 +41,12 @@ dependencies {
     implementation libs.org.influxdb.client
     implementation libs.org.smali.dexlib2
     implementation libs.android.tools.apkanalyzer
+    /**
+     * apkanalyzer's GzipSizeCalculator uses zipflinger at runtime, but its POM does not declare the
+     * dependency. Without it the CLI jar fails with NoClassDefFoundError: com/android/zipflinger/ZipRepo.
+     * Keep the version aligned with the Android Gradle Plugin that ships the same tools version.
+     */
+    implementation libs.android.tools.zipflinger
     implementation libs.guava
     implementation libs.gson
 
